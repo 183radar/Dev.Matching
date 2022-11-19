@@ -1,0 +1,70 @@
+name: main branch cd
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - closed
+
+env:
+  APP_PATH: ./src/main/resources/application.yaml
+
+jobs:
+  deploy:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 11
+        uses: actions/setup-java@v3
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+
+      - name: application.yaml setting
+        uses: microsoft/variable-substitution@v1
+        with:
+          files: ${{ env.APP_PATH }}
+        env:
+          spring.datasource.url: ${{ secrets.RDS_URL }}
+          spring.datasource.username: admin
+          spring.datasource.password: ${{ secrets.RDS_PASSWORD }}
+          spring.datasource.driver-class-name: com.mysql.cj.jdbc.Driver
+
+      - name: Cache Gradle packages
+        uses: actions/cache@v1
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+          restore-keys: ${{ runner.os }}-gradle
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Clean and Build with Gradle
+        run: ./gradlew clean build -x test
+
+      - name: Docker build & push
+        run: |
+          docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/devmatching ./
+          docker push ${{ secrets.DOCKER_USERNAME }}/devmatching
+
+      - name: Deploy EC2
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST_IP }}
+          username: ubuntu
+          key: ${{ secrets.EC2_KEY }}
+          port: 22
+          script: |
+            docker stop spring
+            docker rm spring
+            docker rmi radar19/devmatching
+            docker pull radar19/devmatching
+#            docker run -d -p 8080:8080 --name spring radar19/devmatching
+

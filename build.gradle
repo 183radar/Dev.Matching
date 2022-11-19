@@ -1,10 +1,10 @@
 plugins {
-	id 'java'
-	id 'org.springframework.boot' version '2.7.5'
-	id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+    id 'java'
+    id 'org.springframework.boot' version '2.7.5'
+    id 'io.spring.dependency-management' version '1.0.15.RELEASE'
 
-	id 'jacoco'
-	id "org.sonarqube" version "3.5.0.2730"
+    id 'jacoco'
+    id "org.sonarqube" version "3.5.0.2730"
 }
 
 group = 'radar'
@@ -12,71 +12,72 @@ version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '11'
 
 configurations {
-	compileOnly {
-		extendsFrom annotationProcessor
-	}
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
 }
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'org.springframework.boot:spring-boot-starter-security'
-	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
-	implementation 'org.springframework.boot:spring-boot-starter-validation'
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity5'
-	compileOnly 'org.projectlombok:lombok'
-	annotationProcessor 'org.projectlombok:lombok'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'org.springframework.security:spring-security-test'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity5'
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
 
-	runtimeOnly 'com.h2database:h2'
+    runtimeOnly 'com.h2database:h2'
+    runtimeOnly 'mysql:mysql-connector-java'
 }
 
 tasks.named('test') {
-	useJUnitPlatform()
-	finalizedBy jacocoTestReport
+    useJUnitPlatform()
+    finalizedBy jacocoTestReport
 }
 
 jacoco {
-	toolVersion = "0.8.8"
+    toolVersion = "0.8.8"
 }
 
 jacocoTestReport {
-	dependsOn test
-	reports {
-		html.enabled true
-		xml.enabled true
-		csv.enabled false
-	}
-	finalizedBy jacocoTestCoverageVerification
+    dependsOn test
+    reports {
+        html.enabled true
+        xml.enabled true
+        csv.enabled false
+    }
+    finalizedBy jacocoTestCoverageVerification
 }
 
 jacocoTestCoverageVerification {
-	violationRules {
-		rule {
-			element = 'CLASS'
+    violationRules {
+        rule {
+            element = 'CLASS'
 
-			limit {
-				counter = 'BRANCH'
-				value = 'COVEREDRATIO'
-				minimum = 0.00
-			}
+            limit {
+                counter = 'BRANCH'
+                value = 'COVEREDRATIO'
+                minimum = 0.00
+            }
 
 //			excludes("*..*")
-		}
-	}
+        }
+    }
 }
 
 sonarqube {
-	properties {
-		property "sonar.projectKey", "radar19_Dev.Matching"
-		property "sonar.organization", "radar19"
-		property "sonar.host.url", "https://sonarcloud.io"
-		// jacoco 코드 커버리지 결과를 sonarqube에 적용
-		property "sonar.coverage.jacoco.xmlReportPaths", "${buildDir}/reports/jacoco/test/jacocoTestReport.xml"
-	}
+    properties {
+        property "sonar.projectKey", "radar19_DevMatching"
+        property "sonar.organization", "radar19"
+        property "sonar.host.url", "https://sonarcloud.io"
+        // jacoco 코드 커버리지 결과를 sonarqube에 적용
+        property "sonar.coverage.jacoco.xmlReportPaths", "${buildDir}/reports/jacoco/test/jacocoTestReport.xml"
+    }
 }
