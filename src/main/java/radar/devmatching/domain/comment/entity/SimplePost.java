@@ -1,4 +1,4 @@
-package radar.devmatching.comment.entity;
+package radar.devmatching.domain.comment.entity;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;

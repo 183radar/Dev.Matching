@@ -1,4 +1,4 @@
-package radar.devmatching.user.controller;
+package radar.devmatching.domain.user.controller;
 
 import org.springframework.stereotype.Controller;
 

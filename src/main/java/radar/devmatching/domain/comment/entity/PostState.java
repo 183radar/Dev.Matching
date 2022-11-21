@@ -1,4 +1,4 @@
-package radar.devmatching.comment.entity;
+package radar.devmatching.domain.comment.entity;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -8,6 +8,6 @@ import lombok.RequiredArgsConstructor;
 public enum PostState {
 	RECRUITING("모집중"),
 	END("완료");
-	
+
 	private final String name;
 }
