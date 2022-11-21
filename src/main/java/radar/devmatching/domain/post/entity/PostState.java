@@ -1,4 +1,4 @@
-package radar.devmatching.domain.comment.entity;
+package radar.devmatching.domain.post.entity;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

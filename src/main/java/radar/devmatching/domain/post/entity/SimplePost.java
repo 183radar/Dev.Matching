@@ -1,4 +1,4 @@
-package radar.devmatching.domain.comment.entity;
+package radar.devmatching.domain.post.entity;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -48,13 +48,12 @@ public class SimplePost extends BaseEntity {
 	private FullPost fullPost;
 
 	@Builder
-	public SimplePost(String title, PostCategory category, Region region, Integer userNum, PostState postState,
-		FullPost fullPost) {
+	public SimplePost(String title, PostCategory category, Region region, Integer userNum, FullPost fullPost) {
 		this.title = title;
 		this.category = category;
 		this.region = region;
 		this.userNum = userNum;
-		this.postState = postState;
+		this.postState = PostState.RECRUITING;
 		this.fullPost = fullPost;
 		fullPost.setSimplePost(this);
 	}

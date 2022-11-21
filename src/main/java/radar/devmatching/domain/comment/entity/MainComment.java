@@ -1,4 +1,4 @@
-package radar.devmatching.domain.post.entity;
+package radar.devmatching.domain.comment.entity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +20,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import radar.devmatching.common.entity.BaseEntity;
-import radar.devmatching.domain.comment.entity.FullPost;
+import radar.devmatching.domain.post.entity.FullPost;
 
 @Table(name = "MAIN_COMMENT")
 @Entity

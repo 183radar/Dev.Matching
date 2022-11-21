@@ -1,4 +1,4 @@
-package radar.devmatching.domain.post.entity;
+package radar.devmatching.domain.comment.entity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
