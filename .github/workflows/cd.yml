@@ -66,5 +66,5 @@ jobs:
             docker rm spring
             docker rmi radar19/devmatching
             docker pull radar19/devmatching
-#            docker run -d -p 8080:8080 --name spring radar19/devmatching
+#            docker run -d -p 80:8080 --name spring radar19/devmatching
 
