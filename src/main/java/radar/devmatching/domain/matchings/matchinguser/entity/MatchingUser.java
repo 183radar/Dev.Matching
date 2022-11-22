@@ -9,6 +9,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -18,6 +19,7 @@ import radar.devmatching.common.entity.BaseEntity;
 import radar.devmatching.domain.matchings.matching.entity.Matching;
 import radar.devmatching.domain.user.entity.User;
 
+@Table(name = "MATCHING_USER")
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -25,7 +27,7 @@ public class MatchingUser extends BaseEntity {
 
 	@Id
 	@GeneratedValue
-	@Column(name = "Matching_User_id")
+	@Column(name = "matching_user_id")
 	private Long id;
 
 	@Enumerated(value = EnumType.STRING)

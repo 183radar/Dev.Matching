@@ -9,6 +9,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import javax.persistence.Table;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -17,6 +18,7 @@ import radar.devmatching.common.entity.BaseEntity;
 import radar.devmatching.domain.matchings.matchinguser.entity.MatchingUser;
 import radar.devmatching.domain.post.entity.SimplePost;
 
+@Table(name = "MATCHING")
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

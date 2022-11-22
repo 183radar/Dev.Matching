@@ -10,6 +10,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.Table;
 
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -19,6 +20,7 @@ import radar.devmatching.common.entity.BaseEntity;
 import radar.devmatching.domain.matchings.apply.entity.Apply;
 import radar.devmatching.domain.matchings.matchinguser.entity.MatchingUser;
 
+@Table(name = "USER")
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -30,7 +32,7 @@ public class User extends BaseEntity {
 	private Long id;
 
 	@Column(name = "email")
-	private String email;
+	private String username;
 
 	@Column(name = "password")
 	private String password;
@@ -60,9 +62,9 @@ public class User extends BaseEntity {
 	private List<Apply> applyList;
 
 	@Builder
-	public User(String email, String password, String nickName, String schoolName, String githubUrl,
+	public User(String username, String password, String nickName, String schoolName, String githubUrl,
 		String introduce) {
-		this.email = email;
+		this.username = username;
 		this.password = password;
 		this.nickName = nickName;
 		this.schoolName = schoolName;
@@ -77,7 +79,7 @@ public class User extends BaseEntity {
 	public String toString() {
 		return "User{" +
 			"id=" + id +
-			", email='" + email + '\'' +
+			", username='" + username + '\'' +
 			", password='" + password + '\'' +
 			", nickName='" + nickName + '\'' +
 			", schoolName='" + schoolName + '\'' +
@@ -87,4 +89,19 @@ public class User extends BaseEntity {
 			'}';
 	}
 
+	public void changeNickName(String nickName) {
+		this.nickName = nickName;
+	}
+
+	public void changeSchoolName(String schoolName) {
+		this.schoolName = schoolName;
+	}
+
+	public void changeGithubUrl(String githubUrl) {
+		this.githubUrl = githubUrl;
+	}
+
+	public void changeIntroduce(String introduce) {
+		this.introduce = introduce;
+	}
 }

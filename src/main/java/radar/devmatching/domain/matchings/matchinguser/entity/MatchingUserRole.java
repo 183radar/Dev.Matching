@@ -9,5 +9,5 @@ public enum MatchingUserRole {
 	LEADER("방장"),
 	USER("유저");
 
-	private final String role;
+	private final String name;
 }

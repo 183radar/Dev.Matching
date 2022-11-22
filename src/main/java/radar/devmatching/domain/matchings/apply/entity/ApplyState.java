@@ -10,5 +10,5 @@ public enum ApplyState {
 	ACCEPTED("승인됨"),
 	WAITING("승인 대기중");
 
-	private final String state;
+	private final String name;
 }

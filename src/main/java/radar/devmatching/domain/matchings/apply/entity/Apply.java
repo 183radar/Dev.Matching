@@ -9,6 +9,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -17,6 +18,7 @@ import radar.devmatching.common.entity.BaseEntity;
 import radar.devmatching.domain.post.entity.SimplePost;
 import radar.devmatching.domain.user.entity.User;
 
+@Table(name = "APPLY")
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Apply extends BaseEntity {
