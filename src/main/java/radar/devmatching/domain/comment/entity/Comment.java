@@ -2,8 +2,11 @@ package radar.devmatching.domain.comment.entity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
@@ -12,6 +15,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import radar.devmatching.common.entity.BaseEntity;
+import radar.devmatching.domain.user.entity.User;
 
 @Table(name = "COMMENT")
 @Entity
@@ -24,8 +28,9 @@ public class Comment extends BaseEntity {
 	@Column(name = "comment_id")
 	private Long id;
 
-	// @ManyToOne(fetch = FetchType.LAZY)
-	// private User user;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "user_id")
+	private User user;
 
 	// 일대일 단방향 관계는 JPA가 지원하지 않기에 양방향 관계로 만듦. 없다고 생각해도 될 듯
 	@OneToOne(mappedBy = "comment")
@@ -36,8 +41,9 @@ public class Comment extends BaseEntity {
 	private String content;
 
 	@Builder
-	public Comment(String content) {
+	public Comment(String content, User user) {
 		this.content = content;
+		this.user = user;
 	}
 
 	public void setMainComment(MainComment mainComment) {

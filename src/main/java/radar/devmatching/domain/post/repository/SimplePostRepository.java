@@ -1,12 +1,16 @@
 package radar.devmatching.domain.post.repository;
 
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import radar.devmatching.domain.post.entity.SimplePost;
 
 public interface SimplePostRepository extends JpaRepository<SimplePost, Long> {
 
-	// 필요할 수도 있을것 같아서 만듦
-	// @Query("select s from SimplePost s left join fetch s.fullPost where s.id = :simplePostId")
-	// Optional<SimplePost> findPost(Long simplePostId);
+	List<SimplePost> findMyPostByUserId(Long userId);
+
+	@Query("select a.applySimplePost from Apply a where a.applyUser.id = :userId")
+	List<SimplePost> findApplicationPosts(Long userId);
 }

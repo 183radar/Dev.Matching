@@ -8,8 +8,11 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
@@ -21,6 +24,7 @@ import lombok.NoArgsConstructor;
 import radar.devmatching.common.entity.BaseEntity;
 import radar.devmatching.domain.matchings.apply.entity.Apply;
 import radar.devmatching.domain.matchings.matching.entity.Matching;
+import radar.devmatching.domain.user.entity.User;
 
 @Table(name = "SIMPLE_POST")
 @Entity
@@ -49,6 +53,10 @@ public class SimplePost extends BaseEntity {
 	@Enumerated(EnumType.STRING)
 	private PostState postState;
 
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "user_id")
+	private User user;
+
 	//SimplePost가 FullPost의 생명주기를 관리한다. (FullPost 삭제 시 Comment들도 전부 자동 삭제됨)
 	@OneToOne(mappedBy = "simplePost", cascade = CascadeType.ALL, orphanRemoval = true)
 	private FullPost fullPost;
@@ -62,18 +70,21 @@ public class SimplePost extends BaseEntity {
 	private List<Apply> applyList;
 
 	@Builder
-	public SimplePost(String title, PostCategory category, Region region, Integer userNum, FullPost fullPost,
-		Matching matching) {
+	public SimplePost(String title, PostCategory category, Region region, Integer userNum, User user,
+		FullPost fullPost) {
 		this.title = title;
 		this.category = category;
 		this.region = region;
 		this.userNum = userNum;
 		this.postState = PostState.RECRUITING;
+		this.user = user;
 		this.fullPost = fullPost;
 		fullPost.setSimplePost(this);
 
-		this.matching = matching;
+		//SimplePost 생성 시 Matching도 만든다. (같은 생명주기)
+		this.matching = Matching.builder().build();
 		matching.setSimplePost(this);
+
 		this.applyList = new ArrayList<>();
 	}
 }

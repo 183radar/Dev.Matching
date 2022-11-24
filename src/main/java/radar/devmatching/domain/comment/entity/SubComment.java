@@ -32,7 +32,7 @@ public class SubComment extends BaseEntity {
 	@JoinColumn(name = "main_comment_id")
 	private MainComment mainComment;
 
-	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
 	private Comment comment;
 
 	@Builder
