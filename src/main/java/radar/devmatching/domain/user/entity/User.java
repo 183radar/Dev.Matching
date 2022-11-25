@@ -20,7 +20,8 @@ import radar.devmatching.common.entity.BaseEntity;
 import radar.devmatching.domain.matchings.apply.entity.Apply;
 import radar.devmatching.domain.matchings.matchinguser.entity.MatchingUser;
 
-@Table(name = "USER")
+// USER로 하니 에러떠서 복수형으로 바꿈(더 좋은 방안 없으려나)
+@Table(name = "USERS")
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<div id="layoutSidenav_nav" th:fragment="side">
+    <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
+        <div class="sb-sidenav-menu">
+            <div class="nav">
+
+                <div class="sb-sidenav-menu-heading">학부 시스템</div>
+
+                <a aria-controls="collapseLayouts" aria-expanded="false" class="nav-link collapsed"
+                   data-bs-target="#lectureSide"
+                   data-bs-toggle="collapse" href="#">
+                    <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>
+                    게시글
+                    <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                </a>
+                <div aria-labelledby="headingOne" class="collapse" data-bs-parent="#sidenavAccordion" id="lectureSide">
+                    <nav class="sb-sidenav-menu-nested nav">
+                        <a class="nav-link" th:href="@{/posts/new}">게시글 생성</a>
+                        <a class="nav-link" th:href="@{/posts/my}">내 게시글</a>
+                        <a class="nav-link" th:href="@{/posts/applicationPosts}">신청한 게시글</a>
+                    </nav>
+                </div>
+
+                <a aria-controls="collapseLayouts" aria-expanded="false" class="nav-link collapsed"
+                   data-bs-target="#gradeSide"
+                   data-bs-toggle="collapse" href="#">
+                    <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>
+                    매칭
+                    <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                </a>
+                <div aria-labelledby="headingOne" class="collapse" data-bs-parent="#sidenavAccordion" id="gradeSide">
+                    <nav class="sb-sidenav-menu-nested nav">
+                        <a class="nav-link" th:href="@{/grade/myGrade}">진행중인 매칭</a>
+                    </nav>
+                </div>
+
+            </div>
+        </div>
+    </nav>
+</div>
+
+</body>
+</html>

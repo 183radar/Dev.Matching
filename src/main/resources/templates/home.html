@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html th:replace="~{layout :: layout(~{::main})}" xmlns:th="http://www.thymeleaf.org">
+
+<body>
+<main>
+    <div class="col-xl-6">
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="fas fa-chart-area me-1"></i>
+                개인 정보
+            </div>
+            <!--                <div class="card-body" th:object="${form}">-->
+            <!--                    <h5 class="card-title" th:text="'안녕하세요 '+ *{memberName} + '님'"></h5>-->
+            <!--                    <div th:text="'학번: ' + *{studentNum}"></div>-->
+            <!--                    <div th:text="'대학: ' + *{collegeName}"></div>-->
+            <!--                </div>-->
+        </div>
+    </div>
+    <div class="col-xl-6">
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="fas fa-chart-bar me-1"></i>
+                공지 사항
+            </div>
+            <div class="card-body">
+                <canvas height="200" width="50"></canvas>
+            </div>
+        </div>
+    </div>
+</main>
+</body>
+
+</html>
