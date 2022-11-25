@@ -13,4 +13,6 @@ public interface PostService {
 	List<SimplePost> getMyPosts(long userId);
 
 	List<SimplePost> findApplicationPost(long userId);
+
+	SimplePost getPost(long simplePostId);
 }

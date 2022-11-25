@@ -21,6 +21,11 @@ public class PostServiceImpl implements PostService {
 	private final FullPostRepository fullPostRepository;
 
 	@Override
+	public SimplePost getPost(long simplePostId) {
+		return simplePostRepository.findById(simplePostId).orElseThrow(() -> new RuntimeException());
+	}
+
+	@Override
 	@Transactional
 	public SimplePost createPost(CreatePostDto createPostDto, User user) {
 		return simplePostRepository.save(createPostDto.toEntity(user));

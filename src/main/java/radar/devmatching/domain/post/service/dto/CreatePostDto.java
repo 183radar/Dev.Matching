@@ -22,8 +22,8 @@ public class CreatePostDto {
 
 	private String content;
 
-	@Builder
-	public CreatePostDto(String title, PostCategory category, Region region, String content) {
+	@Builder(access = AccessLevel.PRIVATE)
+	private CreatePostDto(String title, PostCategory category, Region region, String content) {
 		this.title = title;
 		this.category = category;
 		this.region = region;
