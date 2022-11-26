@@ -63,8 +63,9 @@ public class User extends BaseEntity {
 	private List<Apply> applyList;
 
 	@Builder
-	public User(String username, String password, String nickName, String schoolName, String githubUrl,
+	public User(Long id, String username, String password, String nickName, String schoolName, String githubUrl,
 		String introduce) {
+		this.id = id;
 		this.username = username;
 		this.password = password;
 		this.nickName = nickName;
