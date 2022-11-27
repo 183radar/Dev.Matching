@@ -49,4 +49,12 @@ public class Apply extends BaseEntity {
 		this.applySimplePost = applySimplePost;
 		applySimplePost.getApplyList().add(this);
 	}
+
+	public void acceptApply() {
+		this.applyState = ApplyState.ACCEPTED;
+	}
+
+	public void denyApply() {
+		this.applyState = ApplyState.DENIED;
+	}
 }
