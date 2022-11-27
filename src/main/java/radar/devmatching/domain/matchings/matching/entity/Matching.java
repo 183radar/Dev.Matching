@@ -4,7 +4,6 @@ import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
@@ -30,7 +29,7 @@ public class Matching extends BaseEntity {
 	@Column(name = "matching_id")
 	private Long id;
 
-	@OneToOne(fetch = FetchType.LAZY)
+	@OneToOne(mappedBy = "matching")
 	private SimplePost simplePost;
 
 	// Matching 삭제시 MatchingUser 삭제

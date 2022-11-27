@@ -5,7 +5,6 @@ import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
@@ -32,7 +31,7 @@ public class FullPost extends BaseEntity {
 
 	private String content;
 
-	@OneToOne(fetch = FetchType.LAZY)
+	@OneToOne(mappedBy = "fullPost")
 	private SimplePost simplePost;
 
 	@OneToMany(mappedBy = "fullPost", orphanRemoval = true)
