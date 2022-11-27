@@ -24,8 +24,8 @@ public class MainCommentRepositoryImpl implements MainCommentCustomRepository {
 	public List<MainComment> getAllComments(long fullPostId) {
 		return queryFactory
 			.selectFrom(mainComment)
-			.leftJoin(comment).fetchJoin()
-			.leftJoin(subComment).fetchJoin()
+			.leftJoin(mainComment.comment, comment).fetchJoin()
+			.leftJoin(mainComment.subComments, subComment).fetchJoin()
 			.where(mainComment.fullPost.id.eq(fullPostId))
 			.fetch();
 	}

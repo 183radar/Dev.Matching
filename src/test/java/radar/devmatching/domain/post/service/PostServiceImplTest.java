@@ -20,6 +20,7 @@ import radar.devmatching.domain.post.entity.SimplePost;
 import radar.devmatching.domain.post.repository.FullPostRepository;
 import radar.devmatching.domain.post.repository.SimplePostRepository;
 import radar.devmatching.domain.post.service.dto.CreatePostDto;
+import radar.devmatching.domain.post.service.dto.PresentSimplePostDto;
 import radar.devmatching.domain.user.entity.User;
 import radar.devmatching.domain.user.repository.UserRepository;
 
@@ -52,7 +53,7 @@ class PostServiceImplTest {
 			.category(PostCategory.PROJECT)
 			.region(Region.BUSAN)
 			.userNum(1)
-			.user(loginUser)
+			.writer(loginUser)
 			.fullPost(FullPost.builder().content("내용").build())
 			.build();
 	}
@@ -67,17 +68,31 @@ class PostServiceImplTest {
 	}
 
 	@Test
-	@DisplayName("getMyPost메서드는 내 유저 아이디가 인자로 들어오면 내가 게시한 게시글들을 반환한다")
-	void getMyPostTest() throws Exception {
+	@DisplayName("getMyPosts메서드는 내 유저 아이디가 인자로 들어오면 내가 게시한 SimplePost들을 반환한다")
+	void getMyPostsTest() throws Exception {
 		//given
-		SimplePost simplePost = createSimplePost();
-		given(simplePostRepository.findMyPostByUserId(any())).willReturn(List.of(simplePost));
+		SimplePost myPost = createSimplePost();
+		given(simplePostRepository.findMyPostsByWriterId(1L)).willReturn(List.of(myPost));
 
 		//when
-		List<SimplePost> myPost = postService.getMyPosts(1L);
+		List<PresentSimplePostDto> findPosts = postService.getMyPosts(1L);
 
 		//then
-		assertThat(simplePost).isEqualTo(myPost.get(0));
+		assertThat(PresentSimplePostDto.of(myPost)).usingRecursiveComparison().isEqualTo(findPosts.get(0));
+	}
+
+	@Test
+	@DisplayName("getApplicationPosts 메서드는 내 유저 아이디가 인자로 들어오면 내가 신청한 SimplePost들을 반환한다.")
+	void getApplicationPostsTest() throws Exception {
+		//given
+		SimplePost appliedPost = createSimplePost();
+		given(simplePostRepository.findApplicationPosts(1L)).willReturn(List.of(appliedPost));
+
+		//when
+		List<PresentSimplePostDto> findPosts = postService.getApplicationPosts(1L);
+
+		//then
+		assertThat(PresentSimplePostDto.of(appliedPost)).usingRecursiveComparison().isEqualTo(findPosts.get(0));
 	}
 
 	@Nested
@@ -95,6 +110,7 @@ class PostServiceImplTest {
 				CreatePostDto createPostDto = createPostDto();
 				SimplePost simplePost = createSimplePost();
 
+				//simplePostRepository.save시 FullPost와 Matching 엔티티도 만들어져 저장된다.
 				given(simplePostRepository.save(any(SimplePost.class))).willReturn(simplePost);
 
 				//when

@@ -46,4 +46,8 @@ public class FullPost extends BaseEntity {
 	public void setSimplePost(SimplePost simplePost) {
 		this.simplePost = simplePost;
 	}
+
+	public void updateContent(String content) {
+		this.content = content;
+	}
 }

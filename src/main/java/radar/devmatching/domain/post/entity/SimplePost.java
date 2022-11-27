@@ -87,4 +87,12 @@ public class SimplePost extends BaseEntity {
 
 		this.applyList = new ArrayList<>();
 	}
+
+	public void update(String title, PostCategory category, Region region, Integer userNum, String content) {
+		this.title = title;
+		this.category = category;
+		this.region = region;
+		this.userNum = userNum;
+		this.fullPost.updateContent(content);
+	}
 }
