@@ -17,6 +17,6 @@ public interface ApplyService {
 
 	List<ApplyResponse> getAllApplyList(User authUser, Long userId);
 
-	int getAcceptedApplyCount(Long simplePostId)
+	int getAcceptedApplyCount(Long simplePostId);
 
 }
