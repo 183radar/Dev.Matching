@@ -2,6 +2,11 @@ package radar.devmatching.domain.comment.repository;
 
 import static org.assertj.core.api.Assertions.*;
 
+import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceUnitUtil;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -12,18 +17,24 @@ import radar.devmatching.domain.comment.entity.Comment;
 import radar.devmatching.domain.comment.entity.MainComment;
 import radar.devmatching.domain.comment.entity.SubComment;
 import radar.devmatching.domain.post.entity.FullPost;
+import radar.devmatching.domain.post.repository.FullPostRepository;
 import radar.devmatching.domain.user.entity.User;
+import radar.devmatching.domain.user.repository.UserRepository;
 
 @DataJpaTest
 @DisplayName("MainCommentRepository의")
 class MainCommentRepositoryTest {
 
 	@Autowired
+	EntityManager em;
+	@Autowired
+	UserRepository userRepository;
+	@Autowired
+	FullPostRepository fullPostRepository;
+	@Autowired
 	MainCommentRepository mainCommentRepository;
-
 	@Autowired
 	CommentRepository commentRepository;
-
 	@Autowired
 	SubCommentRepository subCommentRepository;
 
@@ -40,7 +51,7 @@ class MainCommentRepositoryTest {
 
 	private Comment createComment() {
 		return Comment.builder().
-			user(createUser())
+			user(userRepository.save(createUser()))
 			.content("내용")
 			.build();
 	}
@@ -124,6 +135,44 @@ class MainCommentRepositoryTest {
 				//then
 				assertThat(subCommentRepository.findById(subComment1.getId()).isEmpty()).isTrue();
 				assertThat(subCommentRepository.findById(subComment2.getId()).isEmpty()).isTrue();
+			}
+		}
+	}
+
+	@Nested
+	@DisplayName("getAllComments 메서드는")
+	class getAllCommentsMethodIs {
+
+		@Nested
+		@DisplayName("정상 흐름이면")
+		class successCondition {
+
+			@Test
+			@DisplayName("Comment, SubComment가 패치조인된 MainComment들을 반환한다.")
+			void returnAllComments() throws Exception {
+				//given
+				FullPost fullPost = FullPost.builder().content("내용").build();
+				fullPostRepository.save(fullPost);
+				MainComment mainComment = MainComment.builder()
+					.fullPost(fullPost)
+					.comment(createComment())
+					.build();
+				mainCommentRepository.save(mainComment);
+				subCommentRepository.save(SubComment.builder()
+					.mainComment(mainComment)
+					.comment(createComment())
+					.build());
+				// 초기화를 안 하면 영속성 컨택스트의 1차 캐시에서 데이터를 가져오기에 초기화함
+				em.flush();
+				em.clear();
+
+				//when
+				List<MainComment> allComments = mainCommentRepository.getAllComments(fullPost.getId());
+
+				//then
+				PersistenceUnitUtil persistenceUnitUtil = em.getEntityManagerFactory().getPersistenceUnitUtil();
+				assertThat(persistenceUnitUtil.isLoaded(allComments.get(0).getComment())).isTrue();
+				assertThat(persistenceUnitUtil.isLoaded(allComments.get(0).getSubComments().get(0))).isTrue();
 			}
 		}
 	}

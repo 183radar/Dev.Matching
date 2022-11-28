@@ -1,28 +1,31 @@
 package radar.devmatching.domain.comment.service.dto;
 
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import radar.devmatching.domain.comment.entity.Comment;
-import radar.devmatching.domain.comment.entity.MainComment;
-import radar.devmatching.domain.post.entity.SimplePost;
+import radar.devmatching.domain.user.service.dto.SimpleUserDto;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class CommentDto {
 
+	private SimpleUserDto simpleUserDto;
+
 	private String content;
 
-	public static CommentDto of() {
-		return new CommentDto();
+	@Builder(access = AccessLevel.PRIVATE)
+	private CommentDto(SimpleUserDto simpleUserDto, String content) {
+		this.simpleUserDto = simpleUserDto;
+		this.content = content;
 	}
 
-	public MainComment toMainCommentEntity(SimplePost simplePost) {
-		return MainComment.builder()
-			.fullPost(
-				simplePost.getFullPost()
-			).comment(
-				Comment.builder().content(this.content).build()
-			).build();
+	public static CommentDto of(Comment comment) {
+		return CommentDto.builder()
+			.simpleUserDto(SimpleUserDto.of(comment.getUser()))
+			.content(comment.getContent())
+			.build();
 	}
+
 }

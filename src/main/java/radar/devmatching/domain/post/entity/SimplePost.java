@@ -55,14 +55,14 @@ public class SimplePost extends BaseEntity {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id")
-	private User user;
+	private User writer;
 
 	//SimplePost가 FullPost의 생명주기를 관리한다. (FullPost 삭제 시 Comment들도 전부 자동 삭제됨)
-	@OneToOne(mappedBy = "simplePost", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
 	private FullPost fullPost;
 
 	//SimplePost가 Matching의 생명주기를 관리한다. (Matching 삭제 시 MatchingUser들도 전부 삭제됨)
-	@OneToOne(mappedBy = "simplePost", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
 	private Matching matching;
 
 	// simplePost가 Apply의 생명주기를 관리한다.
@@ -70,14 +70,14 @@ public class SimplePost extends BaseEntity {
 	private List<Apply> applyList;
 
 	@Builder
-	public SimplePost(String title, PostCategory category, Region region, Integer userNum, User user,
+	public SimplePost(String title, PostCategory category, Region region, Integer userNum, User writer,
 		FullPost fullPost) {
 		this.title = title;
 		this.category = category;
 		this.region = region;
 		this.userNum = userNum;
 		this.postState = PostState.RECRUITING;
-		this.user = user;
+		this.writer = writer;
 		this.fullPost = fullPost;
 		fullPost.setSimplePost(this);
 
@@ -86,5 +86,13 @@ public class SimplePost extends BaseEntity {
 		matching.setSimplePost(this);
 
 		this.applyList = new ArrayList<>();
+	}
+
+	public void update(String title, PostCategory category, Region region, Integer userNum, String content) {
+		this.title = title;
+		this.category = category;
+		this.region = region;
+		this.userNum = userNum;
+		this.fullPost.updateContent(content);
 	}
 }

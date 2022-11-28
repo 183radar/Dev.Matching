@@ -1,3 +1,8 @@
+buildscript {
+    ext {
+        queryDslVersion = "5.0.0"
+    }
+}
 plugins {
     id 'java'
     id 'org.springframework.boot' version '2.7.5'
@@ -5,6 +10,8 @@ plugins {
 
     id 'jacoco'
     id "org.sonarqube" version "3.5.0.2730"
+    // querydsl plugins
+    id "com.ewerk.gradle.plugins.querydsl" version "1.0.10"
 }
 
 group = 'radar'
@@ -28,6 +35,12 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity5'
+    implementation 'com.h2database:h2'
+
+    //QueryDSL 추가
+    implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
+    implementation "com.querydsl:querydsl-apt:${queryDslVersion}"
+
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
@@ -35,6 +48,25 @@ dependencies {
 
     runtimeOnly 'com.h2database:h2'
     runtimeOnly 'mysql:mysql-connector-java'
+}
+
+// QueryDSL 추가
+def querydslDir = "$buildDir/generated/querydsl"
+querydsl {
+    jpa = true
+    querydslSourcesDir = querydslDir
+}
+sourceSets {
+    main.java.srcDir querydslDir
+}
+compileQuerydsl {
+    options.annotationProcessorPath = configurations.querydsl
+}
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+    querydsl.extendsFrom compileClasspath
 }
 
 tasks.named('test') {
@@ -53,10 +85,29 @@ jacocoTestReport {
         xml.enabled true
         csv.enabled false
     }
+    def Qdomains = []
+    for (qPattern in "**/QA".."**/QZ") {
+        Qdomains.add(qPattern + "*")
+    }
+
+    afterEvaluate {
+
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it,
+                    exclude: [] + Qdomains)
+        }))
+    }
+
     finalizedBy jacocoTestCoverageVerification
 }
 
 jacocoTestCoverageVerification {
+
+    def Qdomains = []
+    for (qPattern in "*.QA".."*.QZ") {
+        Qdomains.add(qPattern + "*")
+    }
+
     violationRules {
         rule {
             element = 'CLASS'
@@ -67,7 +118,7 @@ jacocoTestCoverageVerification {
                 minimum = 0.00
             }
 
-//			excludes("*..*")
+            excludes = [] + Qdomains
         }
     }
 }

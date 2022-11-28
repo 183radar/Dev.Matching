@@ -32,13 +32,13 @@ public class SimplePostController {
 
 	@GetMapping("/my")
 	public String getMyPosts() {
-		// List<SimplePost> myPosts = postService.getMyPost(loginUser.getId());
+		// List<PresentSimplePostDto> myPosts = postService.getMyPosts(loginUser.getId());
 		return "post/myPosts";
 	}
 
 	@GetMapping("/applicationPosts")
 	public String getApplicationPosts() {
-		// postService.getApplicationPosts(user);
+		// List<PresentSimplePostDto> applicationPosts = postService.getApplicationPosts(user);
 		return "post/applicationPosts";
 	}
 

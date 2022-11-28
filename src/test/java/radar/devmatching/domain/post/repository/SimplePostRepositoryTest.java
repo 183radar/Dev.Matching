@@ -5,6 +5,8 @@ import static org.assertj.core.api.Assertions.*;
 import java.util.List;
 import java.util.Optional;
 
+import javax.persistence.EntityManager;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -26,6 +28,8 @@ import radar.devmatching.domain.user.repository.UserRepository;
 @DisplayName("SimplePostRepository의")
 class SimplePostRepositoryTest {
 
+	@Autowired
+	EntityManager em;
 	@Autowired
 	SimplePostRepository simplePostRepository;
 	@Autowired
@@ -54,13 +58,13 @@ class SimplePostRepositoryTest {
 			.category(PostCategory.PROJECT)
 			.region(Region.BUSAN)
 			.userNum(1)
-			.user(user)
+			.writer(user)
 			.fullPost(fullPost)
 			.build();
 	}
 
 	@Test
-	@DisplayName("findMyPostByUserId메서드는 유저Id를 받으면 유저가 생성한 게시글들을 반환한다.")
+	@DisplayName("findMyPostByWriterId메서드는 유저Id를 받으면 유저가 생성한 게시글들을 반환한다.")
 	void findMyPostByUserIdTest() throws Exception {
 		//given
 		User user = createUser();
@@ -69,7 +73,7 @@ class SimplePostRepositoryTest {
 		simplePostRepository.save(createSimplePost(user, FullPost.builder().content("내용2").build()));
 
 		//when
-		List<SimplePost> simplePosts = simplePostRepository.findMyPostByUserId(user.getId());
+		List<SimplePost> simplePosts = simplePostRepository.findMyPostsByWriterId(user.getId());
 
 		//then
 		assertThat(simplePosts.size()).isEqualTo(2);
@@ -102,6 +106,25 @@ class SimplePostRepositoryTest {
 
 	}
 
+	@Test
+	@DisplayName("findPostById메서드는 userId를 받으면 SimplePost에 FullPost까지 패치하여 가져온다.")
+	void findPostByIdTest() throws Exception {
+		//given
+		FullPost fullPost = FullPost.builder().content("내용").build();
+		SimplePost simplePost = createSimplePost(null, fullPost);
+		simplePostRepository.save(simplePost);
+		em.flush();
+		em.clear();
+
+		//when
+		Optional<SimplePost> findPost = simplePostRepository.findPostById(simplePost.getId());
+
+		//then
+		assertThat(em.getEntityManagerFactory().getPersistenceUnitUtil().isLoaded(
+			findPost.get().getFullPost()
+		)).isTrue();
+	}
+
 	@Nested
 	@DisplayName("save 메서드는")
 	class SaveMethodIs {
@@ -111,7 +134,7 @@ class SimplePostRepositoryTest {
 		class SaveSimplePost {
 
 			@Test
-			@DisplayName("FullPost 엔티티까지 저장다.")
+			@DisplayName("FullPost 엔티티까지 저장한다.")
 			void saveFullPostTogether() throws Exception {
 				//given
 				SimplePost simplePost = createUserAndSimplePost();
@@ -125,7 +148,7 @@ class SimplePostRepositoryTest {
 			}
 
 			@Test
-			@DisplayName("Matcing 엔티티까지 저장한다.")
+			@DisplayName("Matching 엔티티까지 저장한다.")
 			void saveMatchingTogether() throws Exception {
 				//given
 				SimplePost simplePost = createUserAndSimplePost();

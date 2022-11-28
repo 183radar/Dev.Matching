@@ -1,14 +1,20 @@
 package radar.devmatching.domain.comment.service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
+import radar.devmatching.domain.comment.entity.MainComment;
 import radar.devmatching.domain.comment.repository.MainCommentRepository;
 import radar.devmatching.domain.comment.repository.SubCommentRepository;
-import radar.devmatching.domain.comment.service.dto.CommentDto;
+import radar.devmatching.domain.comment.service.dto.CreateCommentDto;
+import radar.devmatching.domain.comment.service.dto.MainCommentDto;
 import radar.devmatching.domain.post.entity.SimplePost;
 import radar.devmatching.domain.post.repository.SimplePostRepository;
+import radar.devmatching.domain.user.entity.User;
 
 @Service
 @Transactional(readOnly = true)
@@ -21,9 +27,17 @@ public class CommentServiceImpl implements CommentService {
 
 	@Override
 	@Transactional
-	public void createMainComment(long simplePostId, CommentDto commentDto) {
+	public void createMainComment(long simplePostId, User user, CreateCommentDto createCommentDto) {
 		SimplePost simplePost = simplePostRepository.findById(simplePostId).orElseThrow(() -> new RuntimeException());
-		mainCommentRepository.save(commentDto.toMainCommentEntity(simplePost));
+		mainCommentRepository.save(createCommentDto.toMainCommentEntity(simplePost, user));
+	}
+
+	@Override
+	public List<MainCommentDto> getAllComments(long fullPostId) {
+		List<MainComment> allComments = mainCommentRepository.getAllComments(fullPostId);
+		return allComments.stream()
+			.map(MainCommentDto::of)
+			.collect(Collectors.toList());
 	}
 
 }
