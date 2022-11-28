@@ -49,7 +49,7 @@ public class PostServiceImpl implements PostService {
 
 	@Override
 	public List<PresentSimplePostDto> getMyPosts(long userId) {
-		List<SimplePost> myPosts = simplePostRepository.findMyPostsByWriterId(userId);
+		List<SimplePost> myPosts = simplePostRepository.findMyPostsByLeaderId(userId);
 		return myPosts.stream().map(PresentSimplePostDto::of).collect(Collectors.toList());
 	}
 

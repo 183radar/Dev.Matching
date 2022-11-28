@@ -11,7 +11,7 @@ import radar.devmatching.domain.post.entity.SimplePost;
 
 public interface SimplePostRepository extends JpaRepository<SimplePost, Long> {
 
-	List<SimplePost> findMyPostsByWriterId(long userId);
+	List<SimplePost> findMyPostsByLeaderId(long userId);
 
 	@Query("select a.applySimplePost from Apply a where a.applyUser.id = :userId")
 	List<SimplePost> findApplicationPosts(long userId);
