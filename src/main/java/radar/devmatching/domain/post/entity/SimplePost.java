@@ -55,7 +55,7 @@ public class SimplePost extends BaseEntity {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id")
-	private User writer;
+	private User leader;
 
 	//SimplePost가 FullPost의 생명주기를 관리한다. (FullPost 삭제 시 Comment들도 전부 자동 삭제됨)
 	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
@@ -70,15 +70,15 @@ public class SimplePost extends BaseEntity {
 	private List<Apply> applyList;
 
 	@Builder
-	public SimplePost(String title, PostCategory category, Region region, Integer userNum, User writer,
+	public SimplePost(String title, PostCategory category, Region region, Integer userNum, User leader,
 		FullPost fullPost) {
 		this.title = title;
 		this.category = category;
 		this.region = region;
 		this.userNum = userNum;
 		this.postState = PostState.RECRUITING;
-		this.writer = writer;
-		writer.getSimplePosts().add(this);
+		this.leader = leader;
+		leader.getSimplePosts().add(this);
 		this.fullPost = fullPost;
 		fullPost.setSimplePost(this);
 

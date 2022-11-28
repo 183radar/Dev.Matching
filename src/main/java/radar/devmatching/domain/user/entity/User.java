@@ -64,7 +64,7 @@ public class User extends BaseEntity {
 	private List<Apply> applyList;
 
 	// User 삭제 시 SimplePost도 삭제
-	@OneToMany(mappedBy = "writer", orphanRemoval = true)
+	@OneToMany(mappedBy = "leader", orphanRemoval = true)
 	private List<SimplePost> simplePosts;
 
 	@Builder

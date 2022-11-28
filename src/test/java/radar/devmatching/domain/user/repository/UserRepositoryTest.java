@@ -52,7 +52,7 @@ public class UserRepositoryTest {
 			.category(PostCategory.PROJECT)
 			.region(Region.BUSAN)
 			.userNum(1)
-			.user(user)
+			.leader(user)
 			.fullPost(fullPost)
 			.build();
 	}

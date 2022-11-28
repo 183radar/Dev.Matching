@@ -40,7 +40,7 @@ public class CreatePostDto {
 			.category(this.category)
 			.region(this.region)
 			.userNum(1)
-			.writer(user)
+			.leader(user)
 			.fullPost(
 				FullPost.builder().
 					content(this.content)

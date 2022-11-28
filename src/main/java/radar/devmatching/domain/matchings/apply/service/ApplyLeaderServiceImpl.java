@@ -80,7 +80,7 @@ public class ApplyLeaderServiceImpl implements ApplyLeaderService {
 		SimplePost simplePost = simplePostRepository.findById(simplePostId)
 			.orElseThrow(() -> new RuntimeException("not exist simplePost entity"));
 
-		User leader = simplePost.getWriter();
+		User leader = simplePost.getLeader();
 		if (!Objects.equals(leader.getId(), authUser.getId())) {
 			throw new RuntimeException("Invalid Access");
 		}
