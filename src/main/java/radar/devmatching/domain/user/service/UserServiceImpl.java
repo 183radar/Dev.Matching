@@ -102,7 +102,7 @@ public class UserServiceImpl implements UserService {
 	 */
 	private void validatePermission(Long requestUserId, User authUser) {
 		if (!Objects.equals(requestUserId, authUser.getId())) {
-			throw new RuntimeException("request userId is inaccessible Id");
+			throw new RuntimeException("Invalid Access");
 		}
 	}
 

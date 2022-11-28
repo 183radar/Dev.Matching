@@ -78,6 +78,7 @@ public class SimplePost extends BaseEntity {
 		this.userNum = userNum;
 		this.postState = PostState.RECRUITING;
 		this.user = user;
+		user.getSimplePosts().add(this);
 		this.fullPost = fullPost;
 		fullPost.setSimplePost(this);
 
