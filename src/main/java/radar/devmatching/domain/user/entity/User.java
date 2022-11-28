@@ -19,8 +19,8 @@ import lombok.NoArgsConstructor;
 import radar.devmatching.common.entity.BaseEntity;
 import radar.devmatching.domain.matchings.apply.entity.Apply;
 import radar.devmatching.domain.matchings.matchinguser.entity.MatchingUser;
-import radar.devmatching.domain.post.entity.SimplePost;
 
+// USER로 하니 에러떠서 복수형으로 바꿈(더 좋은 방안 없으려나)
 @Table(name = "USERS")
 @Entity
 @Getter
@@ -54,9 +54,6 @@ public class User extends BaseEntity {
 	@Enumerated(value = EnumType.STRING)
 	private UserRole userRole;
 
-	@OneToMany(mappedBy = "user", orphanRemoval = true)
-	private List<SimplePost> simplePosts;
-
 	// User 삭제 시 MatchingUser 도 삭제
 	@OneToMany(mappedBy = "user", orphanRemoval = true)
 	private List<MatchingUser> matchingUsers;
@@ -65,7 +62,11 @@ public class User extends BaseEntity {
 	@OneToMany(mappedBy = "applyUser", orphanRemoval = true)
 	private List<Apply> applyList;
 
-	@Builder(builderClassName = "UsersBuilder")
+	// User 삭제 시 SimplePost도 삭제
+	@OneToMany(mappedBy = "writer", orphanRemoval = true)
+	private List<SimplePost> simplePosts;
+
+	@Builder
 	public User(String username, String password, String nickName, String schoolName, String githubUrl,
 		String introduce) {
 		this.username = username;
@@ -75,9 +76,9 @@ public class User extends BaseEntity {
 		this.githubUrl = githubUrl;
 		this.introduce = introduce;
 		this.userRole = UserRole.ROLE_USER;
-		this.simplePosts = new ArrayList<>();
 		this.matchingUsers = new ArrayList<>();
 		this.applyList = new ArrayList<>();
+		this.simplePosts = new ArrayList<>();
 	}
 
 	@Override

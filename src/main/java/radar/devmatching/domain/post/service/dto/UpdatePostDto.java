@@ -4,15 +4,13 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import radar.devmatching.domain.post.entity.FullPost;
 import radar.devmatching.domain.post.entity.PostCategory;
 import radar.devmatching.domain.post.entity.Region;
 import radar.devmatching.domain.post.entity.SimplePost;
-import radar.devmatching.domain.user.entity.User;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class CreatePostDto {
+public class UpdatePostDto {
 
 	private String title;
 
@@ -20,31 +18,27 @@ public class CreatePostDto {
 
 	private Region region;
 
+	private Integer userNum;
+
 	private String content;
 
 	@Builder
-	private CreatePostDto(String title, PostCategory category, Region region, String content) {
+	private UpdatePostDto(String title, PostCategory category, Region region, Integer userNum, String content) {
 		this.title = title;
 		this.category = category;
 		this.region = region;
+		this.userNum = userNum;
 		this.content = content;
 	}
 
-	public static CreatePostDto of() {
-		return new CreatePostDto();
+	public static UpdatePostDto of(SimplePost simplePost) {
+		return UpdatePostDto.builder()
+			.title(simplePost.getTitle())
+			.category(simplePost.getCategory())
+			.region(simplePost.getRegion())
+			.userNum(simplePost.getUserNum())
+			.content(simplePost.getFullPost().getContent())
+			.build();
 	}
 
-	public SimplePost toEntity(User user) {
-		return SimplePost.builder()
-			.title(this.title)
-			.category(this.category)
-			.region(this.region)
-			.userNum(1)
-			.writer(user)
-			.fullPost(
-				FullPost.builder().
-					content(this.content)
-					.build()
-			).build();
-	}
 }
