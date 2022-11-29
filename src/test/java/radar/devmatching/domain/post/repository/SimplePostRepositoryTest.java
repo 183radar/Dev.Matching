@@ -58,14 +58,15 @@ class SimplePostRepositoryTest {
 			.category(PostCategory.PROJECT)
 			.region(Region.BUSAN)
 			.userNum(1)
-			.writer(user)
+			.leader(user)
+			.matching(Matching.builder().build())
 			.fullPost(fullPost)
 			.build();
 	}
 
 	@Test
-	@DisplayName("findMyPostByWriterId메서드는 유저Id를 받으면 유저가 생성한 게시글들을 반환한다.")
-	void findMyPostByUserIdTest() throws Exception {
+	@DisplayName("findMyPostByLeaderId메서드는 유저Id를 받으면 유저가 생성한 게시글들을 반환한다.")
+	void findMyPostByLeaderIdTest() throws Exception {
 		//given
 		User user = createUser();
 		userRepository.save(user);
@@ -73,7 +74,7 @@ class SimplePostRepositoryTest {
 		simplePostRepository.save(createSimplePost(user, FullPost.builder().content("내용2").build()));
 
 		//when
-		List<SimplePost> simplePosts = simplePostRepository.findMyPostsByWriterId(user.getId());
+		List<SimplePost> simplePosts = simplePostRepository.findMyPostsByLeaderId(user.getId());
 
 		//then
 		assertThat(simplePosts.size()).isEqualTo(2);
@@ -111,7 +112,8 @@ class SimplePostRepositoryTest {
 	void findPostByIdTest() throws Exception {
 		//given
 		FullPost fullPost = FullPost.builder().content("내용").build();
-		SimplePost simplePost = createSimplePost(null, fullPost);
+		User leader = userRepository.save(createUser());
+		SimplePost simplePost = createSimplePost(leader, fullPost);
 		simplePostRepository.save(simplePost);
 		em.flush();
 		em.clear();
