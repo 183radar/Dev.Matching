@@ -29,14 +29,9 @@ public class MatchingUserLeaderServiceImpl implements MatchingUserLeaderService 
 	}
 
 	@Transactional
-	public void createMatchingUserLeader(Long userId, Long matchingId) {
-		// 엔티티를 이렇게 생성하는 방법도 있더라고 잘 작동하면 이렇게 만들까 고민중
-		// User user = matchingUserConverter.toUser(userId);
-		// Matching matching = matchingUserConverter.toMatching(matchingId);
-		User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException());
-		Matching matching = matchingRepository.findById(matchingId).orElseThrow(() -> new RuntimeException());
-
-		MatchingUser matchingUser = new MatchingUser(MatchingUserRole.LEADER, user, matching);
+	public void createMatchingUserLeader(User leader, Matching matching) {
+		// 검증이 들어갔다는걸 전재로함
+		MatchingUser matchingUser = new MatchingUser(MatchingUserRole.LEADER, leader, matching);
 
 		matchingUserRepository.save(matchingUser);
 	}

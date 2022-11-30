@@ -38,8 +38,9 @@ public class Matching extends BaseEntity {
 	private List<MatchingUser> matchingUsers;
 
 	@Builder
-	public Matching(Long id) {
+	public Matching(Long id, SimplePost simplePost) {
 		this.id = id;
+		this.simplePost = simplePost;
 		matchingUsers = new ArrayList<>();
 	}
 
