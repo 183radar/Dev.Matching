@@ -8,7 +8,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import radar.devmatching.common.exception.InvalidAccessException;
+import radar.devmatching.common.exception.error.ErrorMessage;
 import radar.devmatching.domain.user.entity.User;
+import radar.devmatching.domain.user.exception.DuplicateException;
 import radar.devmatching.domain.user.repository.UserRepository;
 import radar.devmatching.domain.user.service.dto.request.CreateUserRequest;
 import radar.devmatching.domain.user.service.dto.request.UpdateUserRequest;
@@ -51,10 +54,11 @@ public class UserServiceImpl implements UserService {
 		validatePermission(requestUserId, authUser);
 
 		changeNickName(request.getNickName(), authUser);
+		//schoolName 빈값으로 들어오면 예외던져야함
 		authUser.changeSchoolName(request.getSchoolName());
 		authUser.changeGithubUrl(request.getGithubUrl());
 		authUser.changeIntroduce(request.getIntroduce());
-
+		log.info("update user data:{}", authUser);
 		return UserResponse.of(authUser);
 	}
 
@@ -79,7 +83,7 @@ public class UserServiceImpl implements UserService {
 	 */
 	private void checkDuplicateUsername(String username) {
 		userRepository.findByUsername(username).ifPresent(user -> {
-			throw new RuntimeException("Username already exist");
+			throw new DuplicateException(ErrorMessage.DUPLICATE_USERNAME);
 		});
 	}
 
@@ -90,7 +94,7 @@ public class UserServiceImpl implements UserService {
 	private void checkDuplicateNickName(String nickName, Long userId) {
 		userRepository.findByNickName(nickName).ifPresent(user -> {
 			if (!Objects.equals(user.getId(), userId) || userId == null) {
-				throw new RuntimeException("nickName already exist");
+				throw new DuplicateException(ErrorMessage.DUPLICATE_NICKNAME);
 			}
 		});
 	}
@@ -102,7 +106,7 @@ public class UserServiceImpl implements UserService {
 	 */
 	private void validatePermission(Long requestUserId, User authUser) {
 		if (!Objects.equals(requestUserId, authUser.getId())) {
-			throw new RuntimeException("Invalid Access");
+			throw new InvalidAccessException(ErrorMessage.INVALID_ACCSS);
 		}
 	}
 
