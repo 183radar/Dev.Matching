@@ -2,6 +2,9 @@ package radar.devmatching.domain.user.repository;
 
 import static org.assertj.core.api.Assertions.*;
 
+import java.util.Objects;
+import java.util.Optional;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -57,6 +60,38 @@ public class UserRepositoryTest {
 			.build();
 	}
 
+	@Test
+	@DisplayName("findByUsername 메서드는 username을 받으면 user를 반환한다")
+	void findByUsernameTest() {
+		//given
+		User user = createUser();
+		userRepository.save(user);
+
+		//when
+		Optional<User> findUser =
+			userRepository.findByUsername(user.getUsername());
+
+		//then
+		assertThat(findUser.isPresent()).isTrue();
+		assertThat(Objects.equals(findUser.get(), user)).isTrue();
+	}
+
+	@Test
+	@DisplayName("findByNickName 메서드는 nickName을 받으면 user를 반환한다")
+	void findByNickNameTest() {
+		//given
+		User user = createUser();
+		userRepository.save(user);
+
+		//when
+		Optional<User> findUser =
+			userRepository.findByNickName(user.getNickName());
+
+		//then
+		assertThat(findUser.isPresent()).isTrue();
+		assertThat(Objects.equals(findUser.get(), user)).isTrue();
+	}
+
 	@Nested
 	@DisplayName("delete 메서드로")
 	class Delete_Method {
@@ -67,7 +102,7 @@ public class UserRepositoryTest {
 
 			@Test
 			@DisplayName("SimplePost도 같이 삭제된다.")
-			void with_delete_simplePost() throws Exception {
+			void with_delete_simplePost() {
 				//given
 				User user = createUser();
 				userRepository.save(user);
@@ -83,7 +118,7 @@ public class UserRepositoryTest {
 
 			@Test
 			@DisplayName("MatchingUser도 같이 삭제된다.")
-			public void with_delete_matchingUser() throws Exception {
+			public void with_delete_matchingUser() {
 				//given
 				User user = createUser();
 				userRepository.save(user);
@@ -104,7 +139,7 @@ public class UserRepositoryTest {
 
 			@Test
 			@DisplayName("Apply도 같이 삭제된다.")
-			public void with_delete_apply() throws Exception {
+			public void with_delete_apply() {
 				//given
 				User user = createUser();
 				userRepository.save(user);
