@@ -10,6 +10,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import radar.devmatching.domain.matchings.apply.entity.Apply;
 import radar.devmatching.domain.matchings.apply.repository.ApplyRepository;
+import radar.devmatching.domain.matchings.matching.entity.Matching;
 import radar.devmatching.domain.matchings.matching.repository.MatchingRepository;
 import radar.devmatching.domain.matchings.matchinguser.entity.MatchingUser;
 import radar.devmatching.domain.matchings.matchinguser.repository.MatchingUserRepository;
@@ -53,6 +54,7 @@ public class UserRepositoryTest {
 			.region(Region.BUSAN)
 			.userNum(1)
 			.leader(user)
+			.matching(Matching.builder().build())
 			.fullPost(fullPost)
 			.build();
 	}
