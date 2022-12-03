@@ -1,28 +1,44 @@
 package radar.devmatching.common.exception.handler;
 
-import java.io.IOException;
+import java.util.Map;
 
-import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletRequest;
 
-import org.springframework.ui.Model;
+import org.springframework.boot.autoconfigure.web.servlet.error.ErrorViewResolver;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.servlet.ModelAndView;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import radar.devmatching.common.exception.BusinessException;
+import radar.devmatching.common.exception.CustomAuthenticationException;
+import radar.devmatching.common.exception.EntityNotFoundException;
 
 @Slf4j
 @ControllerAdvice
+@RequiredArgsConstructor
 public class GlobalExceptionHandler {
 
-	private static final String ERROR_MESSAGE = "[ERROR] class = {} / message = {}";
+	private static final String ERROR_MESSAGE = "[ERROR]";
+	private final ErrorViewResolver errorViewResolver;
 
-	@ExceptionHandler(BusinessException.class)
-	public void catchBusinessException(BusinessException e, HttpServletResponse response, Model model) throws
-		IOException {
-		log.error(ERROR_MESSAGE, e.getClass().getSimpleName(), e);
-		response.setStatus(e.getErrorMessage().getStatus().value());
-		// response.sendRedirect("/api/my");
-		model.addAttribute("msg", e.getMessage());
+	@ExceptionHandler(EntityNotFoundException.class)
+	public ModelAndView catchEntityNotFoundException(EntityNotFoundException e,
+		HttpServletRequest request) {
+		log.error(ERROR_MESSAGE, e);
+		Map<String, Object> models = Map.of("status", e.getErrorMessage().getStatus().value());
+		return errorViewResolver.resolveErrorView(request, e.getErrorMessage().getStatus(), models);
 	}
+
+	@ExceptionHandler(CustomAuthenticationException.class)
+	public ModelAndView catchCustomAuthenticationException(CustomAuthenticationException e,
+		HttpServletRequest request) {
+		log.error(ERROR_MESSAGE, e);
+		Map<String, Object> models = Map.of("status", e.getErrorMessage().getStatus().value());
+		return errorViewResolver.resolveErrorView(request, e.getErrorMessage().getStatus(), models);
+	}
+
+	/**
+	 * 나중에 validation 추가 시 field 에러 잡을 때 model에 값 넣고 redirect하는 작업들 추가돼야함.
+	 */
 }
