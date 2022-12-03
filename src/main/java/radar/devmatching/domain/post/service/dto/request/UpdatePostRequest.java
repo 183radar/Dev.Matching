@@ -1,18 +1,14 @@
-package radar.devmatching.domain.post.service.dto;
-
-import java.time.LocalDateTime;
+package radar.devmatching.domain.post.service.dto.request;
 
 import lombok.AccessLevel;
 import lombok.Builder;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 import radar.devmatching.domain.post.entity.PostCategory;
 import radar.devmatching.domain.post.entity.Region;
 import radar.devmatching.domain.post.entity.SimplePost;
 
-@Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class PresentFullPostDto {
+public class UpdatePostRequest {
 
 	private String title;
 
@@ -22,32 +18,44 @@ public class PresentFullPostDto {
 
 	private Integer userNum;
 
-	private LocalDateTime createDate;
-
 	private String content;
 
-	// private Long clickNum; 조회수는 나중에 추가할게
-
 	@Builder
-	private PresentFullPostDto(String title, PostCategory category, Region region, Integer userNum,
-		LocalDateTime createDate,
-		String content) {
+	private UpdatePostRequest(String title, PostCategory category, Region region, Integer userNum, String content) {
 		this.title = title;
 		this.category = category;
 		this.region = region;
 		this.userNum = userNum;
-		this.createDate = createDate;
 		this.content = content;
 	}
 
-	public static PresentFullPostDto of(SimplePost simplePost) {
-		return PresentFullPostDto.builder()
+	public static UpdatePostRequest of(SimplePost simplePost) {
+		return UpdatePostRequest.builder()
 			.title(simplePost.getTitle())
 			.category(simplePost.getCategory())
 			.region(simplePost.getRegion())
 			.userNum(simplePost.getUserNum())
-			.createDate(simplePost.getCreateDate())
 			.content(simplePost.getFullPost().getContent())
 			.build();
+	}
+
+	public String getTitle() {
+		return title;
+	}
+
+	public PostCategory getCategory() {
+		return category;
+	}
+
+	public Region getRegion() {
+		return region;
+	}
+
+	public Integer getUserNum() {
+		return userNum;
+	}
+
+	public String getContent() {
+		return content;
 	}
 }

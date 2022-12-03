@@ -37,10 +37,15 @@ public class Matching extends BaseEntity {
 	@OneToMany(mappedBy = "matching", orphanRemoval = true)
 	private List<MatchingUser> matchingUsers;
 
+	// @Builder
+	// public Matching(Long id) {
+	// 	this.id = id;
+	// 	matchingUsers = new ArrayList<>();
+	// }
+
 	@Builder
-	public Matching(Long id, SimplePost simplePost) {
+	public Matching(Long id) {
 		this.id = id;
-		this.simplePost = simplePost;
 		matchingUsers = new ArrayList<>();
 	}
 

@@ -1,7 +1,5 @@
 package radar.devmatching.domain.post.controller;
 
-import java.util.List;
-
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,54 +9,36 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import lombok.RequiredArgsConstructor;
-import radar.devmatching.domain.comment.service.CommentService;
-import radar.devmatching.domain.comment.service.dto.MainCommentDto;
-import radar.devmatching.domain.post.entity.SimplePost;
+import radar.devmatching.common.security.resolver.AuthUser;
 import radar.devmatching.domain.post.service.PostService;
-import radar.devmatching.domain.post.service.dto.PresentFullPostDto;
-import radar.devmatching.domain.post.service.dto.UpdatePostDto;
+import radar.devmatching.domain.post.service.dto.request.UpdatePostRequest;
+import radar.devmatching.domain.post.service.dto.response.PresentPostResponse;
+import radar.devmatching.domain.user.entity.User;
 
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("posts")
+@RequestMapping("/api/posts")
 public class FullPostController {
 
 	private final PostService postService;
-	private final CommentService commentService;
 
 	@GetMapping("/{simplePostId}")
-	public String getFullPost(@PathVariable long simplePostId, Model model) {
-		SimplePost findPost = postService.getPost(simplePostId);
-
-		// TODO: simplePostId에 해당하는 apply 중 state가 수락인 apply count() 반환
-		// int applyCount = applyService.getApplicationNum(simplePostId);
-
-		// if (findPost.getWriter().getId() != user.getId())
-		//	TODO: simplePostId에 해당하는 apply 중 userID가 같은 applyList 반환(게시글에 들어가면 내가 신청한 신청 현환을 볼 수 있다)
-		//	List<신청DTO> list = applyService.get~~(simplePostID, userId);
-
-		List<MainCommentDto> allComments = commentService.getAllComments(findPost.getFullPost().getId());
-
-		model.addAttribute("PresentFullPostDto", PresentFullPostDto.of(findPost));
-		// model.addAttribute("isWriter", findPost.getWriter() == user.getId())
-		// model.addAttribute("applyCount", applyCount);
-		// model.addAttribute("신청DTO", list);
-		model.addAttribute("allComments", allComments);
+	public String getAllPost(@PathVariable long simplePostId, Model model) {
+		PresentPostResponse presentPostResponse = postService.getPostWithComment(simplePostId);
+		model.addAttribute("PresentPostResponse", presentPostResponse);
 		return "post/post";
 	}
 
 	@GetMapping("/{simplePostId}/edit")
-	public String getUpdatePost(@PathVariable long simplePostId, Model model) {
-		SimplePost findPost = postService.getPost(simplePostId);
-
-		model.addAttribute("UpdatePostDto", UpdatePostDto.of(findPost));
+	public String getUpdatePost(@AuthUser User authUser, @PathVariable long simplePostId, Model model) {
+		UpdatePostRequest findPost = postService.getFullPost(simplePostId, authUser.getId());
+		model.addAttribute("UpdatePostRequest", findPost);
 		return "post/editPost";
 	}
 
 	@PostMapping("/{simplePostId}/edit")
-	public String updatePost(@PathVariable long simplePostId, @ModelAttribute UpdatePostDto updatePostDto) {
-		postService.updatePost(simplePostId, updatePostDto);
-
+	public String updatePost(@PathVariable long simplePostId, @ModelAttribute UpdatePostRequest updatePostRequest) {
+		postService.updatePost(simplePostId, updatePostRequest);
 		return "post/post";
 	}
 

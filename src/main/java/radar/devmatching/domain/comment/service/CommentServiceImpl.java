@@ -11,7 +11,7 @@ import radar.devmatching.domain.comment.entity.MainComment;
 import radar.devmatching.domain.comment.repository.MainCommentRepository;
 import radar.devmatching.domain.comment.repository.SubCommentRepository;
 import radar.devmatching.domain.comment.service.dto.CreateCommentDto;
-import radar.devmatching.domain.comment.service.dto.MainCommentDto;
+import radar.devmatching.domain.comment.service.dto.MainCommentResponse;
 import radar.devmatching.domain.post.entity.SimplePost;
 import radar.devmatching.domain.post.repository.SimplePostRepository;
 import radar.devmatching.domain.user.entity.User;
@@ -33,10 +33,10 @@ public class CommentServiceImpl implements CommentService {
 	}
 
 	@Override
-	public List<MainCommentDto> getAllComments(long fullPostId) {
+	public List<MainCommentResponse> getAllComments(long fullPostId) {
 		List<MainComment> allComments = mainCommentRepository.getAllComments(fullPostId);
 		return allComments.stream()
-			.map(MainCommentDto::of)
+			.map(MainCommentResponse::of)
 			.collect(Collectors.toList());
 	}
 

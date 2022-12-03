@@ -13,16 +13,17 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import radar.devmatching.domain.matchings.matching.entity.Matching;
+import radar.devmatching.domain.matchings.matchinguser.service.MatchingUserLeaderService;
 import radar.devmatching.domain.post.entity.FullPost;
 import radar.devmatching.domain.post.entity.PostCategory;
 import radar.devmatching.domain.post.entity.Region;
 import radar.devmatching.domain.post.entity.SimplePost;
 import radar.devmatching.domain.post.repository.FullPostRepository;
 import radar.devmatching.domain.post.repository.SimplePostRepository;
-import radar.devmatching.domain.post.service.dto.CreatePostDto;
-import radar.devmatching.domain.post.service.dto.PresentSimplePostDto;
+import radar.devmatching.domain.post.service.dto.request.CreatePostRequest;
+import radar.devmatching.domain.post.service.dto.response.SimplePostResponse;
 import radar.devmatching.domain.user.entity.User;
-import radar.devmatching.domain.user.repository.UserRepository;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("PostService 클래스의")
@@ -37,12 +38,14 @@ class PostServiceImplTest {
 		.introduce("introduce")
 		.build();
 
+	private final static Matching matching = Matching.builder().build();
+
 	@Mock
 	SimplePostRepository simplePostRepository;
 	@Mock
 	FullPostRepository fullPostRepository;
 	@Mock
-	UserRepository userRepository;
+	MatchingUserLeaderService matchingUserLeaderService;
 
 	@InjectMocks
 	PostServiceImpl postService;
@@ -53,13 +56,14 @@ class PostServiceImplTest {
 			.category(PostCategory.PROJECT)
 			.region(Region.BUSAN)
 			.userNum(1)
-			.writer(loginUser)
+			.leader(loginUser)
+			.matching(matching)
 			.fullPost(FullPost.builder().content("내용").build())
 			.build();
 	}
 
-	private CreatePostDto createPostDto() {
-		return CreatePostDto.builder()
+	private CreatePostRequest createPostDto() {
+		return CreatePostRequest.builder()
 			.title("게시글 제목")
 			.category(PostCategory.PROJECT)
 			.region(Region.BUSAN)
@@ -72,13 +76,13 @@ class PostServiceImplTest {
 	void getMyPostsTest() throws Exception {
 		//given
 		SimplePost myPost = createSimplePost();
-		given(simplePostRepository.findMyPostsByWriterId(1L)).willReturn(List.of(myPost));
+		given(simplePostRepository.findMyPostsByLeaderId(1L)).willReturn(List.of(myPost));
 
 		//when
-		List<PresentSimplePostDto> findPosts = postService.getMyPosts(1L);
+		List<SimplePostResponse> findPosts = postService.getMyPosts(1L);
 
 		//then
-		assertThat(PresentSimplePostDto.of(myPost)).usingRecursiveComparison().isEqualTo(findPosts.get(0));
+		assertThat(SimplePostResponse.of(myPost)).usingRecursiveComparison().isEqualTo(findPosts.get(0));
 	}
 
 	@Test
@@ -89,10 +93,10 @@ class PostServiceImplTest {
 		given(simplePostRepository.findApplicationPosts(1L)).willReturn(List.of(appliedPost));
 
 		//when
-		List<PresentSimplePostDto> findPosts = postService.getApplicationPosts(1L);
+		List<SimplePostResponse> findPosts = postService.getApplicationPosts(1L);
 
 		//then
-		assertThat(PresentSimplePostDto.of(appliedPost)).usingRecursiveComparison().isEqualTo(findPosts.get(0));
+		assertThat(SimplePostResponse.of(appliedPost)).usingRecursiveComparison().isEqualTo(findPosts.get(0));
 	}
 
 	@Nested
@@ -104,20 +108,20 @@ class PostServiceImplTest {
 		class ReceivedCreatePostDtoWhichContainsPostInfo {
 
 			@Test
-			@DisplayName("게시글을 저장한다.")
+			@DisplayName("Matching, Post 저장 후 매칭유저리더를 만든다")
 			void savePost() throws Exception {
 				//given
-				CreatePostDto createPostDto = createPostDto();
+				CreatePostRequest createPostDto = createPostDto();
 				SimplePost simplePost = createSimplePost();
-
-				//simplePostRepository.save시 FullPost와 Matching 엔티티도 만들어져 저장된다.
 				given(simplePostRepository.save(any(SimplePost.class))).willReturn(simplePost);
 
 				//when
+
 				SimplePost createdPost = postService.createPost(createPostDto, loginUser);
 
 				//then
-				assertThat(createdPost).usingRecursiveComparison().isEqualTo(createPostDto.toEntity(loginUser));
+				assertThat(createdPost).usingRecursiveComparison()
+					.isEqualTo(createPostDto.toEntity(loginUser, matching));
 			}
 		}
 	}

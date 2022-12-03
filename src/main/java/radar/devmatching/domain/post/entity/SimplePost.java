@@ -71,7 +71,7 @@ public class SimplePost extends BaseEntity {
 
 	@Builder
 	public SimplePost(String title, PostCategory category, Region region, Integer userNum, User leader,
-		FullPost fullPost) {
+		Matching matching, FullPost fullPost) {
 		this.title = title;
 		this.category = category;
 		this.region = region;
@@ -81,11 +81,8 @@ public class SimplePost extends BaseEntity {
 		leader.getSimplePosts().add(this);
 		this.fullPost = fullPost;
 		fullPost.setSimplePost(this);
-
-		//SimplePost 생성 시 Matching도 만든다. (같은 생명주기)
-		this.matching = Matching.builder().build();
+		this.matching = matching;
 		matching.setSimplePost(this);
-
 		this.applyList = new ArrayList<>();
 	}
 
