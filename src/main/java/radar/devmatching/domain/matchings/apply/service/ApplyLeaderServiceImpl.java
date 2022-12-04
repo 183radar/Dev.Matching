@@ -10,10 +10,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import radar.devmatching.common.exception.EntityNotFoundException;
+import radar.devmatching.common.exception.InvalidAccessException;
+import radar.devmatching.common.exception.error.ErrorMessage;
 import radar.devmatching.domain.matchings.apply.entity.Apply;
 import radar.devmatching.domain.matchings.apply.entity.ApplyState;
 import radar.devmatching.domain.matchings.apply.repository.ApplyRepository;
 import radar.devmatching.domain.matchings.apply.service.dto.response.ApplyResponse;
+import radar.devmatching.domain.matchings.matching.entity.Matching;
 import radar.devmatching.domain.matchings.matchinguser.service.MatchingUserService;
 import radar.devmatching.domain.post.entity.SimplePost;
 import radar.devmatching.domain.post.repository.SimplePostRepository;
@@ -38,10 +42,10 @@ public class ApplyLeaderServiceImpl implements ApplyLeaderService {
 		if (!Objects.equals(apply.getApplyState(), ApplyState.ACCEPTED)) {
 			apply.acceptApply();
 
-			Long userId = apply.getApplyUser().getId();
-			Long matchingId = apply.getApplySimplePost().getMatching().getId();
+			User applyUser = apply.getApplyUser();
+			Matching matching = apply.getApplySimplePost().getMatching();
 
-			matchingUserService.createMatchingUser(userId, matchingId);
+			matchingUserService.createMatchingUser(matching, applyUser);
 		}
 	}
 
@@ -72,25 +76,26 @@ public class ApplyLeaderServiceImpl implements ApplyLeaderService {
 	/**
 	 * simplePost에 접근하는 사용자가 리더인지 확인
 	 * applyId가 null이 아니라면 apply가 simplePost에 있는지 확인
+	 *
 	 * @param authUser
 	 * @param applyId
 	 * @param simplePostId
 	 */
 	private Optional<Apply> validatePermission(User authUser, Long applyId, Long simplePostId) {
 		SimplePost simplePost = simplePostRepository.findById(simplePostId)
-			.orElseThrow(() -> new RuntimeException("not exist simplePost entity"));
+			.orElseThrow(() -> new EntityNotFoundException(ErrorMessage.SIMPLE_POST_NOT_FOUND));
 
 		User leader = simplePost.getLeader();
 		if (!Objects.equals(leader.getId(), authUser.getId())) {
-			throw new RuntimeException("Invalid Access");
+			throw new InvalidAccessException(ErrorMessage.INVALID_ACCESS);
 		}
 
 		if (Objects.nonNull(applyId)) {
 			Apply apply = applyRepository.findById(applyId)
-				.orElseThrow(() -> new RuntimeException("not exist apply entity"));
+				.orElseThrow(() -> new EntityNotFoundException(ErrorMessage.APPLY_NOT_FOUND));
 
 			if (!Objects.equals(apply.getApplySimplePost().getId(), simplePost.getId())) {
-				throw new RuntimeException("Invalid Access");
+				throw new InvalidAccessException(ErrorMessage.INVALID_ACCESS);
 			}
 			return Optional.of(apply);
 		}
