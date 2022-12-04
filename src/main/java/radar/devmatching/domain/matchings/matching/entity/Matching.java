@@ -11,10 +11,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
-import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import radar.devmatching.common.entity.BaseEntity;
 import radar.devmatching.domain.matchings.matchinguser.entity.MatchingUser;
 import radar.devmatching.domain.post.entity.SimplePost;
@@ -22,7 +20,6 @@ import radar.devmatching.domain.post.entity.SimplePost;
 @Table(name = "MATCHING")
 @Entity
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Matching extends BaseEntity {
 
 	@Id
@@ -37,15 +34,8 @@ public class Matching extends BaseEntity {
 	@OneToMany(mappedBy = "matching", orphanRemoval = true)
 	private List<MatchingUser> matchingUsers;
 
-	// @Builder
-	// public Matching(Long id) {
-	// 	this.id = id;
-	// 	matchingUsers = new ArrayList<>();
-	// }
-
 	@Builder
-	public Matching(Long id) {
-		this.id = id;
+	public Matching() {
 		matchingUsers = new ArrayList<>();
 	}
 

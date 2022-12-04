@@ -22,11 +22,12 @@ public class MatchingServiceImpl implements MatchingService {
 
 	@Override
 	@Transactional
-	public void createMatching(User authUser, SimplePost simplePost) {
-		Matching matching = Matching.builder().simplePost(simplePost).build();
+	public Matching createMatching(User authUser, SimplePost simplePost) {
+		Matching matching = Matching.builder().build();
 		matchingRepository.save(matching);
 
 		matchingUserLeaderService.createMatchingUserLeader(authUser, matching);
+		return matching;
 	}
 
 }
