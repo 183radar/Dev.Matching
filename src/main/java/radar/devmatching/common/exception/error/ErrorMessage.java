@@ -5,11 +5,19 @@ import org.springframework.http.HttpStatus;
 public enum ErrorMessage {
 
 	//common
-	INVALID_ACCSS("Invalid Access", HttpStatus.BAD_REQUEST),
+	INVALID_ACCESS("Invalid Access", HttpStatus.BAD_REQUEST),
 
 	//User
 	DUPLICATE_USERNAME("duplicate username", HttpStatus.CONFLICT),
 	DUPLICATE_NICKNAME("duplicate nickName", HttpStatus.CONFLICT),
+
+	//MatchingUser
+	ALREADY_JOIN("already join user", HttpStatus.BAD_REQUEST),
+
+	//Apply
+	APPLY_NOT_FOUND("not exist apply", HttpStatus.NOT_FOUND),
+	ALREAD_APPLY("already apply", HttpStatus.BAD_REQUEST),
+
 	//권한이 없는 접근
 	YOU_ARE_NOT_LEADER("오직 방장만 접근할 수 있습니다.", HttpStatus.BAD_REQUEST),
 
