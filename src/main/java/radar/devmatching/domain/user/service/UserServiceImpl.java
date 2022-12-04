@@ -106,7 +106,7 @@ public class UserServiceImpl implements UserService {
 	 */
 	private void validatePermission(Long requestUserId, User authUser) {
 		if (!Objects.equals(requestUserId, authUser.getId())) {
-			throw new InvalidAccessException(ErrorMessage.INVALID_ACCSS);
+			throw new InvalidAccessException(ErrorMessage.INVALID_ACCESS);
 		}
 	}
 
