@@ -14,7 +14,6 @@ import javax.persistence.Table;
 
 import lombok.AccessLevel;
 import lombok.Builder;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 import radar.devmatching.common.entity.BaseEntity;
 import radar.devmatching.domain.matchings.apply.entity.Apply;
@@ -24,7 +23,6 @@ import radar.devmatching.domain.post.entity.SimplePost;
 // USER로 하니 에러떠서 복수형으로 바꿈(더 좋은 방안 없으려나)
 @Table(name = "USERS")
 @Entity
-@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User extends BaseEntity {
 
@@ -68,8 +66,9 @@ public class User extends BaseEntity {
 	private List<SimplePost> simplePosts;
 
 	@Builder
-	public User(String username, String password, String nickName, String schoolName, String githubUrl,
+	public User(Long id, String username, String password, String nickName, String schoolName, String githubUrl,
 		String introduce) {
+		this.id = id;
 		this.username = username;
 		this.password = password;
 		this.nickName = nickName;
@@ -80,6 +79,36 @@ public class User extends BaseEntity {
 		this.matchingUsers = new ArrayList<>();
 		this.applyList = new ArrayList<>();
 		this.simplePosts = new ArrayList<>();
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o)
+			return true;
+		if (o == null || getClass() != o.getClass())
+			return false;
+
+		User user = (User)o;
+
+		if (getId() != null ? !getId().equals(user.getId()) : user.getId() != null)
+			return false;
+		if (getUsername() != null ? !getUsername().equals(user.getUsername()) : user.getUsername() != null)
+			return false;
+		if (getPassword() != null ? !getPassword().equals(user.getPassword()) : user.getPassword() != null)
+			return false;
+		if (getNickName() != null ? !getNickName().equals(user.getNickName()) : user.getNickName() != null)
+			return false;
+		return getSchoolName() != null ? getSchoolName().equals(user.getSchoolName()) : user.getSchoolName() == null;
+	}
+
+	@Override
+	public int hashCode() {
+		int result = getId() != null ? getId().hashCode() : 0;
+		result = 31 * result + (getUsername() != null ? getUsername().hashCode() : 0);
+		result = 31 * result + (getPassword() != null ? getPassword().hashCode() : 0);
+		result = 31 * result + (getNickName() != null ? getNickName().hashCode() : 0);
+		result = 31 * result + (getSchoolName() != null ? getSchoolName().hashCode() : 0);
+		return result;
 	}
 
 	@Override
@@ -94,6 +123,50 @@ public class User extends BaseEntity {
 			", introduce='" + introduce + '\'' +
 			", userRole=" + userRole +
 			'}';
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public String getUsername() {
+		return username;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public String getNickName() {
+		return nickName;
+	}
+
+	public String getSchoolName() {
+		return schoolName;
+	}
+
+	public String getGithubUrl() {
+		return githubUrl;
+	}
+
+	public String getIntroduce() {
+		return introduce;
+	}
+
+	public UserRole getUserRole() {
+		return userRole;
+	}
+
+	public List<MatchingUser> getMatchingUsers() {
+		return matchingUsers;
+	}
+
+	public List<Apply> getApplyList() {
+		return applyList;
+	}
+
+	public List<SimplePost> getSimplePosts() {
+		return simplePosts;
 	}
 
 	public void changeNickName(String nickName) {

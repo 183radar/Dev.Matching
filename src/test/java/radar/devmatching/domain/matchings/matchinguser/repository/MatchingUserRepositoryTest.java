@@ -1,16 +1,15 @@
-package radar.devmatching.domain.matchings.apply.repository;
+package radar.devmatching.domain.matchings.matchinguser.repository;
 
 import static org.assertj.core.api.Assertions.*;
-
-import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
-import radar.devmatching.domain.matchings.apply.entity.Apply;
 import radar.devmatching.domain.matchings.matching.entity.Matching;
+import radar.devmatching.domain.matchings.matching.repository.MatchingRepository;
+import radar.devmatching.domain.matchings.matchinguser.entity.MatchingUser;
 import radar.devmatching.domain.post.entity.FullPost;
 import radar.devmatching.domain.post.entity.PostCategory;
 import radar.devmatching.domain.post.entity.Region;
@@ -20,15 +19,18 @@ import radar.devmatching.domain.user.entity.User;
 import radar.devmatching.domain.user.repository.UserRepository;
 
 @DataJpaTest
-@DisplayName("ApplyRepository의")
-class ApplyRepositoryTest {
+// @SpringBootTest
+@DisplayName("MatchingUserRepository의")
+class MatchingUserRepositoryTest {
 
 	@Autowired
-	private ApplyRepository applyRepository;
+	private MatchingUserRepository matchingUserRepository;
 	@Autowired
 	private UserRepository userRepository;
 	@Autowired
 	private SimplePostRepository simplePostRepository;
+	@Autowired
+	private MatchingRepository matchingRepository;
 
 	private User createUser() {
 		return User.builder()
@@ -54,44 +56,39 @@ class ApplyRepositoryTest {
 	}
 
 	@Test
-	@DisplayName("findAllByApplySimplePostId 메서드에서 simplePostId를 가지는 모든 apply 반환한다.")
-	public void findAllByApplySimplePostIdMethod() {
+	@DisplayName("existsByMatchingIdAndUserId 메서드는 matchingId와 userId를 가지는 matchingUser 있는지 확인한다.")
+	public void existsByMatchingIdAndUserIdMethod() {
 		//given
 		User user = createUser();
 		userRepository.save(user);
 		Matching matching = Matching.builder().build();
+
 		SimplePost simplePost = createSimplePost(user, FullPost.builder().content("test").build(), matching);
 		simplePostRepository.save(simplePost);
-		Apply apply = Apply.builder()
-			.applyUser(user)
-			.applySimplePost(simplePost)
-			.build();
-		applyRepository.save(apply);
+		MatchingUser matchingUser = MatchingUser.builder().user(user).matching(matching).build();
+		matchingUserRepository.save(matchingUser);
 		//when
-		List<Apply> findSimplePost = applyRepository.findAllByApplySimplePostId(simplePost.getId());
+		boolean check = matchingUserRepository.existsByMatchingIdAndUserId(matching.getId(), user.getId());
 		//then
-		assertThat(findSimplePost).contains(apply);
+		assertThat(check).isTrue();
 	}
 
 	@Test
-	@DisplayName("findApplyBySimplePostIdAndUserId는 simplePostId와 userId를 가지는 Apply 엔티티를 반환한다.")
-	public void findApplyBySimplePostIdAndUserIdMethod() {
+	@DisplayName("deleteByMatchingIdAndUserId 메서드는 MatchingId와 userId를 가지는 matchingUser를 삭제한다.")
+	public void deleteByMatchingIdAndUserIdMethod() {
 		//given
 		User user = createUser();
 		userRepository.save(user);
 		Matching matching = Matching.builder().build();
 		SimplePost simplePost = createSimplePost(user, FullPost.builder().content("test").build(), matching);
 		simplePostRepository.save(simplePost);
-		Apply apply = Apply.builder()
-			.applyUser(user)
-			.applySimplePost(simplePost)
-			.build();
-		applyRepository.save(apply);
+		MatchingUser matchingUser = MatchingUser.builder().user(user).matching(matching).build();
+		matchingUserRepository.save(matchingUser);
+
 		//when
-		Apply findApply = applyRepository.findByApplySimplePostIdAndApplyUserId(
-			simplePost.getId(), user.getId()).get();
+		matchingUserRepository.deleteByMatchingIdAndUserId(matching.getId(), user.getId());
 		//then
-		assertThat(findApply).usingRecursiveComparison().isEqualTo(apply);
+		assertThat(matchingUserRepository.findById(matchingUser.getId()).isEmpty()).isTrue();
 	}
 
 }

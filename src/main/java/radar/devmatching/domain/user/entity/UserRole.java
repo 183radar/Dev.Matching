@@ -1,9 +1,7 @@
 package radar.devmatching.domain.user.entity;
 
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-@Getter
 @RequiredArgsConstructor
 public enum UserRole {
 	ROLE_USER("유저"),
@@ -11,4 +9,7 @@ public enum UserRole {
 
 	private final String name;
 
+	public String getName() {
+		return name;
+	}
 }

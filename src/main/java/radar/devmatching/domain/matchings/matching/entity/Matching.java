@@ -20,7 +20,6 @@ import radar.devmatching.domain.post.entity.SimplePost;
 @Table(name = "MATCHING")
 @Entity
 @Getter
-// @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Matching extends BaseEntity {
 
 	@Id
@@ -34,12 +33,6 @@ public class Matching extends BaseEntity {
 	// Matching 삭제시 MatchingUser 삭제
 	@OneToMany(mappedBy = "matching", orphanRemoval = true)
 	private List<MatchingUser> matchingUsers;
-
-	// @Builder
-	// public Matching(Long id) {
-	// 	this.id = id;
-	// 	matchingUsers = new ArrayList<>();
-	// }
 
 	@Builder
 	public Matching() {

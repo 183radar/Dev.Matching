@@ -1,17 +1,13 @@
 package radar.devmatching.domain.user.service.dto.request;
 
 import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
 
-@Getter
-@Setter
 public class UpdateUserRequest {
 
-	private String nickName;
-	private String schoolName;
-	private String githubUrl;
-	private String introduce;
+	private final String nickName;
+	private final String schoolName;
+	private final String githubUrl;
+	private final String introduce;
 
 	@Builder
 	public UpdateUserRequest(String nickName, String schoolName, String githubUrl, String introduce) {
@@ -21,4 +17,19 @@ public class UpdateUserRequest {
 		this.introduce = introduce;
 	}
 
+	public String getNickName() {
+		return nickName;
+	}
+
+	public String getSchoolName() {
+		return schoolName;
+	}
+
+	public String getGithubUrl() {
+		return githubUrl;
+	}
+
+	public String getIntroduce() {
+		return introduce;
+	}
 }

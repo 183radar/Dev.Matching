@@ -35,6 +35,40 @@ public class UserResponse {
 			.password(user.getPassword())
 			.nickName(user.getNickName())
 			.schoolName(user.getSchoolName())
+			.githubUrl(user.getGithubUrl())
+			.introduce(user.getIntroduce())
 			.build();
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public String getUsername() {
+		return username;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public String getNickName() {
+		return nickName;
+	}
+
+	public String getSchoolName() {
+		return schoolName;
+	}
+
+	public String getGithubUrl() {
+		return githubUrl;
+	}
+
+	public String getIntroduce() {
+		return introduce;
+	}
+
+	public UserRole getUserRole() {
+		return userRole;
 	}
 }

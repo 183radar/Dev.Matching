@@ -3,11 +3,26 @@ package radar.devmatching.common.exception.error;
 import org.springframework.http.HttpStatus;
 
 public enum ErrorMessage {
-	//권한이 없는 접근
-	YOU_ARE_NOT_LEADER("오직 방장만 접근할 수 있습니다.", HttpStatus.BAD_REQUEST),
 
-	//EntityNotFoundException
-	SIMPLE_POST_NOT_FOUND("해당 id값을 갖는 엔티티가 존재하지 않습니다.", HttpStatus.NOT_FOUND);
+	//common
+
+	//User
+	DUPLICATE_USERNAME("duplicate username", HttpStatus.CONFLICT),
+	DUPLICATE_NICKNAME("duplicate nickName", HttpStatus.CONFLICT),
+
+	//MatchingUser
+	ALREADY_JOIN("already join user", HttpStatus.BAD_REQUEST),
+
+	//Apply
+	APPLY_NOT_FOUND("not exist apply", HttpStatus.NOT_FOUND),
+	ALREADY_APPLY("already apply", HttpStatus.BAD_REQUEST),
+
+	//SimplePost
+	SIMPLE_POST_NOT_FOUND("해당 id값을 갖는 엔티티가 존재하지 않습니다.", HttpStatus.NOT_FOUND),
+
+	//Invalid Access
+	INVALID_ACCESS("Invalid Access", HttpStatus.BAD_REQUEST),
+	NOT_LEADER("Invalid Access : Access User Not Leader", HttpStatus.BAD_REQUEST);
 
 	private final String message;
 	private final HttpStatus status;
