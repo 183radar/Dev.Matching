@@ -6,8 +6,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import lombok.RequiredArgsConstructor;
+import radar.devmatching.common.security.resolver.AuthUser;
 import radar.devmatching.domain.comment.service.CommentService;
 import radar.devmatching.domain.comment.service.dto.CreateCommentDto;
+import radar.devmatching.domain.user.entity.User;
 
 @Controller
 @RequiredArgsConstructor
@@ -16,9 +18,9 @@ public class MainCommentController {
 	private final CommentService commentService;
 
 	@PostMapping("posts/{simplePostId}/createMainComment")
-	public String createMainComment(@PathVariable long simplePostId,
+	public String createMainComment(@AuthUser User authUser, @PathVariable long simplePostId,
 		@ModelAttribute CreateCommentDto createCommentDto) {
-		// commentService.createMainComment(simplePostId, loginUser, commentDto);
+		// commentService.createMainComment(simplePostId, authUser, commentDto);
 		return "post/post";
 	}
 

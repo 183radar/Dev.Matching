@@ -18,7 +18,7 @@ import radar.devmatching.domain.user.entity.User;
 
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("/api/posts")
+@RequestMapping("api/posts")
 public class SimplePostController {
 
 	private final PostService postService;

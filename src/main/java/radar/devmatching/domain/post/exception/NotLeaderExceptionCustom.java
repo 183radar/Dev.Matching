@@ -5,6 +5,6 @@ import radar.devmatching.common.exception.error.ErrorMessage;
 
 public class NotLeaderExceptionCustom extends CustomAuthenticationException {
 	public NotLeaderExceptionCustom() {
-		super(ErrorMessage.YOU_ARE_NOT_LEADER);
+		super(ErrorMessage.NOT_LEADER);
 	}
 }

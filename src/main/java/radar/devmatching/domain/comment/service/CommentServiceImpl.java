@@ -13,6 +13,7 @@ import radar.devmatching.domain.comment.repository.SubCommentRepository;
 import radar.devmatching.domain.comment.service.dto.CreateCommentDto;
 import radar.devmatching.domain.comment.service.dto.MainCommentResponse;
 import radar.devmatching.domain.post.entity.SimplePost;
+import radar.devmatching.domain.post.exception.SimplePostNotFoundException;
 import radar.devmatching.domain.post.repository.SimplePostRepository;
 import radar.devmatching.domain.user.entity.User;
 
@@ -28,7 +29,8 @@ public class CommentServiceImpl implements CommentService {
 	@Override
 	@Transactional
 	public void createMainComment(long simplePostId, User user, CreateCommentDto createCommentDto) {
-		SimplePost simplePost = simplePostRepository.findById(simplePostId).orElseThrow(() -> new RuntimeException());
+		SimplePost simplePost = simplePostRepository.findById(simplePostId)
+			.orElseThrow(SimplePostNotFoundException::new);
 		mainCommentRepository.save(createCommentDto.toMainCommentEntity(simplePost, user));
 	}
 

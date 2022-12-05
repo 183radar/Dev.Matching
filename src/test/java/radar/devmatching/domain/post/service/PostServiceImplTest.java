@@ -76,7 +76,7 @@ class PostServiceImplTest {
 	void getMyPostsTest() throws Exception {
 		//given
 		SimplePost myPost = createSimplePost();
-		given(simplePostRepository.findMyPostsByLeaderId(1L)).willReturn(List.of(myPost));
+		given(simplePostRepository.findMyPostsByLeaderIdOrderByCreateDateDesc(1L)).willReturn(List.of(myPost));
 
 		//when
 		List<SimplePostResponse> findPosts = postService.getMyPosts(1L);
