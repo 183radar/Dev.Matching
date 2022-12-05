@@ -8,7 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import radar.devmatching.domain.matchings.matching.entity.Matching;
 import radar.devmatching.domain.matchings.matching.repository.MatchingRepository;
 import radar.devmatching.domain.matchings.matchinguser.service.MatchingUserLeaderService;
-import radar.devmatching.domain.post.entity.SimplePost;
 import radar.devmatching.domain.user.entity.User;
 
 @Slf4j
@@ -22,7 +21,7 @@ public class MatchingServiceImpl implements MatchingService {
 
 	@Override
 	@Transactional
-	public Matching createMatching(User authUser, SimplePost simplePost) {
+	public Matching createMatching(User authUser) {
 		Matching matching = Matching.builder().build();
 		matchingRepository.save(matching);
 

@@ -12,7 +12,7 @@ import radar.devmatching.domain.comment.service.CommentService;
 import radar.devmatching.domain.comment.service.dto.MainCommentResponse;
 import radar.devmatching.domain.matchings.apply.service.ApplyService;
 import radar.devmatching.domain.matchings.matching.entity.Matching;
-import radar.devmatching.domain.matchings.matchinguser.service.MatchingUserLeaderService;
+import radar.devmatching.domain.matchings.matching.service.MatchingService;
 import radar.devmatching.domain.post.entity.SimplePost;
 import radar.devmatching.domain.post.repository.SimplePostRepository;
 import radar.devmatching.domain.post.service.dto.request.CreatePostRequest;
@@ -27,7 +27,7 @@ import radar.devmatching.domain.user.entity.User;
 public class PostServiceImpl implements PostService {
 
 	private final SimplePostRepository simplePostRepository;
-	private final MatchingUserLeaderService matchingUserLeaderService;
+	private final MatchingService matchingService;
 	private final ApplyService applyService;
 	private final CommentService commentService;
 
@@ -69,9 +69,8 @@ public class PostServiceImpl implements PostService {
 	@Override
 	@Transactional
 	public SimplePost createPost(CreatePostRequest createPostDto, User user) {
-		Matching matching = Matching.builder().build();
+		Matching matching = matchingService.createMatching(user);
 		SimplePost savedPost = simplePostRepository.save(createPostDto.toEntity(user, matching));
-		matchingUserLeaderService.createMatchingUserLeader(user, matching);
 		return savedPost;
 	}
 

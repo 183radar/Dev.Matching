@@ -38,7 +38,7 @@ public class ApplyServiceImpl implements ApplyService {
 
 		applyRepository.findByApplySimplePostIdAndApplyUserId(simplePostId, authUser.getId())
 			.ifPresent(apply -> {
-				throw new AlreadyApplyException(ErrorMessage.ALREAD_APPLY);
+				throw new AlreadyApplyException(ErrorMessage.ALREADY_APPLY);
 			});
 
 		Apply apply = Apply.builder().applyUser(authUser).applySimplePost(simplePost).build();
