@@ -11,13 +11,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import lombok.RequiredArgsConstructor;
 import radar.devmatching.common.security.resolver.AuthUser;
 import radar.devmatching.domain.post.service.PostService;
-import radar.devmatching.domain.post.service.dto.request.UpdatePostRequest;
+import radar.devmatching.domain.post.service.dto.UpdatePostDto;
 import radar.devmatching.domain.post.service.dto.response.PresentPostResponse;
 import radar.devmatching.domain.user.entity.User;
 
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("/api/posts")
+@RequestMapping("api/posts")
 public class FullPostController {
 
 	private final PostService postService;
@@ -31,24 +31,27 @@ public class FullPostController {
 
 	@GetMapping("/{simplePostId}/edit")
 	public String getUpdatePost(@AuthUser User authUser, @PathVariable long simplePostId, Model model) {
-		UpdatePostRequest findPost = postService.getFullPost(simplePostId, authUser.getId());
-		model.addAttribute("UpdatePostRequest", findPost);
+		UpdatePostDto findPost = postService.getFullPost(simplePostId, authUser.getId());
+		model.addAttribute("UpdatePostDto", findPost);
 		return "post/editPost";
 	}
 
 	@PostMapping("/{simplePostId}/edit")
-	public String updatePost(@PathVariable long simplePostId, @ModelAttribute UpdatePostRequest updatePostRequest) {
-		postService.updatePost(simplePostId, updatePostRequest);
+	public String updatePost(@AuthUser User authUser, @PathVariable long simplePostId,
+		@ModelAttribute UpdatePostDto updatePostDto) {
+		postService.updatePost(simplePostId, authUser.getId(), updatePostDto);
 		return "post/post";
 	}
 
-	@PostMapping("/{simplePostId}/delete")
-	public String deletePost(@PathVariable long simplePostId) {
+	@GetMapping("/{simplePostId}/delete")
+	public String deletePost(@AuthUser User authUser, @PathVariable long simplePostId) {
+		postService.deletePost(simplePostId, authUser.getId());
 		return "post/myPosts";
 	}
 
 	@GetMapping("/{simplePostId}/end")
-	public String closePost(@PathVariable long simplePostId) {
+	public String closePost(@AuthUser User authUser, @PathVariable long simplePostId) {
+		postService.closePost(simplePostId, authUser.getId());
 		return "post/post";
 	}
 

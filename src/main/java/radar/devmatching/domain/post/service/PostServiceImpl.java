@@ -5,7 +5,6 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
 
 import lombok.RequiredArgsConstructor;
 import radar.devmatching.domain.comment.service.CommentService;
@@ -14,9 +13,11 @@ import radar.devmatching.domain.matchings.apply.service.ApplyService;
 import radar.devmatching.domain.matchings.matching.entity.Matching;
 import radar.devmatching.domain.matchings.matching.service.MatchingService;
 import radar.devmatching.domain.post.entity.SimplePost;
+import radar.devmatching.domain.post.exception.NotLeaderExceptionCustom;
+import radar.devmatching.domain.post.exception.SimplePostNotFoundException;
 import radar.devmatching.domain.post.repository.SimplePostRepository;
+import radar.devmatching.domain.post.service.dto.UpdatePostDto;
 import radar.devmatching.domain.post.service.dto.request.CreatePostRequest;
-import radar.devmatching.domain.post.service.dto.request.UpdatePostRequest;
 import radar.devmatching.domain.post.service.dto.response.PresentPostResponse;
 import radar.devmatching.domain.post.service.dto.response.SimplePostResponse;
 import radar.devmatching.domain.user.entity.User;
@@ -33,12 +34,18 @@ public class PostServiceImpl implements PostService {
 
 	@Override
 	public SimplePost getSimplePostOnly(long simplePostId) {
-		return simplePostRepository.findById(simplePostId).orElseThrow(() -> new RuntimeException());
+		return simplePostRepository.findById(simplePostId).orElseThrow(SimplePostNotFoundException::new);
 	}
 
+	/**
+	 * 게시글 화면 전체를 가져온다(게시글, 신청자 수, 댓글)
+	 * @param simplePostId
+	 * @return
+	 */
 	@Override
 	public PresentPostResponse getPostWithComment(long simplePostId) {
-		SimplePost findPost = simplePostRepository.findPostById(simplePostId).orElseThrow(() -> new RuntimeException());
+		SimplePost findPost = simplePostRepository.findPostById(simplePostId)
+			.orElseThrow(SimplePostNotFoundException::new);
 		int applyCount = applyService.getAcceptedApplyCount(simplePostId);
 		List<MainCommentResponse> allComments = commentService.getAllComments(findPost.getFullPost().getId());
 
@@ -52,18 +59,38 @@ public class PostServiceImpl implements PostService {
 	 * @return
 	 */
 	@Override
-	public UpdatePostRequest getFullPost(long simplePostId, long leaderId) {
+	public UpdatePostDto getFullPost(long simplePostId, long leaderId) {
 		isLeaderValidation(simplePostId, leaderId);
-		SimplePost findPost = simplePostRepository.findPostById(simplePostId).orElseThrow(() -> new RuntimeException());
-		return UpdatePostRequest.of(findPost);
+		SimplePost findPost = simplePostRepository.findPostById(simplePostId)
+			.orElseThrow(SimplePostNotFoundException::new);
+		return UpdatePostDto.of(findPost);
 	}
 
 	//테스트
 	@Override
-	public void updatePost(long simplePostId, UpdatePostRequest updatePostRequest) {
-		SimplePost findPost = simplePostRepository.findPostById(simplePostId).orElseThrow(() -> new RuntimeException());
-		findPost.update(updatePostRequest.getTitle(), updatePostRequest.getCategory(), updatePostRequest.getRegion(),
-			updatePostRequest.getUserNum(), updatePostRequest.getContent());
+	@Transactional
+	public void updatePost(long simplePostId, long leaderId, UpdatePostDto updatePostDto) {
+		isLeaderValidation(simplePostId, leaderId);
+		SimplePost findPost = simplePostRepository.findPostById(simplePostId)
+			.orElseThrow(SimplePostNotFoundException::new);
+		findPost.update(updatePostDto.getTitle(), updatePostDto.getCategory(), updatePostDto.getRegion(),
+			updatePostDto.getUserNum(), updatePostDto.getContent());
+	}
+
+	@Override
+	@Transactional
+	public void deletePost(long simplePostId, long leaderId) {
+		isLeaderValidation(simplePostId, leaderId);
+		simplePostRepository.deleteById(simplePostId);
+	}
+
+	@Override
+	@Transactional
+	public void closePost(long simplePostId, long leaderId) {
+		isLeaderValidation(simplePostId, leaderId);
+		SimplePost findPost = simplePostRepository.findPostById(simplePostId)
+			.orElseThrow(SimplePostNotFoundException::new);
+		findPost.closePost();
 	}
 
 	@Override
@@ -76,7 +103,7 @@ public class PostServiceImpl implements PostService {
 
 	@Override
 	public List<SimplePostResponse> getMyPosts(long userId) {
-		List<SimplePost> myPosts = simplePostRepository.findMyPostsByLeaderId(userId);
+		List<SimplePost> myPosts = simplePostRepository.findMyPostsByLeaderIdOrderByCreateDateDesc(userId);
 		return myPosts.stream().map(SimplePostResponse::of).collect(Collectors.toList());
 	}
 
@@ -87,8 +114,11 @@ public class PostServiceImpl implements PostService {
 	}
 
 	private void isLeaderValidation(long simplePostId, long leaderId) {
-		SimplePost findPost = simplePostRepository.findById(simplePostId).orElseThrow(() -> new RuntimeException());
-		Assert.isTrue(findPost.getLeader().getId() == leaderId, "you are not leader");
+		SimplePost findPost = simplePostRepository.findById(simplePostId)
+			.orElseThrow(SimplePostNotFoundException::new);
+		if (findPost.getLeader().getId() == leaderId) {
+			throw new NotLeaderExceptionCustom();
+		}
 	}
 
 }

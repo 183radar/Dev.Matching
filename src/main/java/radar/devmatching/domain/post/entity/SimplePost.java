@@ -93,4 +93,8 @@ public class SimplePost extends BaseEntity {
 		this.userNum = userNum;
 		this.fullPost.updateContent(content);
 	}
+
+	public void closePost() {
+		this.postState = PostState.END;
+	}
 }

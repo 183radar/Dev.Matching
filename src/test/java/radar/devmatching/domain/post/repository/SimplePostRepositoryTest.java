@@ -65,36 +65,41 @@ class SimplePostRepositoryTest {
 	}
 
 	@Test
-	@DisplayName("findMyPostByLeaderId메서드는 유저Id를 받으면 유저가 생성한 게시글들을 반환한다.")
-	void findMyPostByLeaderIdTest() throws Exception {
+	@DisplayName("findMyPostsByLeaderIdOrderByCreateDateDesc메서드는 유저Id를 받으면 유저가 생성한 게시글들을 최신순으로 반환한다.")
+	void findMyPostsByLeaderIdOrderByCreateDateDescTest() throws Exception {
 		//given
 		User user = createUser();
 		userRepository.save(user);
-		simplePostRepository.save(createSimplePost(user, FullPost.builder().content("내용1").build()));
-		simplePostRepository.save(createSimplePost(user, FullPost.builder().content("내용2").build()));
+		SimplePost simplePost1 = createSimplePost(user, FullPost.builder().content("내용1").build());
+		simplePostRepository.save(simplePost1);
+		SimplePost simplePost2 = createSimplePost(user, FullPost.builder().content("내용2").build());
+		simplePostRepository.save(simplePost2);
 
 		//when
-		List<SimplePost> simplePosts = simplePostRepository.findMyPostsByLeaderId(user.getId());
+		List<SimplePost> simplePosts = simplePostRepository.findMyPostsByLeaderIdOrderByCreateDateDesc(user.getId());
 
 		//then
-		assertThat(simplePosts.size()).isEqualTo(2);
+		assertThat(simplePosts.get(0).getFullPost().getContent()).isEqualTo("내용2");
+		assertThat(simplePosts.get(1).getFullPost().getContent()).isEqualTo("내용1");
 	}
 
 	@Test
-	@DisplayName("findApplicationPosts메서드는 유저ID를 받으면 해당 유저가 신청한 게시글들을 반환한다.")
+	@DisplayName("findApplicationPosts메서드는 유저ID를 받으면 해당 유저가 신청한 게시글들을 최신순으로 반환한다.")
 	void findApplicationPostsTest() throws Exception {
 		//given
 		User user = createUser();
 		userRepository.save(user);
-		SimplePost simplePost = createSimplePost(user, FullPost.builder().content("내용1").build());
-		simplePostRepository.save(simplePost);
+		SimplePost simplePost1 = createSimplePost(user, FullPost.builder().content("내용1").build());
+		SimplePost simplePost2 = createSimplePost(user, FullPost.builder().content("내용2").build());
+		simplePostRepository.save(simplePost1);
+		simplePostRepository.save(simplePost2);
 		Apply apply1 = Apply.builder()
 			.applyUser(user)
-			.applySimplePost(simplePost)
+			.applySimplePost(simplePost1)
 			.build();
 		Apply apply2 = Apply.builder()
 			.applyUser(user)
-			.applySimplePost(simplePost)
+			.applySimplePost(simplePost2)
 			.build();
 		applyRepository.save(apply1);
 		applyRepository.save(apply2);
@@ -103,8 +108,8 @@ class SimplePostRepositoryTest {
 		List<SimplePost> applicationSimplePosts = simplePostRepository.findApplicationPosts(user.getId());
 
 		//then
-		assertThat(applicationSimplePosts.containsAll(List.of(apply1, apply2)));
-
+		assertThat(applicationSimplePosts.get(0).getFullPost().getContent()).isEqualTo("내용2");
+		assertThat(applicationSimplePosts.get(1).getFullPost().getContent()).isEqualTo("내용1");
 	}
 
 	@Test

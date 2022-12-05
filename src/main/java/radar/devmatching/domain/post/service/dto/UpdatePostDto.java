@@ -1,4 +1,4 @@
-package radar.devmatching.domain.post.service.dto.request;
+package radar.devmatching.domain.post.service.dto;
 
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -8,7 +8,7 @@ import radar.devmatching.domain.post.entity.Region;
 import radar.devmatching.domain.post.entity.SimplePost;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class UpdatePostRequest {
+public class UpdatePostDto {
 
 	private String title;
 
@@ -21,7 +21,7 @@ public class UpdatePostRequest {
 	private String content;
 
 	@Builder
-	private UpdatePostRequest(String title, PostCategory category, Region region, Integer userNum, String content) {
+	private UpdatePostDto(String title, PostCategory category, Region region, Integer userNum, String content) {
 		this.title = title;
 		this.category = category;
 		this.region = region;
@@ -29,8 +29,8 @@ public class UpdatePostRequest {
 		this.content = content;
 	}
 
-	public static UpdatePostRequest of(SimplePost simplePost) {
-		return UpdatePostRequest.builder()
+	public static UpdatePostDto of(SimplePost simplePost) {
+		return UpdatePostDto.builder()
 			.title(simplePost.getTitle())
 			.category(simplePost.getCategory())
 			.region(simplePost.getRegion())
