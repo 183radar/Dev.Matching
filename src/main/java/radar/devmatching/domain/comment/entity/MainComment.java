@@ -53,4 +53,8 @@ public class MainComment extends BaseEntity {
 		comment.setMainComment(this);
 		this.subComments = new ArrayList<>();
 	}
+
+	public void update(String content) {
+		this.comment.updateContent(content);
+	}
 }

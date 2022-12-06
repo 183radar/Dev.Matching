@@ -33,9 +33,9 @@ public class Comment extends BaseEntity {
 	private User user;
 
 	// 일대일 단방향 관계는 JPA가 지원하지 않기에 양방향 관계로 만듦. 없다고 생각해도 될 듯
-	@OneToOne(mappedBy = "comment")
+	@OneToOne(mappedBy = "comment", fetch = FetchType.LAZY)
 	private MainComment mainComment;
-	@OneToOne(mappedBy = "comment")
+	@OneToOne(mappedBy = "comment", fetch = FetchType.LAZY)
 	private SubComment subComment;
 
 	private String content;
@@ -52,5 +52,9 @@ public class Comment extends BaseEntity {
 
 	public void setSubComment(SubComment subComment) {
 		this.subComment = subComment;
+	}
+
+	public void updateContent(String content) {
+		this.content = content;
 	}
 }

@@ -42,4 +42,8 @@ public class SubComment extends BaseEntity {
 		this.comment = comment;
 		comment.setSubComment(this);
 	}
+
+	public void update(String content) {
+		this.comment.updateContent(content);
+	}
 }
