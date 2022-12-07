@@ -57,7 +57,7 @@ public class FullPost extends BaseEntity {
 		return "FullPost{" +
 			"id=" + id +
 			", content='" + content + '\'' +
-			", simplePost=" + simplePost +
+			", simplePost=" + simplePost.getClass() +
 			", mainComments=" + mainComments +
 			'}';
 	}

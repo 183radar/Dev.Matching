@@ -18,11 +18,18 @@ public enum ErrorMessage {
 	ALREADY_APPLY("already apply", HttpStatus.BAD_REQUEST),
 
 	//SimplePost
-	SIMPLE_POST_NOT_FOUND("해당 id값을 갖는 엔티티가 존재하지 않습니다.", HttpStatus.NOT_FOUND),
+	SIMPLE_POST_NOT_FOUND("not exist simplePost entity of this id", HttpStatus.NOT_FOUND),
+
+	//MainComment
+	MAIN_COMMENT_NOT_FOUND("not exist mainComment entity of this id", HttpStatus.NOT_FOUND),
+
+	//SubComment
+	SUB_COMMENT_NOT_FOUND("not exist subComment entity of this id", HttpStatus.NOT_FOUND),
 
 	//Invalid Access
 	INVALID_ACCESS("Invalid Access", HttpStatus.BAD_REQUEST),
-	NOT_LEADER("Invalid Access : Access User Not Leader", HttpStatus.BAD_REQUEST);
+	NOT_LEADER("Invalid Access : Access User Not Leader", HttpStatus.BAD_REQUEST),
+	NOT_COMMENT_OWNER("Invalid Access : access user is not comment owner", HttpStatus.BAD_REQUEST);
 
 	private final String message;
 	private final HttpStatus status;

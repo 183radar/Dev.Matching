@@ -11,11 +11,11 @@ import radar.devmatching.domain.post.entity.SimplePost;
 
 public interface SimplePostRepository extends JpaRepository<SimplePost, Long> {
 
-	List<SimplePost> findMyPostsByLeaderIdOrderByCreateDateDesc(long userId);
+	List<SimplePost> findMyPostsByLeaderIdOrderByCreateDateDesc(Long userId);
 
 	@Query("select a.applySimplePost from Apply a where a.applyUser.id = :userId order by a.applySimplePost.createDate desc ")
-	List<SimplePost> findApplicationPosts(long userId);
+	List<SimplePost> findApplicationPosts(Long userId);
 
 	@EntityGraph(attributePaths = {"fullPost"})
-	Optional<SimplePost> findPostById(long simplePostId);
+	Optional<SimplePost> findPostById(Long simplePostId);
 }
