@@ -2,6 +2,9 @@ package radar.devmatching.domain.comment.repository;
 
 import static org.assertj.core.api.Assertions.*;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceUnitUtil;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -11,17 +14,43 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import radar.devmatching.domain.comment.entity.Comment;
 import radar.devmatching.domain.comment.entity.MainComment;
 import radar.devmatching.domain.comment.entity.SubComment;
+import radar.devmatching.domain.matchings.matching.entity.Matching;
 import radar.devmatching.domain.post.entity.FullPost;
+import radar.devmatching.domain.post.entity.SimplePost;
+import radar.devmatching.domain.post.repository.FullPostRepository;
+import radar.devmatching.domain.post.repository.SimplePostRepository;
+import radar.devmatching.domain.user.entity.User;
+import radar.devmatching.domain.user.repository.UserRepository;
 
 @DataJpaTest
 @DisplayName("SubCommentRepository의")
 class SubCommentRepositoryTest {
 
 	@Autowired
+	EntityManager em;
+	@Autowired
+	UserRepository userRepository;
+	@Autowired
+	SimplePostRepository simplePostRepository;
+	@Autowired
+	FullPostRepository fullPostRepository;
+	@Autowired
+	MainCommentRepository mainCommentRepository;
+	@Autowired
 	SubCommentRepository subCommentRepository;
-
 	@Autowired
 	CommentRepository commentRepository;
+
+	private User createUser() {
+		return userRepository.save(User.builder()
+			.username("username")
+			.password("password")
+			.nickName("nickName")
+			.schoolName("schoolName")
+			.githubUrl("githubUrl")
+			.introduce("introduce")
+			.build());
+	}
 
 	private Comment createComment() {
 		return Comment.builder().
@@ -35,6 +64,42 @@ class SubCommentRepositoryTest {
 			.comment(createComment())
 			.fullPost(FullPost.builder().content("내용").build())
 			.build();
+	}
+
+	@Test
+	@DisplayName("findSubCommentById 메서드는 subCommentId값을 받으면 Comment MainComment, FullPost, SimplePost를 패치하여 가져온다.")
+	void findSubCommentByIdTest() throws Exception {
+		//given
+		PersistenceUnitUtil persistenceUnitUtil = em.getEntityManagerFactory().getPersistenceUnitUtil();
+		FullPost fullPost = FullPost.builder().content("내용").build();
+		fullPostRepository.save(fullPost);
+		SimplePost simplePost = SimplePost.builder()
+			.matching(Matching.builder().build())
+			.fullPost(fullPost)
+			.leader(createUser()).build();
+		simplePostRepository.save(simplePost);
+		MainComment mainComment = MainComment.builder()
+			.fullPost(fullPost)
+			.comment(createComment())
+			.build();
+		mainCommentRepository.save(mainComment);
+		SubComment subComment = SubComment.builder()
+			.mainComment(mainComment)
+			.comment(createComment())
+			.build();
+		subCommentRepository.save(subComment);
+		em.flush();
+		em.clear();
+
+		//when
+		SubComment findSubComment = subCommentRepository.findSubCommentById(subComment.getId()).get();
+
+		//then
+		assertThat(persistenceUnitUtil.isLoaded(findSubComment.getComment())).isTrue();
+		assertThat(persistenceUnitUtil.isLoaded(findSubComment.getMainComment())).isTrue();
+		assertThat(persistenceUnitUtil.isLoaded(findSubComment.getMainComment().getFullPost())).isTrue();
+		assertThat(
+			persistenceUnitUtil.isLoaded(findSubComment.getMainComment().getFullPost().getSimplePost())).isTrue();
 	}
 
 	@Nested
