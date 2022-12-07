@@ -50,7 +50,7 @@ public class MainComment extends BaseEntity {
 		this.fullPost = fullPost;
 		fullPost.getMainComments().add(this);
 		this.comment = comment;
-		comment.setMainComment(this);
+		// comment.setMainComment(this);
 		this.subComments = new ArrayList<>();
 	}
 

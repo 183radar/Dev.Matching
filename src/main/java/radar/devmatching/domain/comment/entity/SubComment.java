@@ -40,7 +40,7 @@ public class SubComment extends BaseEntity {
 		this.mainComment = mainComment;
 		mainComment.getSubComments().add(this);
 		this.comment = comment;
-		comment.setSubComment(this);
+		// comment.setSubComment(this);
 	}
 
 	public void update(String content) {
