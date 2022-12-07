@@ -56,6 +56,29 @@ class MainCommentRepositoryTest {
 			.build();
 	}
 
+	@Test
+	@DisplayName("findMainCommentById 메서드는 mainCommentId값을 받으면 MainComment에 FullPost와 Comment를 패치하여 가져온다.")
+	void findMainCommentByIdTest() throws Exception {
+		//given
+		PersistenceUnitUtil persistenceUnitUtil = em.getEntityManagerFactory().getPersistenceUnitUtil();
+		FullPost fullPost = FullPost.builder().content("내용").build();
+		fullPostRepository.save(fullPost);
+		MainComment mainComment = MainComment.builder()
+			.fullPost(fullPost)
+			.comment(createComment())
+			.build();
+		mainCommentRepository.save(mainComment);
+		em.flush();
+		em.clear();
+
+		//when
+		MainComment findMainComment = mainCommentRepository.findMainCommentById(mainComment.getId()).get();
+
+		//then
+		assertThat(persistenceUnitUtil.isLoaded(findMainComment.getComment())).isTrue();
+		assertThat(persistenceUnitUtil.isLoaded(findMainComment.getFullPost())).isTrue();
+	}
+
 	@Nested
 	@DisplayName("save 메서드는")
 	class SaveMethodIs {
@@ -69,8 +92,10 @@ class MainCommentRepositoryTest {
 			void saveCommentTogether() throws Exception {
 				//given
 				Comment comment = createComment();
+				FullPost fullPost = FullPost.builder().content("내용").build();
+				fullPostRepository.save(fullPost);
 				MainComment mainComment = MainComment.builder()
-					.fullPost(FullPost.builder().content("내용").build())
+					.fullPost(fullPost)
 					.comment(comment)
 					.build();
 
@@ -96,8 +121,10 @@ class MainCommentRepositoryTest {
 			void deleteCommentTogether() throws Exception {
 				//given
 				Comment comment = createComment();
+				FullPost fullPost = FullPost.builder().content("내용").build();
+				fullPostRepository.save(fullPost);
 				MainComment mainComment = MainComment.builder()
-					.fullPost(FullPost.builder().content("내용").build())
+					.fullPost(fullPost)
 					.comment(comment)
 					.build();
 				mainCommentRepository.save(mainComment);
@@ -113,8 +140,10 @@ class MainCommentRepositoryTest {
 			@DisplayName("MainComment가 참조하는 SubComment 엔티티들도 삭제한다")
 			void deleteSubCommentsTogether() throws Exception {
 				//given
+				FullPost fullPost = FullPost.builder().content("내용").build();
+				fullPostRepository.save(fullPost);
 				MainComment mainComment = MainComment.builder()
-					.fullPost(FullPost.builder().content("내용").build())
+					.fullPost(fullPost)
 					.comment(createComment())
 					.build();
 				SubComment subComment1 = SubComment.builder()
@@ -176,5 +205,4 @@ class MainCommentRepositoryTest {
 			}
 		}
 	}
-
 }

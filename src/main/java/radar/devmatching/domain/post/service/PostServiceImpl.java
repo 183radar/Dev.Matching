@@ -7,13 +7,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
+import radar.devmatching.common.exception.InvalidAccessException;
+import radar.devmatching.common.exception.error.ErrorMessage;
 import radar.devmatching.domain.comment.service.CommentService;
-import radar.devmatching.domain.comment.service.dto.MainCommentResponse;
+import radar.devmatching.domain.comment.service.dto.response.MainCommentResponse;
 import radar.devmatching.domain.matchings.apply.service.ApplyService;
 import radar.devmatching.domain.matchings.matching.entity.Matching;
 import radar.devmatching.domain.matchings.matching.service.MatchingService;
 import radar.devmatching.domain.post.entity.SimplePost;
-import radar.devmatching.domain.post.exception.NotLeaderExceptionCustom;
 import radar.devmatching.domain.post.exception.SimplePostNotFoundException;
 import radar.devmatching.domain.post.repository.SimplePostRepository;
 import radar.devmatching.domain.post.service.dto.UpdatePostDto;
@@ -95,10 +96,10 @@ public class PostServiceImpl implements PostService {
 
 	@Override
 	@Transactional
-	public SimplePost createPost(CreatePostRequest createPostDto, User user) {
+	public long createPost(CreatePostRequest createPostRequest, User user) {
 		Matching matching = matchingService.createMatching(user);
-		SimplePost savedPost = simplePostRepository.save(createPostDto.toEntity(user, matching));
-		return savedPost;
+		SimplePost savedPost = simplePostRepository.save(createPostRequest.toEntity(user, matching));
+		return savedPost.getId();
 	}
 
 	@Override
@@ -117,7 +118,7 @@ public class PostServiceImpl implements PostService {
 		SimplePost findPost = simplePostRepository.findById(simplePostId)
 			.orElseThrow(SimplePostNotFoundException::new);
 		if (findPost.getLeader().getId() == leaderId) {
-			throw new NotLeaderExceptionCustom();
+			throw new InvalidAccessException(ErrorMessage.NOT_LEADER);
 		}
 	}
 

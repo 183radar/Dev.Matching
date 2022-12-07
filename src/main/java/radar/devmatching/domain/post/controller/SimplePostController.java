@@ -31,8 +31,8 @@ public class SimplePostController {
 
 	@PostMapping("/new")
 	public String createPost(@AuthUser User authUser, @ModelAttribute CreatePostRequest createPostRequest) {
-		postService.createPost(createPostRequest, authUser);
-		return "post/post";
+		long simplePostId = postService.createPost(createPostRequest, authUser);
+		return "redirect:/api/posts/" + simplePostId;
 	}
 
 	@GetMapping("/my")

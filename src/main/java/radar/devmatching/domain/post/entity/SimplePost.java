@@ -97,4 +97,20 @@ public class SimplePost extends BaseEntity {
 	public void closePost() {
 		this.postState = PostState.END;
 	}
+
+	@Override
+	public String toString() {
+		return "SimplePost{" +
+			"id=" + id +
+			", title='" + title + '\'' +
+			", category=" + category +
+			", region=" + region +
+			", userNum=" + userNum +
+			", postState=" + postState +
+			", leader=" + leader.getClass() +
+			", fullPost=" + fullPost.getClass() +
+			", matching=" + matching.getClass() +
+			", applyList=" + applyList +
+			'}';
+	}
 }

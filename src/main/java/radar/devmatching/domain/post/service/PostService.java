@@ -11,7 +11,7 @@ import radar.devmatching.domain.user.entity.User;
 
 public interface PostService {
 
-	SimplePost createPost(CreatePostRequest createPostDto, User user);
+	long createPost(CreatePostRequest createPostDto, User user);
 
 	List<SimplePostResponse> getMyPosts(long userId);
 

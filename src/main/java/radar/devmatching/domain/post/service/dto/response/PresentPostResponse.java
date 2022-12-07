@@ -6,7 +6,7 @@ import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
-import radar.devmatching.domain.comment.service.dto.MainCommentResponse;
+import radar.devmatching.domain.comment.service.dto.response.MainCommentResponse;
 import radar.devmatching.domain.post.entity.PostCategory;
 import radar.devmatching.domain.post.entity.Region;
 import radar.devmatching.domain.post.entity.SimplePost;

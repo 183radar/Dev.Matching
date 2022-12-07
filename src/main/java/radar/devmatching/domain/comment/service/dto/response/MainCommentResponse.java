@@ -1,4 +1,4 @@
-package radar.devmatching.domain.comment.service.dto;
+package radar.devmatching.domain.comment.service.dto.response;
 
 import java.util.List;
 import java.util.stream.Collectors;

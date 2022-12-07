@@ -7,7 +7,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import lombok.AccessLevel;
@@ -33,10 +32,10 @@ public class Comment extends BaseEntity {
 	private User user;
 
 	// 일대일 단방향 관계는 JPA가 지원하지 않기에 양방향 관계로 만듦. 없다고 생각해도 될 듯
-	@OneToOne(mappedBy = "comment")
-	private MainComment mainComment;
-	@OneToOne(mappedBy = "comment")
-	private SubComment subComment;
+	// @OneToOne(mappedBy = "comment", fetch = FetchType.LAZY)
+	// private MainComment mainComment;
+	// @OneToOne(mappedBy = "comment", fetch = FetchType.LAZY)
+	// private SubComment subComment;
 
 	private String content;
 
@@ -46,11 +45,15 @@ public class Comment extends BaseEntity {
 		this.user = user;
 	}
 
-	public void setMainComment(MainComment mainComment) {
-		this.mainComment = mainComment;
-	}
+	// public void setMainComment(MainComment mainComment) {
+	// 	this.mainComment = mainComment;
+	// }
 
-	public void setSubComment(SubComment subComment) {
-		this.subComment = subComment;
+	// public void setSubComment(SubComment subComment) {
+	// 	this.subComment = subComment;
+	// }
+
+	public void updateContent(String content) {
+		this.content = content;
 	}
 }
