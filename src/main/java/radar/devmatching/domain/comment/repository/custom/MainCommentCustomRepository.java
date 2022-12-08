@@ -6,6 +6,7 @@ import radar.devmatching.domain.comment.entity.MainComment;
 
 public interface MainCommentCustomRepository {
 
-	List<MainComment> getAllComments(long fullPostId);
+	List<MainComment> getAllComments(Long fullPostId);
 
+	Long findSimplePostIdAsMainCommentId(Long mainCommentId);
 }

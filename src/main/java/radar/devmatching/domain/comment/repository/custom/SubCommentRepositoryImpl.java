@@ -1,45 +1,31 @@
 package radar.devmatching.domain.comment.repository.custom;
 
-import static radar.devmatching.domain.comment.entity.QComment.*;
 import static radar.devmatching.domain.comment.entity.QMainComment.*;
 import static radar.devmatching.domain.comment.entity.QSubComment.*;
 import static radar.devmatching.domain.post.entity.QFullPost.*;
 import static radar.devmatching.domain.post.entity.QSimplePost.*;
 
-import java.util.List;
-
 import javax.persistence.EntityManager;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
-import radar.devmatching.domain.comment.entity.MainComment;
-
-public class MainCommentRepositoryImpl implements MainCommentCustomRepository {
+public class SubCommentRepositoryImpl implements SubCommentCustomRepository {
 
 	private final JPAQueryFactory queryFactory;
 
-	public MainCommentRepositoryImpl(EntityManager em) {
+	public SubCommentRepositoryImpl(EntityManager em) {
 		this.queryFactory = new JPAQueryFactory(em);
 	}
 
 	@Override
-	public List<MainComment> getAllComments(Long fullPostId) {
-		return queryFactory
-			.selectFrom(mainComment)
-			.leftJoin(mainComment.comment, comment).fetchJoin()
-			.leftJoin(mainComment.subComments, subComment).fetchJoin()
-			.where(mainComment.fullPost.id.eq(fullPostId))
-			.fetch();
-	}
-
-	@Override
-	public Long findSimplePostIdAsMainCommentId(Long mainCommentId) {
+	public Long findBySimplePostIdAsSubCommentId(Long subCommentId) {
 		return queryFactory
 			.select(simplePost.id)
 			.from(simplePost)
 			.join(simplePost.fullPost, fullPost)
 			.join(fullPost.mainComments, mainComment)
-			.where(mainComment.id.eq(mainCommentId))
+			.join(mainComment.subComments, subComment)
+			.where(subComment.id.eq(subCommentId))
 			.fetchOne();
 	}
 }

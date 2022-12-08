@@ -96,6 +96,8 @@ class CommentServiceImplTest {
 			String updateContent = "내용 업데이트";
 			UpdateCommentDto dto = UpdateCommentDto.builder().content(updateContent).build();
 			given(mainCommentRepository.findMainCommentById(anyLong())).willReturn(Optional.of(mainComment));
+			given(mainCommentRepository.findSimplePostIdAsMainCommentId(anyLong()))
+				.willReturn(simplePost.getId());
 
 			//when
 			long result = commentService.updateMainComment(anyLong(), dto, loginUser);

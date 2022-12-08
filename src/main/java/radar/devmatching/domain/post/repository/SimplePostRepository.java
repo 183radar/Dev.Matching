@@ -8,8 +8,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import radar.devmatching.domain.post.entity.SimplePost;
+import radar.devmatching.domain.post.repository.custom.SimplePostCustomRepository;
 
-public interface SimplePostRepository extends JpaRepository<SimplePost, Long> {
+public interface SimplePostRepository extends JpaRepository<SimplePost, Long>, SimplePostCustomRepository {
 
 	List<SimplePost> findMyPostsByLeaderIdOrderByCreateDateDesc(Long userId);
 

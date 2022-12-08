@@ -83,7 +83,11 @@ public class CommentServiceImpl implements CommentService {
 	public long updateMainComment(long mainCommentId, UpdateCommentDto updateCommentDto, User loginUser) {
 		MainComment mainComment = validationMainCommentOwner(mainCommentId, loginUser);
 		mainComment.update(updateCommentDto.getContent());
-		return mainComment.getFullPost().getSimplePost().getId();
+		Long simplePostId = mainCommentRepository.findSimplePostIdAsMainCommentId(mainCommentId);
+		if (Objects.isNull(simplePostId)) {
+			throw new EntityNotFoundException(ErrorMessage.SIMPLE_POST_NOT_FOUND);
+		}
+		return simplePostId;
 	}
 
 	@Override

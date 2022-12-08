@@ -57,7 +57,7 @@ class MainCommentRepositoryTest {
 	}
 
 	@Test
-	@DisplayName("findMainCommentById 메서드는 mainCommentId값을 받으면 MainComment에 FullPost와 Comment를 패치하여 가져온다.")
+	@DisplayName("findMainCommentById 메서드는 mainCommentId값을 받으면 MainComment에 Comment를 패치하여 가져온다.")
 	void findMainCommentByIdTest() throws Exception {
 		//given
 		PersistenceUnitUtil persistenceUnitUtil = em.getEntityManagerFactory().getPersistenceUnitUtil();
@@ -76,7 +76,6 @@ class MainCommentRepositoryTest {
 
 		//then
 		assertThat(persistenceUnitUtil.isLoaded(findMainComment.getComment())).isTrue();
-		assertThat(persistenceUnitUtil.isLoaded(findMainComment.getFullPost())).isTrue();
 	}
 
 	@Nested

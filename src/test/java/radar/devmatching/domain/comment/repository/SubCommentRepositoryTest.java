@@ -10,7 +10,9 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.util.StopWatch;
 
+import lombok.extern.slf4j.Slf4j;
 import radar.devmatching.domain.comment.entity.Comment;
 import radar.devmatching.domain.comment.entity.MainComment;
 import radar.devmatching.domain.comment.entity.SubComment;
@@ -22,6 +24,7 @@ import radar.devmatching.domain.post.repository.SimplePostRepository;
 import radar.devmatching.domain.user.entity.User;
 import radar.devmatching.domain.user.repository.UserRepository;
 
+@Slf4j
 @DataJpaTest
 @DisplayName("SubCommentRepository의")
 class SubCommentRepositoryTest {
@@ -92,7 +95,13 @@ class SubCommentRepositoryTest {
 		em.clear();
 
 		//when
+		StopWatch stopWatch = new StopWatch();
+		stopWatch.start();
 		SubComment findSubComment = subCommentRepository.findSubCommentById(subComment.getId()).get();
+		Long id = subCommentRepository.findBySimplePostIdAsSubCommentId(subComment.getId());
+		System.out.println("id = " + id);
+		stopWatch.stop();
+		log.info("findSubCommentById time: {}", stopWatch.getTotalTimeMillis());
 
 		//then
 		assertThat(persistenceUnitUtil.isLoaded(findSubComment.getComment())).isTrue();
