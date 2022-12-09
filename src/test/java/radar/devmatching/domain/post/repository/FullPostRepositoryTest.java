@@ -11,7 +11,8 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import radar.devmatching.domain.comment.entity.Comment;
 import radar.devmatching.domain.comment.entity.MainComment;
 import radar.devmatching.domain.comment.repository.MainCommentRepository;
-import radar.devmatching.domain.post.entity.FullPost;
+import radar.devmatching.domain.post.full.entity.FullPost;
+import radar.devmatching.domain.post.full.repository.FullPostRepository;
 
 @DataJpaTest
 @DisplayName("FullPostRepository의")
@@ -19,7 +20,7 @@ class FullPostRepositoryTest {
 
 	@Autowired
 	FullPostRepository fullPostRepository;
-	
+
 	@Autowired
 	MainCommentRepository mainCommentRepository;
 

@@ -51,8 +51,8 @@ public class SubCommentController {
 	}
 
 	@PostMapping("subComments/{subCommentId}/delete")
-	public String deleteSubComment(@AuthUser User user, @PathVariable long subCommentId) {
-		// commentService.deleteSubComment()
+	public String deleteSubComment(@AuthUser User authUser, @PathVariable long subCommentId) {
+		commentService.deleteSubComment(subCommentId, authUser);
 
 		return "redirect:/api/posts/my";
 	}

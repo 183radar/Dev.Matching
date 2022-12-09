@@ -8,5 +8,5 @@ public interface MainCommentCustomRepository {
 
 	List<MainComment> getAllComments(Long fullPostId);
 
-	Long findSimplePostIdAsMainCommentId(Long mainCommentId);
+	Long findBySimplePostIdAsMainCommentId(Long mainCommentId);
 }

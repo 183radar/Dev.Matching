@@ -3,8 +3,8 @@ package radar.devmatching.domain.comment.repository.custom;
 import static radar.devmatching.domain.comment.entity.QComment.*;
 import static radar.devmatching.domain.comment.entity.QMainComment.*;
 import static radar.devmatching.domain.comment.entity.QSubComment.*;
-import static radar.devmatching.domain.post.entity.QFullPost.*;
-import static radar.devmatching.domain.post.entity.QSimplePost.*;
+import static radar.devmatching.domain.post.full.entity.QFullPost.*;
+import static radar.devmatching.domain.post.simple.entity.QSimplePost.*;
 
 import java.util.List;
 
@@ -33,7 +33,7 @@ public class MainCommentRepositoryImpl implements MainCommentCustomRepository {
 	}
 
 	@Override
-	public Long findSimplePostIdAsMainCommentId(Long mainCommentId) {
+	public Long findBySimplePostIdAsMainCommentId(Long mainCommentId) {
 		return queryFactory
 			.select(simplePost.id)
 			.from(simplePost)

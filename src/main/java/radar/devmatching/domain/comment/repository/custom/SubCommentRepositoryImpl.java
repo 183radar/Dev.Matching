@@ -2,8 +2,8 @@ package radar.devmatching.domain.comment.repository.custom;
 
 import static radar.devmatching.domain.comment.entity.QMainComment.*;
 import static radar.devmatching.domain.comment.entity.QSubComment.*;
-import static radar.devmatching.domain.post.entity.QFullPost.*;
-import static radar.devmatching.domain.post.entity.QSimplePost.*;
+import static radar.devmatching.domain.post.full.entity.QFullPost.*;
+import static radar.devmatching.domain.post.simple.entity.QSimplePost.*;
 
 import javax.persistence.EntityManager;
 

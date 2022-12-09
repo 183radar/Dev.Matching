@@ -9,6 +9,6 @@ import radar.devmatching.domain.comment.entity.SubComment;
 import radar.devmatching.domain.comment.repository.custom.SubCommentCustomRepository;
 
 public interface SubCommentRepository extends JpaRepository<SubComment, Long>, SubCommentCustomRepository {
-	@EntityGraph(attributePaths = {"comment", "mainComment", "mainComment.fullPost", "mainComment.fullPost.simplePost"})
+	@EntityGraph(attributePaths = {"comment"})
 	Optional<SubComment> findSubCommentById(Long subCommentId);
 }

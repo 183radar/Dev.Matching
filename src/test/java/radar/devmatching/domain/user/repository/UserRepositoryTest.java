@@ -17,11 +17,11 @@ import radar.devmatching.domain.matchings.matching.entity.Matching;
 import radar.devmatching.domain.matchings.matching.repository.MatchingRepository;
 import radar.devmatching.domain.matchings.matchinguser.entity.MatchingUser;
 import radar.devmatching.domain.matchings.matchinguser.repository.MatchingUserRepository;
-import radar.devmatching.domain.post.entity.FullPost;
-import radar.devmatching.domain.post.entity.PostCategory;
-import radar.devmatching.domain.post.entity.Region;
-import radar.devmatching.domain.post.entity.SimplePost;
-import radar.devmatching.domain.post.repository.SimplePostRepository;
+import radar.devmatching.domain.post.full.entity.FullPost;
+import radar.devmatching.domain.post.simple.entity.PostCategory;
+import radar.devmatching.domain.post.simple.entity.Region;
+import radar.devmatching.domain.post.simple.entity.SimplePost;
+import radar.devmatching.domain.post.simple.repository.SimplePostRepository;
 import radar.devmatching.domain.user.entity.User;
 
 @DataJpaTest

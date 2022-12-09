@@ -17,10 +17,12 @@ import radar.devmatching.domain.matchings.apply.entity.Apply;
 import radar.devmatching.domain.matchings.apply.repository.ApplyRepository;
 import radar.devmatching.domain.matchings.matching.entity.Matching;
 import radar.devmatching.domain.matchings.matching.repository.MatchingRepository;
-import radar.devmatching.domain.post.entity.FullPost;
-import radar.devmatching.domain.post.entity.PostCategory;
-import radar.devmatching.domain.post.entity.Region;
-import radar.devmatching.domain.post.entity.SimplePost;
+import radar.devmatching.domain.post.full.entity.FullPost;
+import radar.devmatching.domain.post.full.repository.FullPostRepository;
+import radar.devmatching.domain.post.simple.entity.PostCategory;
+import radar.devmatching.domain.post.simple.entity.Region;
+import radar.devmatching.domain.post.simple.entity.SimplePost;
+import radar.devmatching.domain.post.simple.repository.SimplePostRepository;
 import radar.devmatching.domain.user.entity.User;
 import radar.devmatching.domain.user.repository.UserRepository;
 

@@ -16,8 +16,8 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import radar.devmatching.domain.comment.entity.Comment;
 import radar.devmatching.domain.comment.entity.MainComment;
 import radar.devmatching.domain.comment.entity.SubComment;
-import radar.devmatching.domain.post.entity.FullPost;
-import radar.devmatching.domain.post.repository.FullPostRepository;
+import radar.devmatching.domain.post.full.entity.FullPost;
+import radar.devmatching.domain.post.full.repository.FullPostRepository;
 import radar.devmatching.domain.user.entity.User;
 import radar.devmatching.domain.user.repository.UserRepository;
 

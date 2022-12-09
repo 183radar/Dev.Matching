@@ -23,9 +23,9 @@ import radar.devmatching.domain.comment.repository.MainCommentRepository;
 import radar.devmatching.domain.comment.repository.SubCommentRepository;
 import radar.devmatching.domain.comment.service.dto.UpdateCommentDto;
 import radar.devmatching.domain.matchings.matching.entity.Matching;
-import radar.devmatching.domain.post.entity.FullPost;
-import radar.devmatching.domain.post.entity.SimplePost;
-import radar.devmatching.domain.post.repository.SimplePostRepository;
+import radar.devmatching.domain.post.full.entity.FullPost;
+import radar.devmatching.domain.post.simple.entity.SimplePost;
+import radar.devmatching.domain.post.simple.repository.SimplePostRepository;
 import radar.devmatching.domain.user.entity.User;
 
 @ExtendWith(MockitoExtension.class)
@@ -96,7 +96,7 @@ class CommentServiceImplTest {
 			String updateContent = "내용 업데이트";
 			UpdateCommentDto dto = UpdateCommentDto.builder().content(updateContent).build();
 			given(mainCommentRepository.findMainCommentById(anyLong())).willReturn(Optional.of(mainComment));
-			given(mainCommentRepository.findSimplePostIdAsMainCommentId(anyLong()))
+			given(mainCommentRepository.findBySimplePostIdAsMainCommentId(anyLong()))
 				.willReturn(simplePost.getId());
 
 			//when

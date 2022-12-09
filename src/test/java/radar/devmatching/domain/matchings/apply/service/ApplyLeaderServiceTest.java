@@ -8,7 +8,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import radar.devmatching.domain.matchings.apply.repository.ApplyRepository;
 import radar.devmatching.domain.matchings.matchinguser.service.MatchingUserService;
-import radar.devmatching.domain.post.repository.SimplePostRepository;
+import radar.devmatching.domain.post.simple.repository.SimplePostRepository;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("ApplyLeaderService의")

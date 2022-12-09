@@ -17,8 +17,8 @@ import radar.devmatching.domain.matchings.apply.entity.ApplyState;
 import radar.devmatching.domain.matchings.apply.exception.AlreadyApplyException;
 import radar.devmatching.domain.matchings.apply.repository.ApplyRepository;
 import radar.devmatching.domain.matchings.apply.service.dto.response.ApplyResponse;
-import radar.devmatching.domain.post.entity.SimplePost;
-import radar.devmatching.domain.post.repository.SimplePostRepository;
+import radar.devmatching.domain.post.simple.entity.SimplePost;
+import radar.devmatching.domain.post.simple.repository.SimplePostRepository;
 import radar.devmatching.domain.user.entity.User;
 
 @Slf4j
