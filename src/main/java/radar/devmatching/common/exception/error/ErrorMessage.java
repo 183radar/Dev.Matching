@@ -9,6 +9,7 @@ public enum ErrorMessage {
 	//User
 	DUPLICATE_USERNAME("duplicate username", HttpStatus.CONFLICT),
 	DUPLICATE_NICKNAME("duplicate nickName", HttpStatus.CONFLICT),
+	USER_NOT_FOUND("not exist user", HttpStatus.BAD_REQUEST),
 
 	//MatchingUser
 	ALREADY_JOIN("already join user", HttpStatus.BAD_REQUEST),
@@ -29,7 +30,15 @@ public enum ErrorMessage {
 	//Invalid Access
 	INVALID_ACCESS("Invalid Access", HttpStatus.BAD_REQUEST),
 	NOT_LEADER("Invalid Access : Access User Not Leader", HttpStatus.BAD_REQUEST),
-	NOT_COMMENT_OWNER("Invalid Access : access user is not comment owner", HttpStatus.BAD_REQUEST);
+	NOT_COMMENT_OWNER("Invalid Access : access user is not comment owner", HttpStatus.BAD_REQUEST),
+
+	//Security
+	AUTHENTICATION_FAIL("Authentication Fail", HttpStatus.BAD_REQUEST),
+	INVALID_TOKEN("Invalid Token", HttpStatus.BAD_REQUEST),
+	ACCESS_TOKEN_NOT_FOUND("access token not found", HttpStatus.NOT_FOUND),
+	REFRESH_TOKEN_NOT_FOUND("refresh token not found", HttpStatus.NOT_FOUND),
+	EXPIRED_ACCESS_TOKEN("expired access token", HttpStatus.BAD_REQUEST),
+	EXPIRED_REFRESH_TOKEN("expired refresh token", HttpStatus.BAD_REQUEST);
 
 	private final String message;
 	private final HttpStatus status;
