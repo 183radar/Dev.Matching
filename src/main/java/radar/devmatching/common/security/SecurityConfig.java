@@ -12,8 +12,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-	private final CustomUserDetailsService service;
-
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
