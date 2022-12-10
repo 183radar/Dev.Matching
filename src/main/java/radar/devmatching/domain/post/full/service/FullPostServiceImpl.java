@@ -11,11 +11,11 @@ import radar.devmatching.common.exception.error.ErrorMessage;
 import radar.devmatching.domain.comment.service.CommentService;
 import radar.devmatching.domain.comment.service.dto.response.MainCommentResponse;
 import radar.devmatching.domain.matchings.apply.service.ApplyService;
+import radar.devmatching.domain.post.full.service.dto.UpdatePostDto;
+import radar.devmatching.domain.post.full.service.dto.response.PresentPostResponse;
 import radar.devmatching.domain.post.simple.entity.SimplePost;
 import radar.devmatching.domain.post.simple.exception.SimplePostNotFoundException;
 import radar.devmatching.domain.post.simple.repository.SimplePostRepository;
-import radar.devmatching.domain.post.simple.service.dto.UpdatePostDto;
-import radar.devmatching.domain.post.simple.service.dto.response.PresentPostResponse;
 
 @Service
 @Transactional(readOnly = true)

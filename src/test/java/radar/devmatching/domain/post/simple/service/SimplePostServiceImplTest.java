@@ -1,4 +1,4 @@
-package radar.devmatching.domain.post.service;
+package radar.devmatching.domain.post.simple.service;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
@@ -21,8 +21,6 @@ import radar.devmatching.domain.post.simple.entity.PostCategory;
 import radar.devmatching.domain.post.simple.entity.Region;
 import radar.devmatching.domain.post.simple.entity.SimplePost;
 import radar.devmatching.domain.post.simple.repository.SimplePostRepository;
-import radar.devmatching.domain.post.simple.service.SimplePostService;
-import radar.devmatching.domain.post.simple.service.SimplePostServiceImpl;
 import radar.devmatching.domain.post.simple.service.dto.request.CreatePostRequest;
 import radar.devmatching.domain.post.simple.service.dto.response.SimplePostResponse;
 import radar.devmatching.domain.user.entity.User;

@@ -1,7 +1,7 @@
 package radar.devmatching.domain.post.full.service;
 
-import radar.devmatching.domain.post.simple.service.dto.UpdatePostDto;
-import radar.devmatching.domain.post.simple.service.dto.response.PresentPostResponse;
+import radar.devmatching.domain.post.full.service.dto.UpdatePostDto;
+import radar.devmatching.domain.post.full.service.dto.response.PresentPostResponse;
 
 public interface FullPostService {
 

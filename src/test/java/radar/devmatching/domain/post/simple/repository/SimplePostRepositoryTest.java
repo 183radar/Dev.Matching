@@ -1,4 +1,4 @@
-package radar.devmatching.domain.post.repository;
+package radar.devmatching.domain.post.simple.repository;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -13,6 +13,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
+import radar.devmatching.common.exception.InvalidParamException;
+import radar.devmatching.common.exception.error.ErrorMessage;
 import radar.devmatching.domain.matchings.apply.entity.Apply;
 import radar.devmatching.domain.matchings.apply.repository.ApplyRepository;
 import radar.devmatching.domain.matchings.matching.entity.Matching;
@@ -22,7 +24,7 @@ import radar.devmatching.domain.post.full.repository.FullPostRepository;
 import radar.devmatching.domain.post.simple.entity.PostCategory;
 import radar.devmatching.domain.post.simple.entity.Region;
 import radar.devmatching.domain.post.simple.entity.SimplePost;
-import radar.devmatching.domain.post.simple.repository.SimplePostRepository;
+import radar.devmatching.domain.post.simple.service.dto.MainPostDto;
 import radar.devmatching.domain.user.entity.User;
 import radar.devmatching.domain.user.repository.UserRepository;
 
@@ -63,6 +65,42 @@ class SimplePostRepositoryTest {
 			.leader(user)
 			.matching(Matching.builder().build())
 			.fullPost(fullPost)
+			.build();
+	}
+
+	private SimplePost createSimplePostWithCategory(User user, PostCategory category) {
+		return SimplePost.builder()
+			.title("게시글 제목")
+			.category(category)
+			.region(Region.BUSAN)
+			.userNum(1)
+			.leader(user)
+			.matching(Matching.builder().build())
+			.fullPost(FullPost.builder().build())
+			.build();
+	}
+
+	private SimplePost createSimplePostWithRegion(User user, Region region) {
+		return SimplePost.builder()
+			.title("게시글 제목")
+			.category(PostCategory.PROJECT)
+			.region(region)
+			.userNum(1)
+			.leader(user)
+			.matching(Matching.builder().build())
+			.fullPost(FullPost.builder().build())
+			.build();
+	}
+
+	private SimplePost createSimplePostWithTitle(User user, String title) {
+		return SimplePost.builder()
+			.title(title)
+			.category(PostCategory.PROJECT)
+			.region(Region.BUSAN)
+			.userNum(1)
+			.leader(user)
+			.matching(Matching.builder().build())
+			.fullPost(FullPost.builder().build())
 			.build();
 	}
 
@@ -132,6 +170,186 @@ class SimplePostRepositoryTest {
 		assertThat(em.getEntityManagerFactory().getPersistenceUnitUtil().isLoaded(
 			findPost.get().getFullPost()
 		)).isTrue();
+	}
+
+	@Nested
+	@DisplayName("findByPostCategory 메서드는")
+	class FindByPostCategoryMethod {
+
+		@Nested
+		@DisplayName("PostCategory를 인자로 받으면")
+		class inputPostCategoryThan {
+
+			@Test
+			@DisplayName("Category와 일치하는 게시글이 없으면 빈 리스트를 반환한다")
+			void returnEmptyListIfCategoryNotEqualAnything() throws Exception {
+				//given
+				User user = userRepository.save(createUser());
+				simplePostRepository.save(createSimplePost(user, FullPost.builder().content("내용").build()));
+
+				//when
+				List<SimplePost> findSimplePosts = simplePostRepository.findByCategory(PostCategory.MOGAKKO);
+
+				//then
+				assertThat(findSimplePosts.isEmpty()).isTrue();
+			}
+
+			@Test
+			@DisplayName("Category와 일치하는 게시글을 반환한다")
+			void returnSimplePostsWhenEqualsCategory() throws Exception {
+				//given
+				User user = userRepository.save(createUser());
+				simplePostRepository.save(createSimplePost(user, FullPost.builder().content("내용").build()));
+
+				//when
+				List<SimplePost> findSimplePosts = simplePostRepository.findByCategory(PostCategory.PROJECT);
+
+				//then
+				assertThat(findSimplePosts.size()).isEqualTo(1);
+			}
+		}
+	}
+
+	@Nested
+	@DisplayName("findBySearchCondition 메서드는")
+	class findBySearchConditionMethod {
+
+		@Nested
+		@DisplayName("카테고리 인자가")
+		class CategoryParameterIs {
+
+			@Test
+			@DisplayName("유효하지 않다면 예외를 내보낸다")
+			void isIncorrectThanThrowException() throws Exception {
+				//given
+				User user = userRepository.save(createUser());
+				simplePostRepository.save(createSimplePost(user, FullPost.builder().content("내용").build()));
+				MainPostDto mainPostDto = MainPostDto.builder().build();
+
+				//when
+				//then
+				assertThatThrownBy(() ->
+					simplePostRepository.findBySearchCondition("InvalidParam", mainPostDto))
+					.isInstanceOf(InvalidParamException.class)
+					.hasMessage(ErrorMessage.INVALID_POST_CATEGORY.getMessage());
+			}
+
+			@Test
+			@DisplayName("ALL 로 들어오면 카테고리와 상관없이 게시글들을 반환한다")
+			void ALL() throws Exception {
+				//given
+				User user = userRepository.save(createUser());
+				simplePostRepository.save(createSimplePostWithCategory(user, PostCategory.PROJECT));
+				simplePostRepository.save(createSimplePostWithCategory(user, PostCategory.MOGAKKO));
+				MainPostDto mainPostDto = MainPostDto.builder().build();
+
+				//when
+				List<SimplePost> findSimplePosts = simplePostRepository.findBySearchCondition(
+					"ALL", mainPostDto);
+
+				//then
+				assertThat(findSimplePosts.size()).isEqualTo(2);
+			}
+
+			@Test
+			@DisplayName("PROJECT 로 들어오면 PROJECT 카테고리에 해당하는 게시글을 반환한다.")
+			void PROJECT() throws Exception {
+				//given
+				User user = userRepository.save(createUser());
+				simplePostRepository.save(createSimplePostWithCategory(user, PostCategory.PROJECT));
+				simplePostRepository.save(createSimplePostWithCategory(user, PostCategory.MOGAKKO));
+				MainPostDto mainPostDto = MainPostDto.builder().build();
+
+				//when
+				List<SimplePost> findSimplePosts = simplePostRepository.findBySearchCondition(
+					"PROJECT", mainPostDto);
+
+				//then
+				assertThat(findSimplePosts.get(0).getCategory()).isEqualTo(PostCategory.PROJECT);
+				assertThat(findSimplePosts.size()).isEqualTo(1);
+			}
+		}
+
+		@Nested
+		@DisplayName("Region 인자가")
+		class RegionParameterIs {
+
+			@Test
+			@DisplayName("null값이면 region과 관계없이 게시글들을 반환한다.")
+			void nullThan() throws Exception {
+				//given
+				User user = userRepository.save(createUser());
+				simplePostRepository.save(createSimplePostWithRegion(user, Region.BUSAN));
+				simplePostRepository.save(createSimplePostWithRegion(user, Region.DAEGU));
+				MainPostDto mainPostDto = MainPostDto.builder().region(null).build();
+
+				//when
+				List<SimplePost> findSimplePosts = simplePostRepository.findBySearchCondition(
+					"ALL", mainPostDto);
+
+				//then
+				assertThat(findSimplePosts.size()).isEqualTo(2);
+			}
+
+			@Test
+			@DisplayName("BUSAN 값이면 부산지역에 해당하는 게시글들을 반환한다.")
+			void busan() throws Exception {
+				//given
+				User user = userRepository.save(createUser());
+				simplePostRepository.save(createSimplePostWithRegion(user, Region.BUSAN));
+				simplePostRepository.save(createSimplePostWithRegion(user, Region.DAEGU));
+				MainPostDto mainPostDto = MainPostDto.builder().region(Region.BUSAN).build();
+
+				//when
+				List<SimplePost> findSimplePosts = simplePostRepository.findBySearchCondition(
+					"ALL", mainPostDto);
+
+				//then
+				assertThat(findSimplePosts.size()).isEqualTo(1);
+				assertThat(findSimplePosts.get(0).getRegion()).isEqualTo(Region.BUSAN);
+			}
+		}
+
+		@Nested
+		@DisplayName("searchCondition 인자가")
+		class SearchConditionParameterIs {
+
+			@Test
+			@DisplayName("만약 null이나 값이 없다면 searchCondition과 상관없이 게시글들을 반환한다")
+			void isBlankThan() throws Exception {
+				//given
+				User user = userRepository.save(createUser());
+				simplePostRepository.save(createSimplePostWithTitle(user, "으어어"));
+				simplePostRepository.save(createSimplePostWithTitle(user, "으아악"));
+				MainPostDto mainPostDto = MainPostDto.builder().searchCondition("").build();
+
+				//when
+				List<SimplePost> findSimplePosts = simplePostRepository.findBySearchCondition(
+					"ALL", mainPostDto);
+
+				//then
+				assertThat(findSimplePosts.size()).isEqualTo(2);
+			}
+
+			@Test
+			@DisplayName("만약 값이 있다면 게시글 제목에 해당 값을 포함되는 게시글들을 반환한다")
+			void isNotBlankThan() throws Exception {
+				//given
+				User user = userRepository.save(createUser());
+				simplePostRepository.save(createSimplePostWithTitle(user, "가나다"));
+				simplePostRepository.save(createSimplePostWithTitle(user, "가나라"));
+				simplePostRepository.save(createSimplePostWithTitle(user, "바사아"));
+				MainPostDto mainPostDto = MainPostDto.builder().searchCondition("가나").build();
+				//when
+				List<SimplePost> findSimplePosts = simplePostRepository.findBySearchCondition(
+					"ALL", mainPostDto);
+
+				//then
+				assertThat(findSimplePosts.size()).isEqualTo(2);
+				assertThat(findSimplePosts.stream()
+					.allMatch(simplePost -> simplePost.getTitle().contains("가나"))).isTrue();
+			}
+		}
 	}
 
 	@Nested

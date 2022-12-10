@@ -1,4 +1,4 @@
-package radar.devmatching.domain.post.simple.service.dto;
+package radar.devmatching.domain.post.full.service.dto;
 
 import lombok.AccessLevel;
 import lombok.Builder;

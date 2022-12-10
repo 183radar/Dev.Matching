@@ -1,4 +1,4 @@
-package radar.devmatching.domain.post.repository;
+package radar.devmatching.domain.post.full.repository;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -12,7 +12,6 @@ import radar.devmatching.domain.comment.entity.Comment;
 import radar.devmatching.domain.comment.entity.MainComment;
 import radar.devmatching.domain.comment.repository.MainCommentRepository;
 import radar.devmatching.domain.post.full.entity.FullPost;
-import radar.devmatching.domain.post.full.repository.FullPostRepository;
 
 @DataJpaTest
 @DisplayName("FullPostRepository의")

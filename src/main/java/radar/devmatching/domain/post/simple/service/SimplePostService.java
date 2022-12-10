@@ -3,6 +3,7 @@ package radar.devmatching.domain.post.simple.service;
 import java.util.List;
 
 import radar.devmatching.domain.post.simple.entity.SimplePost;
+import radar.devmatching.domain.post.simple.service.dto.MainPostDto;
 import radar.devmatching.domain.post.simple.service.dto.request.CreatePostRequest;
 import radar.devmatching.domain.post.simple.service.dto.response.SimplePostResponse;
 import radar.devmatching.domain.user.entity.User;
@@ -17,4 +18,7 @@ public interface SimplePostService {
 
 	SimplePost getSimplePostOnly(long simplePostId);
 
+	MainPostDto getMainPostDto(User loginUser, String postCategory);
+
+	MainPostDto searchSimplePost(User loginUser, String postCategory, MainPostDto mainPostDto);
 }

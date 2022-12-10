@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import lombok.RequiredArgsConstructor;
 import radar.devmatching.common.security.resolver.AuthUser;
 import radar.devmatching.domain.post.full.service.FullPostService;
-import radar.devmatching.domain.post.simple.service.dto.UpdatePostDto;
-import radar.devmatching.domain.post.simple.service.dto.response.PresentPostResponse;
+import radar.devmatching.domain.post.full.service.dto.UpdatePostDto;
+import radar.devmatching.domain.post.full.service.dto.response.PresentPostResponse;
 import radar.devmatching.domain.user.entity.User;
 
 @Controller

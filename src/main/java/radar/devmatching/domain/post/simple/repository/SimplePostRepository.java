@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import radar.devmatching.domain.post.simple.entity.PostCategory;
 import radar.devmatching.domain.post.simple.entity.SimplePost;
 import radar.devmatching.domain.post.simple.repository.custom.SimplePostCustomRepository;
 
@@ -19,4 +20,6 @@ public interface SimplePostRepository extends JpaRepository<SimplePost, Long>, S
 
 	@EntityGraph(attributePaths = {"fullPost"})
 	Optional<SimplePost> findPostById(Long simplePostId);
+
+	List<SimplePost> findByCategory(PostCategory category);
 }

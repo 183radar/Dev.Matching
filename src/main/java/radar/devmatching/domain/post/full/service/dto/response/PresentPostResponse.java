@@ -1,4 +1,4 @@
-package radar.devmatching.domain.post.simple.service.dto.response;
+package radar.devmatching.domain.post.full.service.dto.response;
 
 import java.time.LocalDateTime;
 import java.util.List;
