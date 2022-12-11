@@ -13,7 +13,7 @@ import radar.devmatching.common.security.resolver.AuthUser;
 import radar.devmatching.domain.comment.service.CommentService;
 import radar.devmatching.domain.comment.service.dto.UpdateCommentDto;
 import radar.devmatching.domain.comment.service.dto.request.CreateCommentRequest;
-import radar.devmatching.domain.post.service.PostService;
+import radar.devmatching.domain.post.simple.service.SimplePostService;
 import radar.devmatching.domain.user.entity.User;
 
 @Controller
@@ -21,13 +21,13 @@ import radar.devmatching.domain.user.entity.User;
 @RequestMapping("api/")
 public class MainCommentController {
 
-	private final PostService postService;
+	private final SimplePostService simplePostService;
 	private final CommentService commentService;
 
 	@GetMapping("posts/{simplePostId}/createMainComment")
 	public String getCreateMainComment(@PathVariable long simplePostId, Model model) {
 		// 해당 simplePost가 존재하는지 검증
-		postService.getSimplePostOnly(simplePostId);
+		simplePostService.getSimplePostOnly(simplePostId);
 		model.addAttribute("createCommentRequest",
 			CreateCommentRequest.of(CreateCommentRequest.CommentType.MAIN));
 		return "comment/createComment";

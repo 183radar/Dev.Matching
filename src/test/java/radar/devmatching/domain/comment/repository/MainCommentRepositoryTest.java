@@ -16,8 +16,8 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import radar.devmatching.domain.comment.entity.Comment;
 import radar.devmatching.domain.comment.entity.MainComment;
 import radar.devmatching.domain.comment.entity.SubComment;
-import radar.devmatching.domain.post.entity.FullPost;
-import radar.devmatching.domain.post.repository.FullPostRepository;
+import radar.devmatching.domain.post.full.entity.FullPost;
+import radar.devmatching.domain.post.full.repository.FullPostRepository;
 import radar.devmatching.domain.user.entity.User;
 import radar.devmatching.domain.user.repository.UserRepository;
 
@@ -57,7 +57,7 @@ class MainCommentRepositoryTest {
 	}
 
 	@Test
-	@DisplayName("findMainCommentById 메서드는 mainCommentId값을 받으면 MainComment에 FullPost와 Comment를 패치하여 가져온다.")
+	@DisplayName("findMainCommentById 메서드는 mainCommentId값을 받으면 MainComment에 Comment를 패치하여 가져온다.")
 	void findMainCommentByIdTest() throws Exception {
 		//given
 		PersistenceUnitUtil persistenceUnitUtil = em.getEntityManagerFactory().getPersistenceUnitUtil();
@@ -76,7 +76,6 @@ class MainCommentRepositoryTest {
 
 		//then
 		assertThat(persistenceUnitUtil.isLoaded(findMainComment.getComment())).isTrue();
-		assertThat(persistenceUnitUtil.isLoaded(findMainComment.getFullPost())).isTrue();
 	}
 
 	@Nested

@@ -3,6 +3,8 @@ package radar.devmatching.domain.comment.repository.custom;
 import static radar.devmatching.domain.comment.entity.QComment.*;
 import static radar.devmatching.domain.comment.entity.QMainComment.*;
 import static radar.devmatching.domain.comment.entity.QSubComment.*;
+import static radar.devmatching.domain.post.full.entity.QFullPost.*;
+import static radar.devmatching.domain.post.simple.entity.QSimplePost.*;
 
 import java.util.List;
 
@@ -21,12 +23,23 @@ public class MainCommentRepositoryImpl implements MainCommentCustomRepository {
 	}
 
 	@Override
-	public List<MainComment> getAllComments(long fullPostId) {
+	public List<MainComment> getAllComments(Long fullPostId) {
 		return queryFactory
 			.selectFrom(mainComment)
 			.leftJoin(mainComment.comment, comment).fetchJoin()
 			.leftJoin(mainComment.subComments, subComment).fetchJoin()
 			.where(mainComment.fullPost.id.eq(fullPostId))
 			.fetch();
+	}
+
+	@Override
+	public Long findBySimplePostIdAsMainCommentId(Long mainCommentId) {
+		return queryFactory
+			.select(simplePost.id)
+			.from(simplePost)
+			.join(simplePost.fullPost, fullPost)
+			.join(fullPost.mainComments, mainComment)
+			.where(mainComment.id.eq(mainCommentId))
+			.fetchOne();
 	}
 }

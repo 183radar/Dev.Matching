@@ -20,7 +20,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import radar.devmatching.common.entity.BaseEntity;
-import radar.devmatching.domain.post.entity.FullPost;
+import radar.devmatching.domain.post.full.entity.FullPost;
 
 @Table(name = "MAIN_COMMENT")
 @Entity

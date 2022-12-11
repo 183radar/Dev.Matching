@@ -11,17 +11,17 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
+import lombok.extern.slf4j.Slf4j;
 import radar.devmatching.domain.comment.entity.Comment;
 import radar.devmatching.domain.comment.entity.MainComment;
 import radar.devmatching.domain.comment.entity.SubComment;
-import radar.devmatching.domain.matchings.matching.entity.Matching;
-import radar.devmatching.domain.post.entity.FullPost;
-import radar.devmatching.domain.post.entity.SimplePost;
-import radar.devmatching.domain.post.repository.FullPostRepository;
-import radar.devmatching.domain.post.repository.SimplePostRepository;
+import radar.devmatching.domain.post.full.entity.FullPost;
+import radar.devmatching.domain.post.full.repository.FullPostRepository;
+import radar.devmatching.domain.post.simple.repository.SimplePostRepository;
 import radar.devmatching.domain.user.entity.User;
 import radar.devmatching.domain.user.repository.UserRepository;
 
+@Slf4j
 @DataJpaTest
 @DisplayName("SubCommentRepository의")
 class SubCommentRepositoryTest {
@@ -67,17 +67,12 @@ class SubCommentRepositoryTest {
 	}
 
 	@Test
-	@DisplayName("findSubCommentById 메서드는 subCommentId값을 받으면 Comment MainComment, FullPost, SimplePost를 패치하여 가져온다.")
+	@DisplayName("findSubCommentById 메서드는 subCommentId값을 받으면 SubComment에 Comment를 패치하여 가져온다.")
 	void findSubCommentByIdTest() throws Exception {
 		//given
 		PersistenceUnitUtil persistenceUnitUtil = em.getEntityManagerFactory().getPersistenceUnitUtil();
 		FullPost fullPost = FullPost.builder().content("내용").build();
 		fullPostRepository.save(fullPost);
-		SimplePost simplePost = SimplePost.builder()
-			.matching(Matching.builder().build())
-			.fullPost(fullPost)
-			.leader(createUser()).build();
-		simplePostRepository.save(simplePost);
 		MainComment mainComment = MainComment.builder()
 			.fullPost(fullPost)
 			.comment(createComment())
@@ -96,10 +91,6 @@ class SubCommentRepositoryTest {
 
 		//then
 		assertThat(persistenceUnitUtil.isLoaded(findSubComment.getComment())).isTrue();
-		assertThat(persistenceUnitUtil.isLoaded(findSubComment.getMainComment())).isTrue();
-		assertThat(persistenceUnitUtil.isLoaded(findSubComment.getMainComment().getFullPost())).isTrue();
-		assertThat(
-			persistenceUnitUtil.isLoaded(findSubComment.getMainComment().getFullPost().getSimplePost())).isTrue();
 	}
 
 	@Nested

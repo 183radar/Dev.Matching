@@ -16,7 +16,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import radar.devmatching.common.entity.BaseEntity;
-import radar.devmatching.domain.post.entity.SimplePost;
+import radar.devmatching.domain.post.simple.entity.SimplePost;
 import radar.devmatching.domain.user.entity.User;
 
 @Table(name = "APPLY")

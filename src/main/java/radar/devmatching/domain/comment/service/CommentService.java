@@ -25,4 +25,6 @@ public interface CommentService {
 	long updateSubComment(long subCommentId, UpdateCommentDto updateCommentDto, User loginUser);
 
 	void deleteMainComment(long mainCommentId, User loginUser);
+
+	void deleteSubComment(long subCommentId, User loginUser);
 }
