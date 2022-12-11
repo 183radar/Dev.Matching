@@ -39,7 +39,11 @@ public enum ErrorMessage {
 	ACCESS_TOKEN_NOT_FOUND("access token not found", HttpStatus.NOT_FOUND),
 	REFRESH_TOKEN_NOT_FOUND("refresh token not found", HttpStatus.NOT_FOUND),
 	EXPIRED_ACCESS_TOKEN("expired access token", HttpStatus.BAD_REQUEST),
-	EXPIRED_REFRESH_TOKEN("expired refresh token", HttpStatus.BAD_REQUEST);
+	EXPIRED_REFRESH_TOKEN("expired refresh token", HttpStatus.BAD_REQUEST),
+	NOT_COMMENT_OWNER("Invalid Access : access user is not comment owner", HttpStatus.BAD_REQUEST),
+
+	//Invalid Param
+	INVALID_POST_CATEGORY("Invalid PostCategoryType Is Inputted", HttpStatus.BAD_REQUEST);
 
 	private final String message;
 	private final HttpStatus status;

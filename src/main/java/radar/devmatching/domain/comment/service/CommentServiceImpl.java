@@ -18,9 +18,9 @@ import radar.devmatching.domain.comment.repository.SubCommentRepository;
 import radar.devmatching.domain.comment.service.dto.UpdateCommentDto;
 import radar.devmatching.domain.comment.service.dto.request.CreateCommentRequest;
 import radar.devmatching.domain.comment.service.dto.response.MainCommentResponse;
-import radar.devmatching.domain.post.entity.SimplePost;
-import radar.devmatching.domain.post.exception.SimplePostNotFoundException;
-import radar.devmatching.domain.post.repository.SimplePostRepository;
+import radar.devmatching.domain.post.simple.entity.SimplePost;
+import radar.devmatching.domain.post.simple.exception.SimplePostNotFoundException;
+import radar.devmatching.domain.post.simple.repository.SimplePostRepository;
 import radar.devmatching.domain.user.entity.User;
 
 @Service
@@ -83,14 +83,22 @@ public class CommentServiceImpl implements CommentService {
 	public long updateMainComment(long mainCommentId, UpdateCommentDto updateCommentDto, User loginUser) {
 		MainComment mainComment = validationMainCommentOwner(mainCommentId, loginUser);
 		mainComment.update(updateCommentDto.getContent());
-		return mainComment.getFullPost().getSimplePost().getId();
+		Long simplePostId = mainCommentRepository.findBySimplePostIdAsMainCommentId(mainCommentId);
+		if (Objects.isNull(simplePostId)) {
+			throw new EntityNotFoundException(ErrorMessage.SIMPLE_POST_NOT_FOUND);
+		}
+		return simplePostId;
 	}
 
 	@Override
 	public long updateSubComment(long subCommentId, UpdateCommentDto updateCommentDto, User loginUser) {
 		SubComment subComment = validationSubCommentOwner(subCommentId, loginUser);
 		subComment.update(updateCommentDto.getContent());
-		return subComment.getMainComment().getFullPost().getSimplePost().getId();
+		Long simplePostId = subCommentRepository.findBySimplePostIdAsSubCommentId(subCommentId);
+		if (Objects.isNull(simplePostId)) {
+			throw new EntityNotFoundException(ErrorMessage.SIMPLE_POST_NOT_FOUND);
+		}
+		return simplePostId;
 	}
 
 	@Override
@@ -98,6 +106,12 @@ public class CommentServiceImpl implements CommentService {
 	public void deleteMainComment(long mainCommentId, User authUser) {
 		MainComment mainComment = validationMainCommentOwner(mainCommentId, authUser);
 		mainCommentRepository.delete(mainComment);
+	}
+
+	@Override
+	public void deleteSubComment(long subCommentId, User loginUser) {
+		SubComment subComment = validationSubCommentOwner(subCommentId, loginUser);
+		subCommentRepository.delete(subComment);
 	}
 
 	private MainComment validationMainCommentOwner(long mainCommentId, User loginUser) {

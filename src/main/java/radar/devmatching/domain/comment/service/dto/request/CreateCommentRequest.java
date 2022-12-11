@@ -4,7 +4,7 @@ import lombok.Builder;
 import radar.devmatching.domain.comment.entity.Comment;
 import radar.devmatching.domain.comment.entity.MainComment;
 import radar.devmatching.domain.comment.entity.SubComment;
-import radar.devmatching.domain.post.entity.SimplePost;
+import radar.devmatching.domain.post.simple.entity.SimplePost;
 import radar.devmatching.domain.user.entity.User;
 
 public class CreateCommentRequest {

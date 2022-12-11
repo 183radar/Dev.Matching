@@ -10,6 +10,6 @@ import radar.devmatching.domain.comment.repository.custom.MainCommentCustomRepos
 
 public interface MainCommentRepository extends JpaRepository<MainComment, Long>, MainCommentCustomRepository {
 
-	@EntityGraph(attributePaths = {"comment", "fullPost"})
+	@EntityGraph(attributePaths = {"comment"})
 	Optional<MainComment> findMainCommentById(Long mainCommentId);
 }
