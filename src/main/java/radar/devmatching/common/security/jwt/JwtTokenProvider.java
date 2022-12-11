@@ -129,9 +129,7 @@ public class JwtTokenProvider {
 		} catch (ExpiredJwtException e) {
 			throw new ExpiredAccessTokenException();
 		} catch (Exception e) {
-			// businessException 변경하기
-			e.getStackTrace();
-			throw new InvalidTokenException();
+			throw new InvalidTokenException(e);
 		}
 	}
 
@@ -141,9 +139,7 @@ public class JwtTokenProvider {
 		} catch (ExpiredJwtException e) {
 			throw new ExpiredRefreshTokenException();
 		} catch (Exception e) {
-			// businessException 변경하기
-			e.getStackTrace();
-			throw new InvalidTokenException();
+			throw new InvalidTokenException(e);
 		}
 	}
 

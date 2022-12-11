@@ -7,4 +7,8 @@ public class TokenException extends BusinessException {
 	public TokenException(ErrorMessage errorMessage) {
 		super(errorMessage);
 	}
+
+	public TokenException(ErrorMessage errorMessage, Throwable throwable) {
+		super(errorMessage, throwable);
+	}
 }
