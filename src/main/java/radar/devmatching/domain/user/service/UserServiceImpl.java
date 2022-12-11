@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import radar.devmatching.common.exception.EntityNotFoundException;
 import radar.devmatching.common.exception.InvalidAccessException;
 import radar.devmatching.common.exception.error.ErrorMessage;
 import radar.devmatching.domain.user.entity.User;
@@ -46,6 +47,13 @@ public class UserServiceImpl implements UserService {
 	public UserResponse getUser(Long requestUserId, User authUser) {
 		validatePermission(requestUserId, authUser);
 		return UserResponse.of(authUser);
+	}
+
+	public UserResponse getUserByUsername(String username) {
+		User user = userRepository.findByUsername(username)
+			.orElseThrow(() -> new EntityNotFoundException(ErrorMessage.USER_NOT_FOUND));
+		log.info("signIn user={}", user);
+		return UserResponse.of(user);
 	}
 
 	@Override

@@ -7,10 +7,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import lombok.Getter;
 import radar.devmatching.domain.user.entity.User;
 
-@Getter
 public class CustomUserDetails implements UserDetails {
 
 	private static final long serialVersionUID = -7280729607974805035L;
@@ -25,6 +23,10 @@ public class CustomUserDetails implements UserDetails {
 		Collection<GrantedAuthority> list = new ArrayList<>();
 		list.add(new SimpleGrantedAuthority(user.getUserRole().getName()));
 		return list;
+	}
+
+	public User getUser() {
+		return user;
 	}
 
 	@Override

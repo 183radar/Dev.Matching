@@ -20,7 +20,6 @@ import radar.devmatching.domain.matchings.apply.entity.Apply;
 import radar.devmatching.domain.matchings.matchinguser.entity.MatchingUser;
 import radar.devmatching.domain.post.simple.entity.SimplePost;
 
-// USER로 하니 에러떠서 복수형으로 바꿈(더 좋은 방안 없으려나)
 @Table(name = "USERS")
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -31,7 +30,7 @@ public class User extends BaseEntity {
 	@Column(name = "user_id")
 	private Long id;
 
-	@Column(name = "email")
+	@Column(name = "username")
 	private String username;
 
 	@Column(name = "password")
