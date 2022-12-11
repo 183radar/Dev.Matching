@@ -39,7 +39,7 @@ public class AuthServiceImpl implements AuthService {
 			log.warn("request password not match about found password : access username = {}", username);
 			throw new BusinessException(ErrorMessage.AUTHENTICATION_FAIL);
 		}
-
+		log.info("findUser role = {}", findUser.getUserRole());
 		String accessToken = jwtTokenProvider.createAccessToken(username, findUser.getUserRole());
 		String refreshToken = jwtTokenProvider.createRefreshToken(username, findUser.getUserRole());
 

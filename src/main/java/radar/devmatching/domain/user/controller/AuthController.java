@@ -12,8 +12,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import radar.devmatching.common.security.JwtCookieProvider;
 import radar.devmatching.common.security.jwt.JwtToken;
+import radar.devmatching.common.security.resolver.AuthUser;
+import radar.devmatching.domain.user.entity.User;
 import radar.devmatching.domain.user.service.AuthService;
 import radar.devmatching.domain.user.service.dto.request.SignInRequest;
 import radar.devmatching.domain.user.service.dto.response.SignInResponse;
@@ -22,6 +25,7 @@ import radar.devmatching.domain.user.service.dto.response.SignOutResponse;
 /**
  *  TODO : RestController -> Controller 변경
  */
+@Slf4j
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
@@ -52,9 +56,10 @@ public class AuthController {
 	}
 
 	@GetMapping("/signOut")
-	public void signOut(HttpServletResponse response) {
+	public void signOut(@AuthUser User user, HttpServletResponse response) {
 		SignOutResponse signOutResponse = authService.singOut();
-
+		log.info("access User={}", user);
+		log.info("logout process execute");
 		ResponseCookie accessTokenCookie = ResponseCookie.from(signOutResponse.getAccessTokenHeader(), "")
 			.path("/")
 			.maxAge(0)

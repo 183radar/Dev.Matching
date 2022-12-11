@@ -31,13 +31,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	private final JwtTokenProvider jwtTokenProvider;
 	private final JwtCookieProvider jwtCookieProvider;
 
-	//setFilterProcessesUrl 설정으로 로그인 url 변경가능
-
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
 		FilterChain filterChain) throws ServletException, IOException {
 		String accessToken = null;
 		try {
+			// accessToken 유효성 검사
 			accessToken = authentication(request);
 		} catch (ExpiredAccessTokenException e) {
 			accessToken = refreshAuthentication(request, response);
@@ -51,7 +50,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	}
 
 	private String authentication(HttpServletRequest request) {
-		String accessToken = request.getHeader(JwtProperties.ACCESS_TOKEN_HEADER);
+		String accessToken = jwtCookieProvider.getCookieFromRequest(request, JwtProperties.ACCESS_TOKEN_HEADER);
+		log.info("access Token = {}", accessToken);
 		if (Objects.isNull(accessToken)) {
 			throw new BusinessException(ErrorMessage.ACCESS_TOKEN_NOT_FOUND);
 		}
@@ -59,31 +59,34 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		return accessToken;
 	}
 
+	/**
+	 * TODO : refreshToken 검사해서 유효하지 않으면 예외를 던질지 아니면 토큰을 다시 생성할지 결정하기.
+	 * accessToken, refreshToken 재생성 or signOut 요청후 토큰 만료후 재로그인 하기.
+	 * TODO : 코드 중복 부분 리펙터링하기
+	 */
 	private String refreshAuthentication(HttpServletRequest request, HttpServletResponse response) {
 
 		String accessToken = null;
-		String refreshToken = request.getHeader(JwtProperties.REFRESH_TOKEN_HEADER);
+		String refreshToken = jwtCookieProvider.getCookieFromRequest(request, JwtProperties.REFRESH_TOKEN_HEADER);
 
 		if (Objects.isNull(refreshToken)) {
 			throw new BusinessException(ErrorMessage.REFRESH_TOKEN_NOT_FOUND);
 		}
 
 		try {
-
+			// refreshToken 유효성 검사
 			jwtTokenProvider.validRefreshToken(refreshToken);
-			log.info("refresh token valid");
 
 			accessToken = jwtTokenProvider.createNewAccessTokenFromRefreshToken(refreshToken);
-			log.info("access token create");
 
 			ResponseCookie accessTokenCookie =
 				jwtCookieProvider.createCookie(JwtProperties.ACCESS_TOKEN_HEADER, accessToken,
 					jwtTokenProvider.getExpireTime());
 
 			response.addHeader(SET_COOKIE, accessTokenCookie.toString());
-			log.info("access token set cookie");
 
 		} catch (ExpiredRefreshTokenException e) {
+			// refreshToken 만료됐을때 accessToken, refreshToken 재생성
 			accessToken = jwtTokenProvider.createNewAccessTokenFromRefreshToken(refreshToken);
 			refreshToken = jwtTokenProvider.createNewRefreshToken(refreshToken);
 

@@ -34,6 +34,7 @@ public enum ErrorMessage {
 
 	//Security
 	AUTHENTICATION_FAIL("Authentication Fail", HttpStatus.BAD_REQUEST),
+	AUTHORITY_NOT_FOUND("Authority not found", HttpStatus.NOT_FOUND),
 	INVALID_TOKEN("Invalid Token", HttpStatus.BAD_REQUEST),
 	ACCESS_TOKEN_NOT_FOUND("access token not found", HttpStatus.NOT_FOUND),
 	REFRESH_TOKEN_NOT_FOUND("refresh token not found", HttpStatus.NOT_FOUND),

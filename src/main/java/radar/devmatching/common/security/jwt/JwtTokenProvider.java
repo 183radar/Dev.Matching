@@ -7,12 +7,10 @@ import java.util.Date;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -23,6 +21,9 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
+import radar.devmatching.common.exception.BusinessException;
+import radar.devmatching.common.exception.error.ErrorMessage;
+import radar.devmatching.common.security.CustomUserDetails;
 import radar.devmatching.common.security.JwtProperties;
 import radar.devmatching.common.security.jwt.exception.ExpiredAccessTokenException;
 import radar.devmatching.common.security.jwt.exception.ExpiredRefreshTokenException;
@@ -33,20 +34,22 @@ import radar.devmatching.domain.user.entity.UserRole;
 @Component
 public class JwtTokenProvider {
 
-	private static final String BEARER_TYPE = "Bearer";
-
 	private final long ACCESS_TOKEN_EXPIRE_TIME;
 	private final long REFRESH_TOKEN_EXPIRE_TIME;
 
 	private final Key key;
 
+	private final UserDetailsService userDetailsService;
+
 	public JwtTokenProvider(@Value("${jwt.access-token-expire-time}") long accessTime,
 		@Value("${jwt.refresh-token-expire-time}") long refreshTime,
-		@Value("${jwt.secret}") String secretKey) {
+		@Value("${jwt.secret}") String secretKey,
+		UserDetailsService userDetailsService) {
 		this.ACCESS_TOKEN_EXPIRE_TIME = accessTime;
 		this.REFRESH_TOKEN_EXPIRE_TIME = refreshTime;
 		byte[] keyBytes = Decoders.BASE64.decode(secretKey);
 		this.key = Keys.hmacShaKeyFor(keyBytes);
+		this.userDetailsService = userDetailsService;
 	}
 
 	protected String createToken(String username, UserRole userRole, long tokenValid) {
@@ -87,22 +90,23 @@ public class JwtTokenProvider {
 		return createRefreshToken(username, role);
 	}
 
-	// TODO : 쿠키 만료시간 조정 필요
-	// 쿠키 maxAge는 초단위 설정이라 1000으로 나눈값으로 설정
+	/**
+	 * TODO : 쿠키 만료시간 조정 필요
+	 * 쿠키 maxAge는 초단위 설정이라 1000으로 나눈값으로 설정
+	 * 지금 설정은 1주일로 설정되어있음
+	 */
 	public long getExpireTime() {
 		return REFRESH_TOKEN_EXPIRE_TIME / 1000;
 	}
 
-	// 토큰 값을 파싱하여 클레임에 담긴 이메일 값을 가져온다.
-	public String getUserNameByToken(String token) {
-		return parseClaims(token).getSubject();
-	}
-
+	/**
+	 * TODO : 인증 부분을 따로 클래스를 만들어서 분리할지 고민해보기
+	 */
 	public Authentication getAuthentication(String accessToken) {
 		Claims claims = parseClaims(accessToken);
-
+		log.info("user role={}", claims.get(JwtProperties.ROLE).toString());
 		if (claims.get(JwtProperties.ROLE) == null || !StringUtils.hasText(claims.get(JwtProperties.ROLE).toString())) {
-			throw new RuntimeException("NOT_FOUND_AUTHORITY"); //유저권한없음
+			throw new BusinessException(ErrorMessage.AUTHORITY_NOT_FOUND); //유저권한없음
 		}
 
 		log.info("access claims : username={}, authority={}", claims.getSubject(), claims.get(JwtProperties.ROLE));
@@ -112,10 +116,11 @@ public class JwtTokenProvider {
 				.map(SimpleGrantedAuthority::new)
 				.collect(Collectors.toList());
 
-		// 여기서 사용하는 User는 spring security가 구현한 UserDetails 이다.
-		UserDetails principal = new User(claims.getSubject(), "", authorities);
+		//TODO : AuthenticationToken에 담을 principal 객체를 username을 통해 User 엔티티로 변환해서 넣거나, ArgumentResolver로 변환해서 넣어주기
 
-		return new UsernamePasswordAuthenticationToken(principal, "", authorities);
+		CustomUserDetails principal = (CustomUserDetails)userDetailsService.loadUserByUsername(claims.getSubject());
+
+		return new JwtAuthenticationToken(principal, "", authorities);
 	}
 
 	public void validAccessToken(String token) {
@@ -124,6 +129,8 @@ public class JwtTokenProvider {
 		} catch (ExpiredJwtException e) {
 			throw new ExpiredAccessTokenException();
 		} catch (Exception e) {
+			// businessException 변경하기
+			e.getStackTrace();
 			throw new InvalidTokenException();
 		}
 	}
@@ -134,6 +141,8 @@ public class JwtTokenProvider {
 		} catch (ExpiredJwtException e) {
 			throw new ExpiredRefreshTokenException();
 		} catch (Exception e) {
+			// businessException 변경하기
+			e.getStackTrace();
 			throw new InvalidTokenException();
 		}
 	}
