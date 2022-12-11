@@ -52,6 +52,7 @@ public class UserServiceImpl implements UserService {
 	public UserResponse getUserByUsername(String username) {
 		User user = userRepository.findByUsername(username)
 			.orElseThrow(() -> new EntityNotFoundException(ErrorMessage.USER_NOT_FOUND));
+		log.info("signIn user={}", user);
 		return UserResponse.of(user);
 	}
 

@@ -37,6 +37,7 @@ public class UserResponse {
 			.schoolName(user.getSchoolName())
 			.githubUrl(user.getGithubUrl())
 			.introduce(user.getIntroduce())
+			.userRole(user.getUserRole())
 			.build();
 	}
 
