@@ -90,7 +90,7 @@ class SimplePostServiceImplTest {
 		List<SimplePostResponse> findPosts = simplePostService.getMyPosts(any(Long.class));
 
 		//then
-		assertThat(SimplePostResponse.of(myPost)).usingRecursiveComparison().isEqualTo(findPosts.get(0));
+		assertThat(findPosts.get(0)).usingRecursiveComparison().isEqualTo(SimplePostResponse.of(myPost));
 	}
 
 	@Test

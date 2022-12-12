@@ -12,6 +12,7 @@ import radar.devmatching.common.exception.error.ErrorMessage;
 import radar.devmatching.domain.matchings.matching.entity.Matching;
 import radar.devmatching.domain.matchings.matching.service.MatchingService;
 import radar.devmatching.domain.post.simple.entity.PostCategory;
+import radar.devmatching.domain.post.simple.entity.PostState;
 import radar.devmatching.domain.post.simple.entity.SimplePost;
 import radar.devmatching.domain.post.simple.exception.SimplePostNotFoundException;
 import radar.devmatching.domain.post.simple.repository.SimplePostRepository;
@@ -49,7 +50,8 @@ public class SimplePostServiceImpl implements SimplePostService {
 
 	@Override
 	public MainPostDto searchSimplePost(User loginUser, String postCategory, MainPostDto mainPostDto) {
-		List<SimplePost> simplePosts = simplePostRepository.findBySearchCondition(postCategory, mainPostDto);
+		List<SimplePost> simplePosts = simplePostRepository.findRecruitingPostBySearchCondition(postCategory,
+			mainPostDto);
 		return MainPostDto.of(loginUser.getNickName(), mainPostDto.getRegion(), simplePosts);
 	}
 
@@ -67,10 +69,11 @@ public class SimplePostServiceImpl implements SimplePostService {
 
 	private List<SimplePost> getSimplePostsWhichCategoryEq(String postCategory) {
 		try {
-			return simplePostRepository.findByCategory(PostCategory.valueOf(postCategory));
+			return simplePostRepository.findByCategoryAndPostState(
+				PostCategory.valueOf(postCategory), PostState.RECRUITING);
 		} catch (IllegalArgumentException e) {
 			if (postCategory.equals("ALL")) {
-				return simplePostRepository.findAll();
+				return simplePostRepository.findByPostState(PostState.RECRUITING);
 			}
 			throw new InvalidParamException(ErrorMessage.INVALID_POST_CATEGORY, e);
 		}

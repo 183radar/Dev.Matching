@@ -22,6 +22,7 @@ import radar.devmatching.domain.matchings.matching.repository.MatchingRepository
 import radar.devmatching.domain.post.full.entity.FullPost;
 import radar.devmatching.domain.post.full.repository.FullPostRepository;
 import radar.devmatching.domain.post.simple.entity.PostCategory;
+import radar.devmatching.domain.post.simple.entity.PostState;
 import radar.devmatching.domain.post.simple.entity.Region;
 import radar.devmatching.domain.post.simple.entity.SimplePost;
 import radar.devmatching.domain.post.simple.service.dto.MainPostDto;
@@ -173,36 +174,38 @@ class SimplePostRepositoryTest {
 	}
 
 	@Nested
-	@DisplayName("findByPostCategory 메서드는")
-	class FindByPostCategoryMethod {
+	@DisplayName("findByCategoryAndPostState 메서드는")
+	class findByCategoryAndPostStateMethod {
 
 		@Nested
 		@DisplayName("PostCategory를 인자로 받으면")
 		class inputPostCategoryThan {
 
 			@Test
-			@DisplayName("Category와 일치하는 게시글이 없으면 빈 리스트를 반환한다")
+			@DisplayName("Category에 해당하는 모집중인 게시글이 없을 경우 빈 리스트를 반환한다.")
 			void returnEmptyListIfCategoryNotEqualAnything() throws Exception {
 				//given
 				User user = userRepository.save(createUser());
 				simplePostRepository.save(createSimplePost(user, FullPost.builder().content("내용").build()));
 
 				//when
-				List<SimplePost> findSimplePosts = simplePostRepository.findByCategory(PostCategory.MOGAKKO);
+				List<SimplePost> findSimplePosts = simplePostRepository.findByCategoryAndPostState(
+					PostCategory.MOGAKKO, PostState.RECRUITING);
 
 				//then
 				assertThat(findSimplePosts.isEmpty()).isTrue();
 			}
 
 			@Test
-			@DisplayName("Category와 일치하는 게시글을 반환한다")
+			@DisplayName("Category와 일치하는 모집중인 게시글을 반환한다")
 			void returnSimplePostsWhenEqualsCategory() throws Exception {
 				//given
 				User user = userRepository.save(createUser());
 				simplePostRepository.save(createSimplePost(user, FullPost.builder().content("내용").build()));
 
 				//when
-				List<SimplePost> findSimplePosts = simplePostRepository.findByCategory(PostCategory.PROJECT);
+				List<SimplePost> findSimplePosts = simplePostRepository.findByCategoryAndPostState(
+					PostCategory.PROJECT, PostState.RECRUITING);
 
 				//then
 				assertThat(findSimplePosts.size()).isEqualTo(1);
@@ -211,8 +214,44 @@ class SimplePostRepositoryTest {
 	}
 
 	@Nested
-	@DisplayName("findBySearchCondition 메서드는")
-	class findBySearchConditionMethod {
+	@DisplayName("findRecruitingPostBySearchCondition 메서드는")
+	class findRecruitingPostBySearchConditionMethod {
+
+		@Test
+		@DisplayName("모집 종료된 게시글들은 게시글에 포함하지 않는다")
+		void endPostAreNotCollect() throws Exception {
+			//given
+			User user = userRepository.save(createUser());
+			SimplePost simplePost = createSimplePost(user, FullPost.builder().content("내용").build());
+			simplePost.closePost();
+			simplePostRepository.save(simplePost);
+			MainPostDto mainPostDto = MainPostDto.builder().build();
+
+			//when
+			List<SimplePost> findSimplePosts = simplePostRepository.findRecruitingPostBySearchCondition(
+				"ALL", mainPostDto);
+
+			//then
+			assertThat(findSimplePosts.isEmpty()).isTrue();
+		}
+
+		@Test
+		@DisplayName("게시글들을 최신순으로 정렬한다.")
+		void orderByCreatedDateDesc() throws Exception {
+			//given
+			User user = userRepository.save(createUser());
+			simplePostRepository.save(createSimplePost(user, FullPost.builder().content("내용1").build()));
+			simplePostRepository.save(createSimplePost(user, FullPost.builder().content("내용2").build()));
+			MainPostDto mainPostDto = MainPostDto.builder().build();
+
+			//when
+			List<SimplePost> findSimplePosts = simplePostRepository.findRecruitingPostBySearchCondition(
+				"ALL", mainPostDto);
+
+			//then
+			assertThat(findSimplePosts.get(0).getFullPost().getContent()).isEqualTo("내용2");
+			assertThat(findSimplePosts.get(1).getFullPost().getContent()).isEqualTo("내용1");
+		}
 
 		@Nested
 		@DisplayName("카테고리 인자가")
@@ -229,7 +268,7 @@ class SimplePostRepositoryTest {
 				//when
 				//then
 				assertThatThrownBy(() ->
-					simplePostRepository.findBySearchCondition("InvalidParam", mainPostDto))
+					simplePostRepository.findRecruitingPostBySearchCondition("InvalidParam", mainPostDto))
 					.isInstanceOf(InvalidParamException.class)
 					.hasMessage(ErrorMessage.INVALID_POST_CATEGORY.getMessage());
 			}
@@ -244,7 +283,7 @@ class SimplePostRepositoryTest {
 				MainPostDto mainPostDto = MainPostDto.builder().build();
 
 				//when
-				List<SimplePost> findSimplePosts = simplePostRepository.findBySearchCondition(
+				List<SimplePost> findSimplePosts = simplePostRepository.findRecruitingPostBySearchCondition(
 					"ALL", mainPostDto);
 
 				//then
@@ -261,7 +300,7 @@ class SimplePostRepositoryTest {
 				MainPostDto mainPostDto = MainPostDto.builder().build();
 
 				//when
-				List<SimplePost> findSimplePosts = simplePostRepository.findBySearchCondition(
+				List<SimplePost> findSimplePosts = simplePostRepository.findRecruitingPostBySearchCondition(
 					"PROJECT", mainPostDto);
 
 				//then
@@ -284,7 +323,7 @@ class SimplePostRepositoryTest {
 				MainPostDto mainPostDto = MainPostDto.builder().region(null).build();
 
 				//when
-				List<SimplePost> findSimplePosts = simplePostRepository.findBySearchCondition(
+				List<SimplePost> findSimplePosts = simplePostRepository.findRecruitingPostBySearchCondition(
 					"ALL", mainPostDto);
 
 				//then
@@ -301,7 +340,7 @@ class SimplePostRepositoryTest {
 				MainPostDto mainPostDto = MainPostDto.builder().region(Region.BUSAN).build();
 
 				//when
-				List<SimplePost> findSimplePosts = simplePostRepository.findBySearchCondition(
+				List<SimplePost> findSimplePosts = simplePostRepository.findRecruitingPostBySearchCondition(
 					"ALL", mainPostDto);
 
 				//then
@@ -324,7 +363,7 @@ class SimplePostRepositoryTest {
 				MainPostDto mainPostDto = MainPostDto.builder().searchCondition("").build();
 
 				//when
-				List<SimplePost> findSimplePosts = simplePostRepository.findBySearchCondition(
+				List<SimplePost> findSimplePosts = simplePostRepository.findRecruitingPostBySearchCondition(
 					"ALL", mainPostDto);
 
 				//then
@@ -341,7 +380,7 @@ class SimplePostRepositoryTest {
 				simplePostRepository.save(createSimplePostWithTitle(user, "바사아"));
 				MainPostDto mainPostDto = MainPostDto.builder().searchCondition("가나").build();
 				//when
-				List<SimplePost> findSimplePosts = simplePostRepository.findBySearchCondition(
+				List<SimplePost> findSimplePosts = simplePostRepository.findRecruitingPostBySearchCondition(
 					"ALL", mainPostDto);
 
 				//then
