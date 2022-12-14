@@ -69,11 +69,11 @@ public class SimplePostServiceImpl implements SimplePostService {
 
 	private List<SimplePost> getSimplePostsWhichCategoryEq(String postCategory) {
 		try {
-			return simplePostRepository.findByCategoryAndPostState(
+			return simplePostRepository.findByCategoryAndPostStateOrderByCreateDateDesc(
 				PostCategory.valueOf(postCategory), PostState.RECRUITING);
 		} catch (IllegalArgumentException e) {
 			if (postCategory.equals("ALL")) {
-				return simplePostRepository.findByPostState(PostState.RECRUITING);
+				return simplePostRepository.findByPostStateOrderByCreateDateDesc(PostState.RECRUITING);
 			}
 			throw new InvalidParamException(ErrorMessage.INVALID_POST_CATEGORY, e);
 		}

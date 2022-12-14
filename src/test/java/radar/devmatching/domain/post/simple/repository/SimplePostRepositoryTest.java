@@ -173,8 +173,28 @@ class SimplePostRepositoryTest {
 		)).isTrue();
 	}
 
+	@Test
+	@DisplayName("findByPostState 메서드는 PostState 상태에 따라 게시글들을 최신순으로 반환한다")
+	void findByPostStateTest() throws Exception {
+		//given
+		User user = userRepository.save(createUser());
+		SimplePost closedPost = createSimplePost(user, FullPost.builder().content("내용1").build());
+		closedPost.closePost();
+		simplePostRepository.save(closedPost);
+		simplePostRepository.save(createSimplePost(user, FullPost.builder().content("내용1").build()));
+		simplePostRepository.save(createSimplePost(user, FullPost.builder().content("내용2").build()));
+
+		//when
+		List<SimplePost> findSimplePosts = simplePostRepository.findByPostStateOrderByCreateDateDesc(
+			PostState.RECRUITING);
+
+		//then
+		assertThat(findSimplePosts.get(0).getFullPost().getContent()).isEqualTo("내용2");
+		assertThat(findSimplePosts.get(1).getFullPost().getContent()).isEqualTo("내용1");
+	}
+
 	@Nested
-	@DisplayName("findByCategoryAndPostState 메서드는")
+	@DisplayName("findByCategoryAndPostStateOrderByCreateDateDesc 메서드는")
 	class findByCategoryAndPostStateMethod {
 
 		@Nested
@@ -189,7 +209,7 @@ class SimplePostRepositoryTest {
 				simplePostRepository.save(createSimplePost(user, FullPost.builder().content("내용").build()));
 
 				//when
-				List<SimplePost> findSimplePosts = simplePostRepository.findByCategoryAndPostState(
+				List<SimplePost> findSimplePosts = simplePostRepository.findByCategoryAndPostStateOrderByCreateDateDesc(
 					PostCategory.MOGAKKO, PostState.RECRUITING);
 
 				//then
@@ -197,18 +217,20 @@ class SimplePostRepositoryTest {
 			}
 
 			@Test
-			@DisplayName("Category와 일치하는 모집중인 게시글을 반환한다")
+			@DisplayName("Category와 일치하는 모집중인 게시글을 최신순으로 반환한다")
 			void returnSimplePostsWhenEqualsCategory() throws Exception {
 				//given
 				User user = userRepository.save(createUser());
-				simplePostRepository.save(createSimplePost(user, FullPost.builder().content("내용").build()));
+				simplePostRepository.save(createSimplePost(user, FullPost.builder().content("내용1").build()));
+				simplePostRepository.save(createSimplePost(user, FullPost.builder().content("내용2").build()));
 
 				//when
-				List<SimplePost> findSimplePosts = simplePostRepository.findByCategoryAndPostState(
+				List<SimplePost> findSimplePosts = simplePostRepository.findByCategoryAndPostStateOrderByCreateDateDesc(
 					PostCategory.PROJECT, PostState.RECRUITING);
 
 				//then
-				assertThat(findSimplePosts.size()).isEqualTo(1);
+				assertThat(findSimplePosts.get(0).getFullPost().getContent()).isEqualTo("내용2");
+				assertThat(findSimplePosts.get(1).getFullPost().getContent()).isEqualTo("내용1");
 			}
 		}
 	}

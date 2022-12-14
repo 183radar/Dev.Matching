@@ -22,7 +22,7 @@ public interface SimplePostRepository extends JpaRepository<SimplePost, Long>, S
 	@EntityGraph(attributePaths = {"fullPost"})
 	Optional<SimplePost> findPostById(Long simplePostId);
 
-	List<SimplePost> findByCategoryAndPostState(PostCategory category, PostState state);
+	List<SimplePost> findByCategoryAndPostStateOrderByCreateDateDesc(PostCategory category, PostState state);
 
-	List<SimplePost> findByPostState(PostState state);
+	List<SimplePost> findByPostStateOrderByCreateDateDesc(PostState state);
 }
