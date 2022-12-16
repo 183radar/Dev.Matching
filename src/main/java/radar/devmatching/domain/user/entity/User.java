@@ -183,4 +183,8 @@ public class User extends BaseEntity {
 	public void changeIntroduce(String introduce) {
 		this.introduce = introduce;
 	}
+
+	public void changeUserRole(UserRole userRole) {
+		this.userRole = userRole;
+	}
 }
