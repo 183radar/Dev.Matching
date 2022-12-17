@@ -1,8 +1,11 @@
 package radar.devmatching.domain.post.simple.service.dto.request;
 
+import javax.validation.constraints.NotBlank;
+
+import org.hibernate.validator.constraints.Length;
+
 import lombok.AccessLevel;
 import lombok.Builder;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 import radar.devmatching.domain.matchings.matching.entity.Matching;
 import radar.devmatching.domain.post.full.entity.FullPost;
@@ -11,16 +14,21 @@ import radar.devmatching.domain.post.simple.entity.Region;
 import radar.devmatching.domain.post.simple.entity.SimplePost;
 import radar.devmatching.domain.user.entity.User;
 
-@Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class CreatePostRequest {
 
+	// @NotBlank
+	@Length(max = 200)
 	private String title;
 
+	// @NotNull
 	private PostCategory category;
 
+	// @NotNull
 	private Region region;
 
+	@NotBlank
+	@Length(max = 10000)
 	private String content;
 
 	@Builder
@@ -48,5 +56,21 @@ public class CreatePostRequest {
 					content(this.content)
 					.build()
 			).build();
+	}
+
+	public String getTitle() {
+		return title;
+	}
+
+	public PostCategory getCategory() {
+		return category;
+	}
+
+	public Region getRegion() {
+		return region;
+	}
+
+	public String getContent() {
+		return content;
 	}
 }

@@ -9,8 +9,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-@Import(ControllerTestConfig.class)
+@Import({ControllerTestConfig.class})
 @MockBean(JpaMetamodelMappingContext.class)
+@WithCustomUser // 만약 UserRole 변경을 원하면 대상 메서드에 애노테이션을 붙여 설정 변경 가능
 public abstract class ControllerTestSetUp {
 
 	protected MockMvc mockMvc;
