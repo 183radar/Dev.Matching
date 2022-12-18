@@ -22,4 +22,6 @@ public interface ApplyService {
 
 	int getAcceptedApplyCount(Long simplePostId);
 
+	Apply getApply(Long applyId);
+
 }

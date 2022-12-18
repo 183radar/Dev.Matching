@@ -66,4 +66,10 @@ public class ApplyServiceImpl implements ApplyService {
 		return Math.toIntExact(count);
 	}
 
+	@Override
+	public Apply getApply(Long applyId) {
+		return applyRepository.findById(applyId)
+			.orElseThrow(() -> new EntityNotFoundException(ErrorMessage.APPLY_NOT_FOUND));
+	}
+
 }
