@@ -17,27 +17,38 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import radar.devmatching.common.exception.BusinessException;
 import radar.devmatching.common.exception.error.ErrorMessage;
 import radar.devmatching.common.security.JwtCookieProvider;
 import radar.devmatching.common.security.JwtProperties;
 import radar.devmatching.common.security.jwt.exception.ExpiredAccessTokenException;
 import radar.devmatching.common.security.jwt.exception.ExpiredRefreshTokenException;
+import radar.devmatching.common.security.jwt.exception.JwtTokenNotFoundException;
+import radar.devmatching.common.security.jwt.exception.TokenException;
 
 @Slf4j
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 	private final JwtTokenProvider jwtTokenProvider;
-	private final JwtCookieProvider jwtCookieProvider;
+	private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
 		FilterChain filterChain) throws ServletException, IOException {
+		try {
+			authentication(request, response);
+			filterChain.doFilter(request, response);
+		} catch (TokenException e) {
+			SecurityContextHolder.clearContext();
+			jwtAuthenticationEntryPoint.commence(request, response, e);
+		}
+	}
+
+	private void authentication(HttpServletRequest request, HttpServletResponse response) {
 		String accessToken = null;
 		try {
 			// accessToken 유효성 검사
-			accessToken = authentication(request);
+			accessToken = accessAuthentication(request);
 		} catch (ExpiredAccessTokenException e) {
 			accessToken = refreshAuthentication(request, response);
 		}
@@ -46,14 +57,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			Authentication authentication = jwtTokenProvider.getAuthentication(accessToken);
 			SecurityContextHolder.getContext().setAuthentication(authentication);
 		}
-		filterChain.doFilter(request, response);
 	}
 
-	private String authentication(HttpServletRequest request) {
-		String accessToken = jwtCookieProvider.getCookieFromRequest(request, JwtProperties.ACCESS_TOKEN_HEADER);
+	private String accessAuthentication(HttpServletRequest request) {
+		String accessToken = JwtCookieProvider.getCookieFromRequest(request, JwtProperties.ACCESS_TOKEN_HEADER);
 		log.info("access Token = {}", accessToken);
 		if (Objects.isNull(accessToken)) {
-			throw new BusinessException(ErrorMessage.ACCESS_TOKEN_NOT_FOUND);
+			throw new JwtTokenNotFoundException(ErrorMessage.ACCESS_TOKEN_NOT_FOUND);
 		}
 		jwtTokenProvider.validAccessToken(accessToken);
 		return accessToken;
@@ -67,10 +77,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	private String refreshAuthentication(HttpServletRequest request, HttpServletResponse response) {
 
 		String accessToken = null;
-		String refreshToken = jwtCookieProvider.getCookieFromRequest(request, JwtProperties.REFRESH_TOKEN_HEADER);
+		String refreshToken = JwtCookieProvider.getCookieFromRequest(request, JwtProperties.REFRESH_TOKEN_HEADER);
 
 		if (Objects.isNull(refreshToken)) {
-			throw new BusinessException(ErrorMessage.REFRESH_TOKEN_NOT_FOUND);
+			throw new JwtTokenNotFoundException(ErrorMessage.REFRESH_TOKEN_NOT_FOUND);
 		}
 
 		try {
@@ -80,7 +90,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			accessToken = jwtTokenProvider.createNewAccessTokenFromRefreshToken(refreshToken);
 
 			ResponseCookie accessTokenCookie =
-				jwtCookieProvider.createCookie(JwtProperties.ACCESS_TOKEN_HEADER, accessToken,
+				JwtCookieProvider.createCookie(JwtProperties.ACCESS_TOKEN_HEADER, accessToken,
 					jwtTokenProvider.getExpireTime());
 
 			response.addHeader(SET_COOKIE, accessTokenCookie.toString());
@@ -90,10 +100,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			accessToken = jwtTokenProvider.createNewAccessTokenFromRefreshToken(refreshToken);
 			refreshToken = jwtTokenProvider.createNewRefreshToken(refreshToken);
 
-			ResponseCookie accessTokenCookie = jwtCookieProvider.createCookie(JwtProperties.ACCESS_TOKEN_HEADER,
+			ResponseCookie accessTokenCookie = JwtCookieProvider.createCookie(JwtProperties.ACCESS_TOKEN_HEADER,
 				accessToken,
 				jwtTokenProvider.getExpireTime());
-			ResponseCookie refreshTokenCookie = jwtCookieProvider.createCookie(JwtProperties.REFRESH_TOKEN_HEADER,
+			ResponseCookie refreshTokenCookie = JwtCookieProvider.createCookie(JwtProperties.REFRESH_TOKEN_HEADER,
 				refreshToken,
 				jwtTokenProvider.getExpireTime());
 
