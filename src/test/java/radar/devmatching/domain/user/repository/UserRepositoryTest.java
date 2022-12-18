@@ -14,7 +14,6 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import radar.devmatching.domain.matchings.apply.entity.Apply;
 import radar.devmatching.domain.matchings.apply.repository.ApplyRepository;
 import radar.devmatching.domain.matchings.matching.entity.Matching;
-import radar.devmatching.domain.matchings.matching.repository.MatchingRepository;
 import radar.devmatching.domain.matchings.matchinguser.entity.MatchingUser;
 import radar.devmatching.domain.matchings.matchinguser.repository.MatchingUserRepository;
 import radar.devmatching.domain.post.full.entity.FullPost;
@@ -34,8 +33,6 @@ public class UserRepositoryTest {
 	private SimplePostRepository simplePostRepository;
 	@Autowired
 	private MatchingUserRepository matchingUserRepository;
-	@Autowired
-	private MatchingRepository matchingRepository;
 	@Autowired
 	private ApplyRepository applyRepository;
 
