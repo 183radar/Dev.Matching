@@ -62,7 +62,7 @@ public class UserServiceImpl implements UserService {
 		validatePermission(requestUserId, authUser);
 
 		changeNickName(request.getNickName(), authUser);
-		//schoolName 빈값으로 들어오면 예외던져야함
+		// TODO : schoolName 빈값으로 들어오면 예외던져야함
 		authUser.changeSchoolName(request.getSchoolName());
 		authUser.changeGithubUrl(request.getGithubUrl());
 		authUser.changeIntroduce(request.getIntroduce());
