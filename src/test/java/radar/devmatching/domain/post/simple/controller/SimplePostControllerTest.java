@@ -66,8 +66,7 @@ class SimplePostControllerTest extends ControllerTestSetUp {
 
 			MockHttpServletRequestBuilder request = post(BASIC_URL + "/new")
 				.with(SecurityMockMvcRequestPostProcessors.csrf())
-				.param("region", "SEOUL");
-			// .params(params);
+				.params(params);
 			ResultActions result = mockMvc.perform(request);
 
 			//then

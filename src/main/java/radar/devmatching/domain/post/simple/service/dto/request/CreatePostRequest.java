@@ -32,7 +32,7 @@ public class CreatePostRequest {
 	private String content;
 
 	@Builder
-	private CreatePostRequest(String title, PostCategory category, Region region, String content) {
+	public CreatePostRequest(String title, PostCategory category, Region region, String content) {
 		this.title = title;
 		this.category = category;
 		this.region = region;

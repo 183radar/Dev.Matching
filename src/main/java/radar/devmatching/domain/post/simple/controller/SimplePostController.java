@@ -35,9 +35,9 @@ public class SimplePostController {
 	@PostMapping("/new")
 	public String createPost(@AuthUser User authUser, @Valid @ModelAttribute CreatePostRequest createPostRequest,
 		BindingResult bindingResult) {
-		// if (bindingResult.hasErrors()) {
-		// 	return "post/createPost";
-		// }
+		if (bindingResult.hasErrors()) {
+			return "post/createPost";
+		}
 		long simplePostId = simplePostService.createPost(createPostRequest, authUser);
 		return "redirect:/api/posts/" + simplePostId;
 	}
