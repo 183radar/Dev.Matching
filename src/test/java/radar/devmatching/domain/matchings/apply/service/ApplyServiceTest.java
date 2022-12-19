@@ -3,6 +3,7 @@ package radar.devmatching.domain.matchings.apply.service;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
+import java.lang.reflect.Field;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -46,9 +47,8 @@ class ApplyServiceTest {
 		applyService = new ApplyServiceImpl(applyRepository, simplePostRepository);
 	}
 
-	private User createUser() {
+	private User basicUser() {
 		return User.builder()
-			.id(TEST_USER_ID)
 			.username("username")
 			.password("password")
 			.nickName("nickName")
@@ -56,6 +56,17 @@ class ApplyServiceTest {
 			.githubUrl("githubUrl")
 			.introduce("introduce")
 			.build();
+	}
+
+	private User createUser() throws NoSuchFieldException, IllegalAccessException {
+		User user = basicUser();
+
+		Class<User> userClass = User.class;
+		Field userId = userClass.getDeclaredField("id");
+		userId.setAccessible(true);
+		userId.set(user, TEST_USER_ID);
+
+		return user;
 	}
 
 	private SimplePost createSimplePost(User user, FullPost fullPost, Matching matching) {
@@ -76,7 +87,7 @@ class ApplyServiceTest {
 
 		@Test
 		@DisplayName("예외를 던지지 않고 정상적으로 Apply 엔티티가 저장된다")
-		void create_Apply_Without_Exception() {
+		void create_Apply_Without_Exception() throws NoSuchFieldException, IllegalAccessException {
 			//given
 			User user = createUser();
 			Matching matching = Matching.builder().build();
@@ -90,7 +101,7 @@ class ApplyServiceTest {
 
 		@Test
 		@DisplayName("simplePostId를 가지는 simplePost 엔티티가 없으면 예외를 던진다.")
-		void simplePost_Entity_Not_Found() {
+		void simplePost_Entity_Not_Found() throws NoSuchFieldException, IllegalAccessException {
 			//given
 			User user = createUser();
 			Matching matching = Matching.builder().build();
@@ -105,7 +116,7 @@ class ApplyServiceTest {
 
 		@Test
 		@DisplayName("SimplePost 엔티티에 이미 AuthUser가 신청 되어있으면 예외를 던진다.")
-		void authUser_Already_Apply_SimplePost() {
+		void authUser_Already_Apply_SimplePost() throws NoSuchFieldException, IllegalAccessException {
 			//given
 			User user = createUser();
 			Matching matching = Matching.builder().build();
@@ -129,7 +140,7 @@ class ApplyServiceTest {
 
 		@Test
 		@DisplayName("요청 userId와 User 엔티티의 id가 다르면 예외를 던진다.")
-		public void requestUserIdNotEqualAuthUserID() {
+		public void requestUserIdNotEqualAuthUserID() throws NoSuchFieldException, IllegalAccessException {
 			//given
 			User user = createUser();
 			Matching matching = Matching.builder().build();

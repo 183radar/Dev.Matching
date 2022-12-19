@@ -3,6 +3,7 @@ package radar.devmatching.domain.user.service;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
+import java.lang.reflect.Field;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -41,9 +42,8 @@ public class UserServiceTest {
 		userService = new UserServiceImpl(userRepository, passwordEncoder);
 	}
 
-	private User createUser() {
+	private User basicUser() {
 		return User.builder()
-			.id(TEST_USER_ID)
 			.username("username")
 			.password("password")
 			.nickName("nickName")
@@ -51,6 +51,28 @@ public class UserServiceTest {
 			.githubUrl("githubUrl")
 			.introduce("introduce")
 			.build();
+	}
+
+	private User createUser() throws IllegalAccessException, NoSuchFieldException {
+		User user = basicUser();
+
+		Class<User> userClass = User.class;
+		Field userId = userClass.getDeclaredField("id");
+		userId.setAccessible(true);
+		userId.set(user, TEST_USER_ID);
+
+		return user;
+	}
+
+	private User createUserEX() throws NoSuchFieldException, IllegalAccessException {
+		User user = basicUser();
+
+		Class<User> userClass = User.class;
+		Field userId = userClass.getDeclaredField("id");
+		userId.setAccessible(true);
+		userId.set(user, TEST_USER_ID_EX);
+
+		return user;
 	}
 
 	@Nested
@@ -62,7 +84,7 @@ public class UserServiceTest {
 		public void createUserWithoutException() {
 			//given
 			CreateUserRequest request = getCreateUserRequest();
-			User user = CreateUserRequest.toEntity(request);
+			User user = CreateUserRequest.toEntity(request, passwordEncoder);
 			given(passwordEncoder.encode(any())).willReturn(request.getPassword());
 
 			//when
@@ -74,7 +96,7 @@ public class UserServiceTest {
 
 		@Test
 		@DisplayName("username 중복되면 예외를 던진다.")
-		public void throwDuplicateExceptionAboutUsername() {
+		public void throwDuplicateExceptionAboutUsername() throws NoSuchFieldException, IllegalAccessException {
 			//given
 			CreateUserRequest request = getCreateUserRequest();
 			given(userRepository.findByUsername(any())).willReturn(Optional.of(createUser()));
@@ -86,7 +108,7 @@ public class UserServiceTest {
 
 		@Test
 		@DisplayName("nickName 중복되면 예외를 던진다.")
-		public void throwDuplicateExceptionAboutNickName() {
+		public void throwDuplicateExceptionAboutNickName() throws NoSuchFieldException, IllegalAccessException {
 			//given
 			CreateUserRequest request = getCreateUserRequest();
 			given(userRepository.findByNickName(any())).willReturn(Optional.of(createUser()));
@@ -112,7 +134,7 @@ public class UserServiceTest {
 
 		@Test
 		@DisplayName("예외를 던지지 않고 User 정보를 가져온다.")
-		public void getUserWithoutException() {
+		public void getUserWithoutException() throws NoSuchFieldException, IllegalAccessException {
 			//given
 			User authUser = createUser();
 			//when
@@ -123,7 +145,7 @@ public class UserServiceTest {
 
 		@Test
 		@DisplayName("요청 userId와 사용자 userId가 달라 예외를 던진다.")
-		public void requestUserIdNotEqualAuthUserID() {
+		public void requestUserIdNotEqualAuthUserID() throws NoSuchFieldException, IllegalAccessException {
 			//given
 			User authUser = createUser();
 			//when
@@ -140,7 +162,7 @@ public class UserServiceTest {
 
 		@Test
 		@DisplayName("예외를 던지지 않고 User 정보를 변경한다.")
-		public void updateUserWithoutException() {
+		public void updateUserWithoutException() throws NoSuchFieldException, IllegalAccessException {
 			//given
 			User user = createUser();
 			UpdateUserRequest request = UpdateUserRequest.builder()
@@ -161,7 +183,7 @@ public class UserServiceTest {
 
 		@Test
 		@DisplayName("요청 userId와 사용자 userId가 달라 예외를 던진다.")
-		public void requestUserIdNotEqualAuthUserID() {
+		public void requestUserIdNotEqualAuthUserID() throws NoSuchFieldException, IllegalAccessException {
 			//given
 			User user = createUser();
 			UpdateUserRequest request = UpdateUserRequest.builder()
@@ -178,13 +200,10 @@ public class UserServiceTest {
 
 		@Test
 		@DisplayName("NickName 중복되면 예외를 던진다.")
-		public void throwDuplicateExceptionAboutNickName() {
+		public void throwDuplicateExceptionAboutNickName() throws NoSuchFieldException, IllegalAccessException {
 			//given
 			User user = createUser();
-			User findUser = User.builder()
-				.id(TEST_USER_ID_EX)
-				.nickName("updateNickName")
-				.build();
+			User findUser = createUserEX();
 			UpdateUserRequest request = UpdateUserRequest.builder()
 				.nickName("updateNickName")
 				.schoolName("updateSchoolName")
@@ -205,7 +224,7 @@ public class UserServiceTest {
 
 		@Test
 		@DisplayName("정상적으로 user가 삭제된다.")
-		public void deleteUserWithoutException() {
+		public void deleteUserWithoutException() throws NoSuchFieldException, IllegalAccessException {
 			//given
 			User user = createUser();
 			//when
@@ -216,7 +235,7 @@ public class UserServiceTest {
 
 		@Test
 		@DisplayName("요청 userId와 사용자 userId가 달라 예외를 던진다.")
-		public void requestUserIdNotEqualAuthUserID() {
+		public void requestUserIdNotEqualAuthUserID() throws NoSuchFieldException, IllegalAccessException {
 			//given
 			User authUser = createUser();
 			//when

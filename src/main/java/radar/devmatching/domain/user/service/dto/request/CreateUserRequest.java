@@ -3,6 +3,7 @@ package radar.devmatching.domain.user.service.dto.request;
 import javax.validation.constraints.NotBlank;
 
 import org.hibernate.validator.constraints.Length;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import lombok.Builder;
 import radar.devmatching.domain.user.entity.User;
@@ -30,10 +31,10 @@ public class CreateUserRequest {
 		this.schoolName = schoolName;
 	}
 
-	public static User toEntity(CreateUserRequest request) {
+	public static User toEntity(CreateUserRequest request, PasswordEncoder passwordEncoder) {
 		return User.builder()
 			.username(request.getUsername())
-			.password(request.getPassword())
+			.password(passwordEncoder.encode(request.getPassword()))
 			.nickName(request.getNickName())
 			.schoolName(request.getSchoolName())
 			.build();

@@ -3,6 +3,8 @@ package radar.devmatching.domain.matchings.matchinguser.service;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
+import java.lang.reflect.Field;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -34,9 +36,8 @@ class MatchingUserServiceTest {
 		matchingUserService = new MatchingUserServiceImpl(matchingUserRepository);
 	}
 
-	private User createUser() {
+	private User basicUser() {
 		return User.builder()
-			.id(TEST_USER_ID)
 			.username("username")
 			.password("password")
 			.nickName("nickName")
@@ -46,13 +47,24 @@ class MatchingUserServiceTest {
 			.build();
 	}
 
+	private User createUser() throws NoSuchFieldException, IllegalAccessException {
+		User user = basicUser();
+
+		Class<User> userClass = User.class;
+		Field userId = userClass.getDeclaredField("id");
+		userId.setAccessible(true);
+		userId.set(user, TEST_USER_ID);
+
+		return user;
+	}
+
 	@Nested
 	@DisplayName("createMatchingUser 메서드에서")
 	class CreateMatchingUserMethod {
 
 		@Test
 		@DisplayName("정상적으로 matchingUser 엔티티가 저장된다.")
-		public void saveMatchingUserWithoutException() {
+		public void saveMatchingUserWithoutException() throws NoSuchFieldException, IllegalAccessException {
 			//given
 			User user = createUser();
 			Matching matching = Matching.builder().build();
@@ -66,7 +78,7 @@ class MatchingUserServiceTest {
 
 		@Test
 		@DisplayName("해당 User가 이미 저장되어 있으면 예외를 던진다.")
-		public void throwAlreadyJoinMatchingUserException() {
+		public void throwAlreadyJoinMatchingUserException() throws NoSuchFieldException, IllegalAccessException {
 			//given
 			User user = createUser();
 			Matching matching = Matching.builder().build();

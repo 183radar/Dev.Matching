@@ -9,6 +9,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import lombok.RequiredArgsConstructor;
+import radar.devmatching.common.security.jwt.JwtAuthenticationEntryPoint;
 import radar.devmatching.common.security.jwt.JwtAuthenticationFilter;
 import radar.devmatching.common.security.jwt.JwtTokenProvider;
 
@@ -17,7 +18,7 @@ import radar.devmatching.common.security.jwt.JwtTokenProvider;
 public class SecurityConfig {
 
 	private final JwtTokenProvider jwtTokenProvider;
-	private final JwtCookieProvider jwtCookieProvider;
+	private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
 	@Bean
 	public WebSecurityCustomizer webSecurityCustomizer() {
@@ -33,17 +34,15 @@ public class SecurityConfig {
 			.headers(header -> {
 				header.frameOptions().disable();
 			})
-			.httpBasic().disable()
 			.rememberMe().disable()
 			.logout().disable()
-			.requestCache().disable()
 			.formLogin().disable()
 			.headers().disable()
 			.sessionManagement()
 			.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 
 			.and()
-			.addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider, jwtCookieProvider),
+			.addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider, jwtAuthenticationEntryPoint),
 				UsernamePasswordAuthenticationFilter.class);
 
 		return http.build();

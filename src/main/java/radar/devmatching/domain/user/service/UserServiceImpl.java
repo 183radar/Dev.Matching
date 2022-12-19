@@ -32,10 +32,8 @@ public class UserServiceImpl implements UserService {
 	public UserResponse createUser(CreateUserRequest request) {
 		checkDuplicateUsername(request.getUsername());
 		checkDuplicateNickName(request.getNickName(), null);
-
-		String encodePassword = passwordEncoder.encode(request.getPassword());
-		request.setPassword(encodePassword);
-		User signUpUser = CreateUserRequest.toEntity(request);
+		
+		User signUpUser = CreateUserRequest.toEntity(request, passwordEncoder);
 
 		userRepository.save(signUpUser);
 		log.info("create user={}", signUpUser);
@@ -62,7 +60,7 @@ public class UserServiceImpl implements UserService {
 		validatePermission(requestUserId, authUser);
 
 		changeNickName(request.getNickName(), authUser);
-		//schoolName 빈값으로 들어오면 예외던져야함
+		// TODO : schoolName 빈값으로 들어오면 예외던져야함
 		authUser.changeSchoolName(request.getSchoolName());
 		authUser.changeGithubUrl(request.getGithubUrl());
 		authUser.changeIntroduce(request.getIntroduce());

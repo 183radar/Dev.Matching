@@ -2,7 +2,6 @@ package radar.devmatching.domain.matchings.apply.service;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -10,7 +9,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import radar.devmatching.common.exception.EntityNotFoundException;
 import radar.devmatching.common.exception.InvalidAccessException;
 import radar.devmatching.common.exception.error.ErrorMessage;
 import radar.devmatching.domain.matchings.apply.entity.Apply;
@@ -20,7 +18,7 @@ import radar.devmatching.domain.matchings.apply.service.dto.response.ApplyRespon
 import radar.devmatching.domain.matchings.matching.entity.Matching;
 import radar.devmatching.domain.matchings.matchinguser.service.MatchingUserService;
 import radar.devmatching.domain.post.simple.entity.SimplePost;
-import radar.devmatching.domain.post.simple.repository.SimplePostRepository;
+import radar.devmatching.domain.post.simple.service.SimplePostService;
 import radar.devmatching.domain.user.entity.User;
 
 @Slf4j
@@ -30,14 +28,14 @@ import radar.devmatching.domain.user.entity.User;
 public class ApplyLeaderServiceImpl implements ApplyLeaderService {
 
 	private final ApplyRepository applyRepository;
+	private final ApplyService applyService;
 	private final MatchingUserService matchingUserService;
-	// SimplePostService로 변경 예정
-	private final SimplePostRepository simplePostRepository;
+	private final SimplePostService simplePostService;
 
 	@Override
 	@Transactional
 	public void acceptApply(User authUser, Long applyId, Long simplePostId) {
-		Apply apply = validatePermission(authUser, applyId, simplePostId).get();
+		Apply apply = validatePermission(authUser, applyId, simplePostId);
 
 		if (!Objects.equals(apply.getApplyState(), ApplyState.ACCEPTED)) {
 			apply.acceptApply();
@@ -52,7 +50,7 @@ public class ApplyLeaderServiceImpl implements ApplyLeaderService {
 	@Override
 	@Transactional
 	public void denyApply(User authUser, Long applyId, Long simplePostId) {
-		Apply apply = validatePermission(authUser, applyId, simplePostId).get();
+		Apply apply = validatePermission(authUser, applyId, simplePostId);
 
 		if (Objects.equals(apply.getApplyState(), ApplyState.ACCEPTED)) {
 			Long matchingId = apply.getApplySimplePost().getMatching().getId();
@@ -76,14 +74,12 @@ public class ApplyLeaderServiceImpl implements ApplyLeaderService {
 	/**
 	 * simplePost에 접근하는 사용자가 리더인지 확인
 	 * applyId가 null이 아니라면 apply가 simplePost에 있는지 확인
-	 *
 	 * @param authUser
 	 * @param applyId
 	 * @param simplePostId
 	 */
-	private Optional<Apply> validatePermission(User authUser, Long applyId, Long simplePostId) {
-		SimplePost simplePost = simplePostRepository.findById(simplePostId)
-			.orElseThrow(() -> new EntityNotFoundException(ErrorMessage.SIMPLE_POST_NOT_FOUND));
+	private Apply validatePermission(User authUser, Long applyId, Long simplePostId) {
+		SimplePost simplePost = simplePostService.getSimplePostOnly(simplePostId);
 
 		User leader = simplePost.getLeader();
 		if (!Objects.equals(leader.getId(), authUser.getId())) {
@@ -91,14 +87,13 @@ public class ApplyLeaderServiceImpl implements ApplyLeaderService {
 		}
 
 		if (Objects.nonNull(applyId)) {
-			Apply apply = applyRepository.findById(applyId)
-				.orElseThrow(() -> new EntityNotFoundException(ErrorMessage.APPLY_NOT_FOUND));
+			Apply apply = applyService.getApply(applyId);
 
-			if (!Objects.equals(apply.getApplySimplePost().getId(), simplePost.getId())) {
+			if (!Objects.equals(apply.getApplySimplePost().getId(), simplePostId)) {
 				throw new InvalidAccessException(ErrorMessage.INVALID_ACCESS);
 			}
-			return Optional.of(apply);
+			return apply;
 		}
-		return Optional.empty();
+		return null;
 	}
 }
