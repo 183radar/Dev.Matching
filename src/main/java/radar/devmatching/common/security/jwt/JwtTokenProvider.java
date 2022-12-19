@@ -91,6 +91,7 @@ public class JwtTokenProvider {
 	}
 
 	/**
+	 * TODO : 쿠키 만료시간 조정 필요
 	 * 쿠키 maxAge는 초단위 설정이라 1000으로 나눈값으로 설정
 	 * 지금 설정은 1주일로 설정되어있음
 	 */
@@ -98,6 +99,9 @@ public class JwtTokenProvider {
 		return REFRESH_TOKEN_EXPIRE_TIME / 1000;
 	}
 
+	/**
+	 * TODO : 인증 부분을 따로 클래스를 만들어서 분리할지 고민해보기
+	 */
 	public Authentication getAuthentication(String accessToken) {
 		Claims claims = parseClaims(accessToken);
 		log.info("user role={}", claims.get(JwtProperties.ROLE).toString());
@@ -112,7 +116,9 @@ public class JwtTokenProvider {
 				.map(SimpleGrantedAuthority::new)
 				.collect(Collectors.toList());
 
-		CustomUserDetails principal = (CustomUserDetails)userDetailsService.loadUserByUsername(claims.getSubject());
+		//TODO : AuthenticationToken에 담을 principal 객체를 username을 통해 User 엔티티로 변환해서 넣거나, ArgumentResolver로 변환해서 넣어주기
+
+		UserDetails principal = userDetailsService.loadUserByUsername(claims.getSubject());
 
 		return new JwtAuthenticationToken(principal, "", authorities);
 	}

@@ -1,15 +1,21 @@
 package radar.devmatching.domain.user.service.dto.request;
 
-import org.springframework.security.crypto.password.PasswordEncoder;
-
 import lombok.Builder;
 import radar.devmatching.domain.user.entity.User;
 
 public class CreateUserRequest {
 
+	@NotBlank
+	@Length(min = 10, max = 30)
 	String username;
+
+	@NotBlank
 	String password;
+
+	@NotBlank
 	String nickName;
+
+	@NotBlank
 	String schoolName;
 
 	@Builder

@@ -5,6 +5,7 @@ import static org.springframework.http.HttpHeaders.*;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.http.ResponseCookie;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -36,7 +37,8 @@ public class AuthController {
 
 	// TODO : SecurityContextHolder 에 Authentication 저장하기 추가.
 	@PostMapping("/signIn")
-	public void signIn(HttpServletResponse response, @ModelAttribute SignInRequest signInRequest) {
+	public void signIn(HttpServletResponse response, @ModelAttribute SignInRequest signInRequest,
+		BindingResult bindingResult) {
 		SignInResponse signInResponse = authService.signIn(signInRequest.getUsername(), signInRequest.getPassword());
 
 		JwtToken accessToken = signInResponse.getAccessToken();

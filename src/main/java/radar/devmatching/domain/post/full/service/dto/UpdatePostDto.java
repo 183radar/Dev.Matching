@@ -1,5 +1,10 @@
 package radar.devmatching.domain.post.full.service.dto;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+
+import org.hibernate.validator.constraints.Length;
+
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
@@ -10,18 +15,25 @@ import radar.devmatching.domain.post.simple.entity.SimplePost;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class UpdatePostDto {
 
+	@NotBlank
+	@Length(max = 200)
 	private String title;
 
+	@NotNull
 	private PostCategory category;
 
+	@NotNull
 	private Region region;
 
+	@Length(min = 1, max = 100)
 	private Integer userNum;
 
+	@NotBlank
+	@Length(max = 10000)
 	private String content;
 
 	@Builder
-	private UpdatePostDto(String title, PostCategory category, Region region, Integer userNum, String content) {
+	public UpdatePostDto(String title, PostCategory category, Region region, Integer userNum, String content) {
 		this.title = title;
 		this.category = category;
 		this.region = region;

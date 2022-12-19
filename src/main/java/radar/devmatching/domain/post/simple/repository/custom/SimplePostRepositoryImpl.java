@@ -14,6 +14,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import radar.devmatching.common.exception.InvalidParamException;
 import radar.devmatching.common.exception.error.ErrorMessage;
 import radar.devmatching.domain.post.simple.entity.PostCategory;
+import radar.devmatching.domain.post.simple.entity.PostState;
 import radar.devmatching.domain.post.simple.entity.Region;
 import radar.devmatching.domain.post.simple.entity.SimplePost;
 import radar.devmatching.domain.post.simple.service.dto.MainPostDto;
@@ -27,12 +28,14 @@ public class SimplePostRepositoryImpl implements SimplePostCustomRepository {
 	}
 
 	@Override
-	public List<SimplePost> findBySearchCondition(String postCategory, MainPostDto mainPostDto) {
+	public List<SimplePost> findRecruitingPostBySearchCondition(String postCategory, MainPostDto mainPostDto) {
 		return queryFactory
 			.selectFrom(simplePost)
 			.where(categoryEq(postCategory),
 				regionEq(mainPostDto.getRegion()),
-				searchConditionContain(mainPostDto.getSearchCondition()))
+				searchConditionContain(mainPostDto.getSearchCondition()),
+				simplePost.postState.eq(PostState.RECRUITING))
+			.orderBy(simplePost.createDate.desc())
 			.fetch();
 	}
 

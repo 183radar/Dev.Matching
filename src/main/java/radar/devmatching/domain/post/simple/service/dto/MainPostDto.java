@@ -3,6 +3,8 @@ package radar.devmatching.domain.post.simple.service.dto;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.hibernate.validator.constraints.Length;
+
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
@@ -17,6 +19,7 @@ public class MainPostDto {
 
 	private Region region;
 
+	@Length(max = 20)
 	private String searchCondition;
 
 	private List<SimplePostResponse> simplePostResponses;

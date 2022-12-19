@@ -2,8 +2,11 @@ package radar.devmatching.domain.post.simple.controller;
 
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,12 +28,16 @@ public class SimplePostController {
 
 	@GetMapping("/new")
 	public String getCreatePost(Model model) {
-		model.addAttribute("createPostDto", CreatePostRequest.of());
+		model.addAttribute("createPostRequest", CreatePostRequest.of());
 		return "post/createPost";
 	}
 
 	@PostMapping("/new")
-	public String createPost(@AuthUser User authUser, @ModelAttribute CreatePostRequest createPostRequest) {
+	public String createPost(@AuthUser User authUser, @Valid @ModelAttribute CreatePostRequest createPostRequest,
+		BindingResult bindingResult) {
+		if (bindingResult.hasErrors()) {
+			return "post/createPost";
+		}
 		long simplePostId = simplePostService.createPost(createPostRequest, authUser);
 		return "redirect:/api/posts/" + simplePostId;
 	}

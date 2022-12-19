@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -14,13 +15,18 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import radar.devmatching.common.exception.InvalidParamException;
+import radar.devmatching.common.exception.error.ErrorMessage;
 import radar.devmatching.domain.matchings.matching.entity.Matching;
 import radar.devmatching.domain.matchings.matching.service.MatchingService;
 import radar.devmatching.domain.post.full.entity.FullPost;
 import radar.devmatching.domain.post.simple.entity.PostCategory;
+import radar.devmatching.domain.post.simple.entity.PostState;
 import radar.devmatching.domain.post.simple.entity.Region;
 import radar.devmatching.domain.post.simple.entity.SimplePost;
+import radar.devmatching.domain.post.simple.exception.SimplePostNotFoundException;
 import radar.devmatching.domain.post.simple.repository.SimplePostRepository;
+import radar.devmatching.domain.post.simple.service.dto.MainPostDto;
 import radar.devmatching.domain.post.simple.service.dto.request.CreatePostRequest;
 import radar.devmatching.domain.post.simple.service.dto.response.SimplePostResponse;
 import radar.devmatching.domain.user.entity.User;
@@ -90,7 +96,7 @@ class SimplePostServiceImplTest {
 		List<SimplePostResponse> findPosts = simplePostService.getMyPosts(any(Long.class));
 
 		//then
-		assertThat(SimplePostResponse.of(myPost)).usingRecursiveComparison().isEqualTo(findPosts.get(0));
+		assertThat(findPosts.get(0)).usingRecursiveComparison().isEqualTo(SimplePostResponse.of(myPost));
 	}
 
 	@Test
@@ -105,6 +111,112 @@ class SimplePostServiceImplTest {
 
 		//then
 		assertThat(SimplePostResponse.of(appliedPost)).usingRecursiveComparison().isEqualTo(findPosts.get(0));
+	}
+
+	@Nested
+	@DisplayName("getSimplePostOnly 메서드는")
+	class getSimplePostOnlyMethodIs {
+
+		@Test
+		@DisplayName("db에 존재하지 않는 simplePostId를 넘기면 에러를 낸다.")
+		void ifNotExistIdThanThrowException() throws Exception {
+			//given
+			//when
+			//then
+			assertThatThrownBy(() -> simplePostService.getSimplePostOnly(anyLong()))
+				.isInstanceOf(SimplePostNotFoundException.class);
+		}
+
+		@Test
+		@DisplayName("db에 존재하는 simplePostId를 넘기면 simplePost만 가져온다.")
+		void ifExistIdThanGetSimplePost() throws Exception {
+			//given
+			SimplePost simplePost = createSimplePost(loginUser, matching);
+			given(simplePostRepository.findById(anyLong())).willReturn(Optional.of(simplePost));
+
+			//when
+			SimplePost findSimplePost = simplePostService.getSimplePostOnly(anyLong());
+
+			//then
+			assertThat(findSimplePost).isEqualTo(simplePost);
+		}
+	}
+
+	@Nested
+	@DisplayName("getMainPostDto 메서드는")
+	class GetMainPostDtoMethod {
+
+		@Nested
+		@DisplayName("postCategoryParam 인자가")
+		class PostCategoryParameter {
+
+			@Test
+			@DisplayName("PostCategory에 존재하지 않는 인자면 에러를 던진다")
+			void isNotMatchWithPostCategoryThanThrow() throws Exception {
+				//given
+				//when
+				//then
+				assertThatThrownBy(() -> simplePostService.getMainPostDto(loginUser, "noMatch"))
+					.isInstanceOf(InvalidParamException.class)
+					.hasMessage(ErrorMessage.INVALID_POST_CATEGORY.getMessage());
+			}
+
+			@Test
+			@DisplayName("ALL로 들어오면 simplePostRepository.findByPostStateOrderByCreateDateDesc 메서드로 게시글들을 가져온다 ")
+			void isAllThanSearchAll() throws Exception {
+				//given
+				SimplePost simplePost = createSimplePost(loginUser, matching);
+				given(simplePostRepository.findByPostStateOrderByCreateDateDesc(PostState.RECRUITING))
+					.willReturn(List.of(simplePost));
+
+				//when
+				MainPostDto findMainPostDto = simplePostService.getMainPostDto(loginUser, "ALL");
+
+				//then
+				assertThat(findMainPostDto.getSimplePostResponses().get(0))
+					.usingRecursiveComparison().isEqualTo(SimplePostResponse.of(simplePost));
+			}
+
+			@Test
+			@DisplayName("PostCategory에 존재하는 값이면 카테고리에 해당하는 게시글을 반환한다.")
+			void correctCase() throws Exception {
+				//given
+				SimplePost simplePost = createSimplePost(loginUser, matching);
+				given(simplePostRepository.findByCategoryAndPostStateOrderByCreateDateDesc(
+					PostCategory.PROJECT, PostState.RECRUITING)).willReturn(List.of(simplePost));
+
+				//when
+				MainPostDto findMainPostDto = simplePostService.getMainPostDto(loginUser, "PROJECT");
+
+				//then
+				assertThat(findMainPostDto.getSimplePostResponses().get(0).getCategory()).isEqualTo(
+					PostCategory.PROJECT);
+			}
+		}
+	}
+
+	@Nested
+	@DisplayName("searchSimplePost 메서드는")
+	class searchSimplePostMethod {
+
+		@Test
+		@DisplayName("유저에서 닉네임을 가져오고, dto에서 지역을 가져오고, 리포지토리에서 서칭 조건에 따라 게시글을 가져와 MainPostDto로 반환한다")
+		void correctCase() throws Exception {
+			//given
+			SimplePost simplePost = createSimplePost(loginUser, matching);
+			MainPostDto mainPostDto = MainPostDto.builder().region(Region.BUSAN).build();
+			given(simplePostRepository.findRecruitingPostBySearchCondition("ALL", mainPostDto))
+				.willReturn(List.of(simplePost));
+
+			//when
+			MainPostDto findMainPostDto = simplePostService.searchSimplePost(loginUser, "ALL", mainPostDto);
+
+			//then
+			assertThat(findMainPostDto.getUserName()).isEqualTo(loginUser.getNickName());
+			assertThat(findMainPostDto.getRegion()).isEqualTo(mainPostDto.getRegion());
+			assertThat(findMainPostDto.getSimplePostResponses().get(0))
+				.usingRecursiveComparison().isEqualTo(SimplePostResponse.of(simplePost));
+		}
 	}
 
 	@Nested

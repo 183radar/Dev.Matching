@@ -1,8 +1,12 @@
 package radar.devmatching.domain.comment.controller;
 
+import javax.validation.Valid;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,7 +35,10 @@ public class SubCommentController {
 
 	@PostMapping("mainComments/{mainCommentId}/createSubComment")
 	public String createSubComment(@AuthUser User authUser, @PathVariable long mainCommentId,
-		CreateCommentRequest createCommentRequest) {
+		@Valid @ModelAttribute CreateCommentRequest createCommentRequest, BindingResult bindingResult) {
+		if (bindingResult.hasErrors()) {
+			return "comment/createComment";
+		}
 		long simplePostId = commentService.createSubComment(mainCommentId, authUser, createCommentRequest);
 		return "redirect:/api/posts/" + simplePostId;
 	}
@@ -45,7 +52,10 @@ public class SubCommentController {
 
 	@PostMapping("subComments/{subCommentId}/edit")
 	public String updateSubComment(@AuthUser User authUser, @PathVariable long subCommentId,
-		UpdateCommentDto updateCommentDto) {
+		@Valid @ModelAttribute UpdateCommentDto updateCommentDto, BindingResult bindingResult) {
+		if (bindingResult.hasErrors()) {
+			return "comment/updateComment";
+		}
 		long simplePostId = commentService.updateSubComment(subCommentId, updateCommentDto, authUser);
 		return "redirect:/api/posts/" + simplePostId;
 	}
@@ -53,7 +63,6 @@ public class SubCommentController {
 	@PostMapping("subComments/{subCommentId}/delete")
 	public String deleteSubComment(@AuthUser User authUser, @PathVariable long subCommentId) {
 		commentService.deleteSubComment(subCommentId, authUser);
-
 		return "redirect:/api/posts/my";
 	}
 

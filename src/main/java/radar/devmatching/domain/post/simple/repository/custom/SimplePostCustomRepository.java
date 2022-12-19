@@ -7,5 +7,5 @@ import radar.devmatching.domain.post.simple.service.dto.MainPostDto;
 
 public interface SimplePostCustomRepository {
 
-	List<SimplePost> findBySearchCondition(String postCategory, MainPostDto mainPostDto);
+	List<SimplePost> findRecruitingPostBySearchCondition(String postCategory, MainPostDto mainPostDto);
 }
