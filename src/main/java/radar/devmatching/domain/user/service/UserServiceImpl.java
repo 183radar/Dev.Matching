@@ -32,10 +32,8 @@ public class UserServiceImpl implements UserService {
 	public UserResponse createUser(CreateUserRequest request) {
 		checkDuplicateUsername(request.getUsername());
 		checkDuplicateNickName(request.getNickName(), null);
-
-		String encodePassword = passwordEncoder.encode(request.getPassword());
-		request.setPassword(encodePassword);
-		User signUpUser = CreateUserRequest.toEntity(request);
+		
+		User signUpUser = CreateUserRequest.toEntity(request, passwordEncoder);
 
 		userRepository.save(signUpUser);
 		log.info("create user={}", signUpUser);
