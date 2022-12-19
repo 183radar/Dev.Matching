@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -23,7 +24,6 @@ import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import radar.devmatching.common.exception.BusinessException;
 import radar.devmatching.common.exception.error.ErrorMessage;
-import radar.devmatching.common.security.CustomUserDetails;
 import radar.devmatching.common.security.JwtProperties;
 import radar.devmatching.common.security.jwt.exception.ExpiredAccessTokenException;
 import radar.devmatching.common.security.jwt.exception.ExpiredRefreshTokenException;
@@ -118,7 +118,7 @@ public class JwtTokenProvider {
 
 		//TODO : AuthenticationToken에 담을 principal 객체를 username을 통해 User 엔티티로 변환해서 넣거나, ArgumentResolver로 변환해서 넣어주기
 
-		CustomUserDetails principal = (CustomUserDetails)userDetailsService.loadUserByUsername(claims.getSubject());
+		UserDetails principal = userDetailsService.loadUserByUsername(claims.getSubject());
 
 		return new JwtAuthenticationToken(principal, "", authorities);
 	}

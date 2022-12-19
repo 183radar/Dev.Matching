@@ -1,7 +1,10 @@
 package radar.devmatching.domain.post.full.controller;
 
+import javax.validation.Valid;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -38,7 +41,10 @@ public class FullPostController {
 
 	@PostMapping("/{simplePostId}/edit")
 	public String updatePost(@AuthUser User authUser, @PathVariable long simplePostId,
-		@ModelAttribute UpdatePostDto updatePostDto) {
+		@Valid @ModelAttribute UpdatePostDto updatePostDto, BindingResult bindingResult) {
+		if (bindingResult.hasErrors()) {
+			return "post/editPost";
+		}
 		fullPostService.updatePost(simplePostId, authUser.getId(), updatePostDto);
 		return "post/post";
 	}

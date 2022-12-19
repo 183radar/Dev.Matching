@@ -1,6 +1,7 @@
 package radar.devmatching.domain.post.simple.service.dto.request;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.Length;
 
@@ -17,14 +18,14 @@ import radar.devmatching.domain.user.entity.User;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class CreatePostRequest {
 
-	// @NotBlank
+	@NotBlank
 	@Length(max = 200)
 	private String title;
 
-	// @NotNull
+	@NotNull
 	private PostCategory category;
 
-	// @NotNull
+	@NotNull
 	private Region region;
 
 	@NotBlank

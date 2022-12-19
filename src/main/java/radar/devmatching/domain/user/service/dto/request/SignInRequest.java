@@ -1,7 +1,13 @@
 package radar.devmatching.domain.user.service.dto.request;
 
+import javax.validation.constraints.NotBlank;
+
 public class SignInRequest {
+
+	@NotBlank
 	private String username;
+
+	@NotBlank
 	private String password;
 
 	public SignInRequest(String username, String password) {

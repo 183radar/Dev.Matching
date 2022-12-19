@@ -1,5 +1,9 @@
 package radar.devmatching.domain.comment.service.dto.request;
 
+import javax.validation.constraints.NotBlank;
+
+import org.hibernate.validator.constraints.Length;
+
 import lombok.Builder;
 import radar.devmatching.domain.comment.entity.Comment;
 import radar.devmatching.domain.comment.entity.MainComment;
@@ -9,7 +13,9 @@ import radar.devmatching.domain.user.entity.User;
 
 public class CreateCommentRequest {
 
-	private String content;
+	@NotBlank
+	@Length(max = 10000)
+	private final String content;
 
 	private CommentType commentType;
 
@@ -18,12 +24,13 @@ public class CreateCommentRequest {
 		this.content = content;
 	}
 
-	private CreateCommentRequest(CommentType commentType) {
+	public CreateCommentRequest(String content, CommentType commentType) {
+		this.content = content;
 		this.commentType = commentType;
 	}
 
 	public static CreateCommentRequest of(CommentType commentType) {
-		return new CreateCommentRequest(commentType);
+		return new CreateCommentRequest(null, commentType);
 	}
 
 	public MainComment toMainCommentEntity(SimplePost simplePost, User user) {

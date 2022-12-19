@@ -1,7 +1,10 @@
 package radar.devmatching.domain.user.controller;
 
+import javax.validation.Valid;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,7 +35,11 @@ public class UserController {
 	 * UserService에서 AuthService를 분리하면 컨트롤러도 분리 예정
 	 */
 	@PostMapping(value = "/signup")
-	public String signUpRequest(@ModelAttribute CreateUserRequest request, Model model) {
+	public String signUpRequest(@Valid @ModelAttribute CreateUserRequest request, BindingResult bindingResult,
+		Model model) {
+		if (bindingResult.hasErrors()) {
+			return "/";
+		}
 		UserResponse user = userService.createUser(request);
 		model.addAttribute("createUser", user);
 		return "/";
@@ -53,8 +60,11 @@ public class UserController {
 	}
 
 	@PostMapping("/{userId}/update")
-	public String updateUser(@ModelAttribute UpdateUserRequest request,
+	public String updateUser(@Valid @ModelAttribute UpdateUserRequest request, BindingResult bindingResult,
 		@PathVariable(name = "userId") Long requestUserId, @AuthUser User authUser) {
+		if (bindingResult.hasErrors()) {
+			return "/";
+		}
 		userService.updateUser(request, requestUserId, authUser);
 		return "redirect:/api/users/" + requestUserId;
 	}
