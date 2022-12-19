@@ -1,7 +1,10 @@
 package radar.devmatching.domain.comment.controller;
 
+import javax.validation.Valid;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,7 +29,6 @@ public class MainCommentController {
 
 	@GetMapping("posts/{simplePostId}/createMainComment")
 	public String getCreateMainComment(@PathVariable long simplePostId, Model model) {
-		// 해당 simplePost가 존재하는지 검증
 		simplePostService.getSimplePostOnly(simplePostId);
 		model.addAttribute("createCommentRequest",
 			CreateCommentRequest.of(CreateCommentRequest.CommentType.MAIN));
@@ -35,7 +37,10 @@ public class MainCommentController {
 
 	@PostMapping("posts/{simplePostId}/createMainComment")
 	public String createMainComment(@AuthUser User authUser, @PathVariable long simplePostId,
-		@ModelAttribute CreateCommentRequest createCommentRequest) {
+		@Valid @ModelAttribute CreateCommentRequest createCommentRequest, BindingResult bindingResult) {
+		if (bindingResult.hasErrors()) {
+			return "comment/createComment";
+		}
 		commentService.createMainComment(simplePostId, authUser, createCommentRequest);
 		return "redirect:/api/posts/" + simplePostId;
 	}
@@ -49,7 +54,10 @@ public class MainCommentController {
 
 	@PostMapping("mainComments/{mainCommentId}/edit")
 	public String updateMainComment(@AuthUser User authUser, @PathVariable long mainCommentId,
-		UpdateCommentDto updateCommentDto) {
+		@Valid @ModelAttribute UpdateCommentDto updateCommentDto, BindingResult bindingResult) {
+		if (bindingResult.hasErrors()) {
+			return "comment/updateComment";
+		}
 		long simplePostId = commentService.updateMainComment(mainCommentId, updateCommentDto, authUser);
 		return "redirect:/api/posts/" + simplePostId;
 	}

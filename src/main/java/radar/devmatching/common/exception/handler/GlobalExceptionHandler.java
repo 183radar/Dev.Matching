@@ -38,7 +38,4 @@ public class GlobalExceptionHandler {
 		return errorViewResolver.resolveErrorView(request, e.getErrorMessage().getStatus(), models);
 	}
 
-	/**
-	 * 나중에 validation 추가 시 field 에러 잡을 때 model에 값 넣고 redirect하는 작업들 추가돼야함.
-	 */
 }
