@@ -84,7 +84,7 @@ public class UserServiceTest {
 		public void createUserWithoutException() {
 			//given
 			CreateUserRequest request = getCreateUserRequest();
-			User user = CreateUserRequest.toEntity(request);
+			User user = CreateUserRequest.toEntity(request, passwordEncoder);
 			given(passwordEncoder.encode(any())).willReturn(request.getPassword());
 
 			//when
