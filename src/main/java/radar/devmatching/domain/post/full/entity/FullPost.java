@@ -17,6 +17,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import radar.devmatching.common.entity.BaseEntity;
+import radar.devmatching.common.util.ExcludeJacocoGenerated;
 import radar.devmatching.domain.comment.entity.MainComment;
 import radar.devmatching.domain.post.simple.entity.SimplePost;
 
@@ -53,6 +54,7 @@ public class FullPost extends BaseEntity {
 		this.content = content;
 	}
 
+	@ExcludeJacocoGenerated
 	@Override
 	public String toString() {
 		return "FullPost{" +
