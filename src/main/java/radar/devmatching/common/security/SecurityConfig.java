@@ -40,8 +40,12 @@ public class SecurityConfig {
 			.headers().disable()
 			.sessionManagement()
 			.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-
 			.and()
+
+			.authorizeRequests(
+				request -> request.anyRequest().authenticated()
+			)
+
 			.addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider, jwtAuthenticationEntryPoint),
 				UsernamePasswordAuthenticationFilter.class);
 

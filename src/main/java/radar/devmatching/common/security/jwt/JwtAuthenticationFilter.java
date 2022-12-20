@@ -21,7 +21,6 @@ import radar.devmatching.common.exception.error.ErrorMessage;
 import radar.devmatching.common.security.JwtCookieProvider;
 import radar.devmatching.common.security.JwtProperties;
 import radar.devmatching.common.security.jwt.exception.ExpiredAccessTokenException;
-import radar.devmatching.common.security.jwt.exception.ExpiredRefreshTokenException;
 import radar.devmatching.common.security.jwt.exception.JwtTokenNotFoundException;
 import radar.devmatching.common.security.jwt.exception.TokenException;
 
@@ -79,37 +78,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		String accessToken = null;
 		String refreshToken = JwtCookieProvider.getCookieFromRequest(request, JwtProperties.REFRESH_TOKEN_HEADER);
 
-		if (Objects.isNull(refreshToken)) {
-			throw new JwtTokenNotFoundException(ErrorMessage.REFRESH_TOKEN_NOT_FOUND);
-		}
+		/**
+		 * refreshToken 유효성 검사
+		 * refreshToken 유효하지 않으면 ExpiredRefreshTokenException 던짐
+		 */
+		jwtTokenProvider.validRefreshToken(refreshToken);
 
-		try {
-			// refreshToken 유효성 검사
-			jwtTokenProvider.validRefreshToken(refreshToken);
+		accessToken = jwtTokenProvider.createNewAccessTokenFromRefreshToken(refreshToken);
 
-			accessToken = jwtTokenProvider.createNewAccessTokenFromRefreshToken(refreshToken);
-
-			ResponseCookie accessTokenCookie =
-				JwtCookieProvider.createCookie(JwtProperties.ACCESS_TOKEN_HEADER, accessToken,
-					jwtTokenProvider.getExpireTime());
-
-			response.addHeader(SET_COOKIE, accessTokenCookie.toString());
-
-		} catch (ExpiredRefreshTokenException e) {
-			// refreshToken 만료됐을때 accessToken, refreshToken 재생성
-			accessToken = jwtTokenProvider.createNewAccessTokenFromRefreshToken(refreshToken);
-			refreshToken = jwtTokenProvider.createNewRefreshToken(refreshToken);
-
-			ResponseCookie accessTokenCookie = JwtCookieProvider.createCookie(JwtProperties.ACCESS_TOKEN_HEADER,
-				accessToken,
-				jwtTokenProvider.getExpireTime());
-			ResponseCookie refreshTokenCookie = JwtCookieProvider.createCookie(JwtProperties.REFRESH_TOKEN_HEADER,
-				refreshToken,
+		ResponseCookie accessTokenCookie =
+			JwtCookieProvider.createCookie(JwtProperties.ACCESS_TOKEN_HEADER, accessToken,
 				jwtTokenProvider.getExpireTime());
 
-			response.setHeader(SET_COOKIE, accessTokenCookie.toString());
-			response.addHeader(SET_COOKIE, refreshTokenCookie.toString());
-		}
+		response.addHeader(SET_COOKIE, accessTokenCookie.toString());
+
 		return accessToken;
 	}
 }
