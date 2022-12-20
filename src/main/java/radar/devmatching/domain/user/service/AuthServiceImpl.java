@@ -26,7 +26,7 @@ public class AuthServiceImpl implements AuthService {
 	private final UserService userService;
 	private final JwtTokenProvider jwtTokenProvider;
 
-	// @Transactional
+	@Override
 	public SignInResponse signIn(String username, String password) {
 		UserResponse findUser;
 		try {

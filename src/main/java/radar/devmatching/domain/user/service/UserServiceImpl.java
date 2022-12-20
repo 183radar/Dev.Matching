@@ -30,9 +30,11 @@ public class UserServiceImpl implements UserService {
 	@Override
 	@Transactional
 	public UserResponse createUser(CreateUserRequest request) {
-		checkDuplicateUsername(request.getUsername());
-		checkDuplicateNickName(request.getNickName(), null);
-		
+
+		if (!(request.getNickNameCheck() && request.getUsernameCheck())) {
+			throw new RuntimeException();
+		}
+
 		User signUpUser = CreateUserRequest.toEntity(request, passwordEncoder);
 
 		userRepository.save(signUpUser);
@@ -47,6 +49,7 @@ public class UserServiceImpl implements UserService {
 		return UserResponse.of(authUser);
 	}
 
+	@Override
 	public UserResponse getUserByUsername(String username) {
 		User user = userRepository.findByUsername(username)
 			.orElseThrow(() -> new EntityNotFoundException(ErrorMessage.USER_NOT_FOUND));
@@ -54,6 +57,9 @@ public class UserServiceImpl implements UserService {
 		return UserResponse.of(user);
 	}
 
+	/**
+	 * TODO : nickName 변경하는거는 api 분리할 예정
+	 */
 	@Override
 	@Transactional
 	public UserResponse updateUser(UpdateUserRequest request, Long requestUserId, User authUser) {
@@ -84,20 +90,22 @@ public class UserServiceImpl implements UserService {
 	}
 
 	/**
-	 * 아이디 중복 확인, 회원가입시에만 사용
-	 * BusinessException 정의되면 예외 변경 예정
+	 * 회원 가입시에만 사용
 	 */
-	private void checkDuplicateUsername(String username) {
+	@Override
+	public void checkDuplicateUsername(String username) {
 		userRepository.findByUsername(username).ifPresent(user -> {
 			throw new DuplicateException(ErrorMessage.DUPLICATE_USERNAME);
 		});
+
 	}
 
 	/**
 	 * 닉네임 중복 확인
 	 * BusinessException 정의되면 예외 변경 예정
 	 */
-	private void checkDuplicateNickName(String nickName, Long userId) {
+	@Override
+	public void checkDuplicateNickName(String nickName, Long userId) {
 		userRepository.findByNickName(nickName).ifPresent(user -> {
 			if (!Objects.equals(user.getId(), userId) || userId == null) {
 				throw new DuplicateException(ErrorMessage.DUPLICATE_NICKNAME);
