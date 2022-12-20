@@ -9,6 +9,9 @@ import javax.persistence.EntityManager;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
+import radar.devmatching.common.exception.EntityNotFoundException;
+import radar.devmatching.common.exception.error.ErrorMessage;
+
 public class SubCommentRepositoryImpl implements SubCommentCustomRepository {
 
 	private final JPAQueryFactory queryFactory;
@@ -19,7 +22,7 @@ public class SubCommentRepositoryImpl implements SubCommentCustomRepository {
 
 	@Override
 	public Long findBySimplePostIdAsSubCommentId(Long subCommentId) {
-		return queryFactory
+		Long findSimplePostId = queryFactory
 			.select(simplePost.id)
 			.from(simplePost)
 			.join(simplePost.fullPost, fullPost)
@@ -27,5 +30,9 @@ public class SubCommentRepositoryImpl implements SubCommentCustomRepository {
 			.join(mainComment.subComments, subComment)
 			.where(subComment.id.eq(subCommentId))
 			.fetchOne();
+		if (findSimplePostId == null) {
+			throw new EntityNotFoundException(ErrorMessage.SUB_COMMENT_NOT_FOUND);
+		}
+		return findSimplePostId;
 	}
 }

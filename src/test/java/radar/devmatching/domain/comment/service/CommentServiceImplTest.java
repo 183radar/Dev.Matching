@@ -135,7 +135,6 @@ class CommentServiceImplTest {
 				given(mainCommentRepository.findMainCommentById(anyLong())).willReturn(Optional.of(mainComment));
 
 				//when
-
 				//then
 				assertThatThrownBy(() -> commentService.updateMainComment(anyLong(), null, loginUser))
 					.isInstanceOf(InvalidAccessException.class)
