@@ -7,11 +7,11 @@ public interface FullPostService {
 
 	PresentPostResponse getPostWithComment(long simplePostId);
 
-	UpdatePostDto getFullPost(long simplePostId, long leaderId);
+	UpdatePostDto getFullPost(long simplePostId, long userId);
 
-	void updatePost(long simplePostId, long leaderId, UpdatePostDto updatePostDto);
+	void updatePost(long simplePostId, long userId, UpdatePostDto updatePostDto);
 
-	void deletePost(long simplePostId, long leaderId);
+	void deletePost(long simplePostId, long userId);
 
-	void closePost(long simplePostId, long leaderId);
+	void closePost(long simplePostId, long userId);
 }

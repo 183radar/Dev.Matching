@@ -1,6 +1,7 @@
 package radar.devmatching.domain.post.full.service;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,6 +36,8 @@ public class FullPostServiceImpl implements FullPostService {
 	public PresentPostResponse getPostWithComment(long simplePostId) {
 		SimplePost findPost = simplePostRepository.findPostById(simplePostId)
 			.orElseThrow(SimplePostNotFoundException::new);
+		// 나중에 새로고침 누르면 clickCount는 안 올라가도록 설정해도 좋을듯? (JWT 가져와서)
+		findPost.plusClickCount();
 		int applyCount = applyService.getAcceptedApplyCount(simplePostId);
 		List<MainCommentResponse> allComments = commentService.getAllComments(findPost.getFullPost().getId());
 
@@ -44,12 +47,12 @@ public class FullPostServiceImpl implements FullPostService {
 	/**
 	 * 업데이트를 위해 기존 게시글 정보를 가져온다.
 	 * @param simplePostId
-	 * @param leaderId
+	 * @param userId
 	 * @return
 	 */
 	@Override
-	public UpdatePostDto getFullPost(long simplePostId, long leaderId) {
-		isLeaderValidation(simplePostId, leaderId);
+	public UpdatePostDto getFullPost(long simplePostId, long userId) {
+		isLeaderValidation(simplePostId, userId);
 		SimplePost findPost = simplePostRepository.findPostById(simplePostId)
 			.orElseThrow(SimplePostNotFoundException::new);
 		return UpdatePostDto.of(findPost);
@@ -57,8 +60,8 @@ public class FullPostServiceImpl implements FullPostService {
 
 	@Override
 	@Transactional
-	public void updatePost(long simplePostId, long leaderId, UpdatePostDto updatePostDto) {
-		isLeaderValidation(simplePostId, leaderId);
+	public void updatePost(long simplePostId, long userId, UpdatePostDto updatePostDto) {
+		isLeaderValidation(simplePostId, userId);
 		SimplePost findPost = simplePostRepository.findPostById(simplePostId)
 			.orElseThrow(SimplePostNotFoundException::new);
 		findPost.update(updatePostDto.getTitle(), updatePostDto.getCategory(), updatePostDto.getRegion(),
@@ -67,24 +70,24 @@ public class FullPostServiceImpl implements FullPostService {
 
 	@Override
 	@Transactional
-	public void deletePost(long simplePostId, long leaderId) {
-		isLeaderValidation(simplePostId, leaderId);
+	public void deletePost(long simplePostId, long userId) {
+		isLeaderValidation(simplePostId, userId);
 		simplePostRepository.deleteById(simplePostId);
 	}
 
 	@Override
 	@Transactional
-	public void closePost(long simplePostId, long leaderId) {
-		isLeaderValidation(simplePostId, leaderId);
+	public void closePost(long simplePostId, long userId) {
+		isLeaderValidation(simplePostId, userId);
 		SimplePost findPost = simplePostRepository.findPostById(simplePostId)
 			.orElseThrow(SimplePostNotFoundException::new);
 		findPost.closePost();
 	}
 
-	private void isLeaderValidation(long simplePostId, long leaderId) {
+	private void isLeaderValidation(long simplePostId, long userId) {
 		SimplePost findPost = simplePostRepository.findById(simplePostId)
 			.orElseThrow(SimplePostNotFoundException::new);
-		if (findPost.getLeader().getId() == leaderId) {
+		if (!Objects.equals(findPost.getLeader().getId(), userId)) {
 			throw new InvalidAccessException(ErrorMessage.NOT_LEADER);
 		}
 	}

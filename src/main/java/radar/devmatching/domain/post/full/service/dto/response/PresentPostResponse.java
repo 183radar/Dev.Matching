@@ -5,13 +5,11 @@ import java.util.List;
 
 import lombok.AccessLevel;
 import lombok.Builder;
-import lombok.Getter;
 import radar.devmatching.domain.comment.service.dto.response.MainCommentResponse;
 import radar.devmatching.domain.post.simple.entity.PostCategory;
 import radar.devmatching.domain.post.simple.entity.Region;
 import radar.devmatching.domain.post.simple.entity.SimplePost;
 
-@Getter
 @Builder(access = AccessLevel.PRIVATE)
 public class PresentPostResponse {
 
@@ -23,6 +21,8 @@ public class PresentPostResponse {
 
 	private final Integer userNum;
 
+	private final Long clickCount;
+
 	private final LocalDateTime createDate;
 
 	private final Integer applyCount;
@@ -31,8 +31,6 @@ public class PresentPostResponse {
 
 	private final List<MainCommentResponse> mainCommentResponse;
 
-	// private Long clickNum; 조회수는 나중에 추가할게
-
 	public static PresentPostResponse of(SimplePost simplePost, int applyCount,
 		List<MainCommentResponse> mainCommentResponse) {
 		return PresentPostResponse.builder()
@@ -40,6 +38,7 @@ public class PresentPostResponse {
 			.category(simplePost.getCategory())
 			.region(simplePost.getRegion())
 			.userNum(simplePost.getUserNum())
+			.clickCount(simplePost.getClickCount())
 			.createDate(simplePost.getCreateDate())
 			.applyCount(applyCount)
 			.content(simplePost.getFullPost().getContent())
@@ -61,6 +60,10 @@ public class PresentPostResponse {
 
 	public Integer getUserNum() {
 		return userNum;
+	}
+
+	public Long getClickCount() {
+		return clickCount;
 	}
 
 	public LocalDateTime getCreateDate() {
