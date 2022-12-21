@@ -204,6 +204,7 @@ class MainCommentRepositoryTest {
 			PersistenceUnitUtil persistenceUnitUtil = em.getEntityManagerFactory().getPersistenceUnitUtil();
 			assertThat(persistenceUnitUtil.isLoaded(allComments.get(0).getComment())).isTrue();
 			assertThat(persistenceUnitUtil.isLoaded(allComments.get(0).getSubComments().get(0))).isTrue();
+			assertThat(persistenceUnitUtil.isLoaded(allComments.get(0).getSubComments().get(0).getComment())).isTrue();
 		}
 	}
 
