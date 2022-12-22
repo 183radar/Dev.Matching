@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html th:replace="~{layout :: layout(~{::main})}" xmlns:th="http://www.thymeleaf.org">
+
+<body>
+<main>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-5">
+                <div class="card shadow-lg border-0 rounded-lg mt-5">
+                    <div class="card-header"><h3 class="text-center font-weight-light my-4">로그인</h3></div>
+                    <div class="card-body">
+                        <form method="post" th:object="${signInRequest}">
+                            <div th:if="${error}">
+                                <p class="alert-danger" th:text="${error}">에러 메시지</p>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input class="form-control" placeholder="username" th:errorclass="is-invalid"
+                                       th:field="*{username}" type="text"/>
+                                <label for="username">이름</label>
+                                <div class="invalid-feedback" th:errors="*{username}">에러 메시지</div>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input class="form-control" placeholder="password" th:errorclass="is-invalid"
+                                       th:field="*{password}" type="password"/>
+                                <label for="password">비밀번호</label>
+                                <div class="invalid-feedback" th:errors="*{password}">에러 메시지</div>
+                            </div>
+                            <div class="d-flex align-items-center justify-content-between mt-4 mb-0">
+                                <button class="btn btn-primary" type="submit">로그인</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+</body>
+</html>

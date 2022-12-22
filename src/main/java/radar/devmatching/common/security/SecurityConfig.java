@@ -23,7 +23,8 @@ public class SecurityConfig {
 	public WebSecurityCustomizer webSecurityCustomizer() {
 		return web -> web.ignoring()
 			.antMatchers("/h2-console/**")
-			.antMatchers("/api/users/signIn");
+			.antMatchers("/api/users/signIn")
+			.antMatchers("/js/scripts.js");
 	}
 
 	@Bean
