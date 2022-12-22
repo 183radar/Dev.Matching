@@ -28,7 +28,7 @@ public class FullPostController {
 	@GetMapping("/{simplePostId}")
 	public String getFullPost(@PathVariable long simplePostId, Model model) {
 		PresentPostResponse presentPostResponse = fullPostService.getPostWithComment(simplePostId);
-		model.addAttribute("PresentPostResponse", presentPostResponse);
+		model.addAttribute("presentPostResponse", presentPostResponse);
 		return "post/post";
 	}
 

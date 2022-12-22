@@ -33,6 +33,7 @@ public class FullPostServiceImpl implements FullPostService {
 	 * @return
 	 */
 	@Override
+	@Transactional
 	public PresentPostResponse getPostWithComment(long simplePostId) {
 		SimplePost findPost = simplePostRepository.findPostById(simplePostId)
 			.orElseThrow(SimplePostNotFoundException::new);

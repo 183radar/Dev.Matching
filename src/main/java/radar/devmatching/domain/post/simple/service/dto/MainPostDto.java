@@ -15,7 +15,7 @@ import radar.devmatching.domain.post.simple.service.dto.response.SimplePostRespo
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class MainPostDto {
 
-	private String userName;
+	private String nickname;
 
 	private Region region;
 
@@ -25,17 +25,17 @@ public class MainPostDto {
 	private List<SimplePostResponse> simplePostResponses;
 
 	@Builder
-	public MainPostDto(String userName, Region region, String searchCondition,
+	public MainPostDto(String nickname, Region region, String searchCondition,
 		List<SimplePostResponse> simplePostResponses) {
-		this.userName = userName;
+		this.nickname = nickname;
 		this.region = region;
 		this.searchCondition = searchCondition;
 		this.simplePostResponses = simplePostResponses;
 	}
 
-	public static MainPostDto of(String userName, Region region, List<SimplePost> simplePosts) {
+	public static MainPostDto of(String nickname, Region region, List<SimplePost> simplePosts) {
 		return MainPostDto.builder()
-			.userName(userName)
+			.nickname(nickname)
 			.region(region)
 			.simplePostResponses(simplePosts.stream()
 				.map(SimplePostResponse::of).
@@ -43,8 +43,8 @@ public class MainPostDto {
 			.build();
 	}
 
-	public String getUserName() {
-		return userName;
+	public String getNickname() {
+		return nickname;
 	}
 
 	public Region getRegion() {

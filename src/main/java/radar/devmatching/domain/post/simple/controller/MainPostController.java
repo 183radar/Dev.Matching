@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import lombok.RequiredArgsConstructor;
 import radar.devmatching.common.security.resolver.AuthUser;
+import radar.devmatching.domain.post.simple.entity.Region;
 import radar.devmatching.domain.post.simple.service.SimplePostService;
 import radar.devmatching.domain.post.simple.service.dto.MainPostDto;
 import radar.devmatching.domain.user.entity.User;
@@ -23,6 +24,11 @@ public class MainPostController {
 	private static final String categoryDefaultValue = "ALL";
 	private final SimplePostService simplePostService;
 
+	@ModelAttribute("regions")
+	public Region[] regions() {
+		return Region.values();
+	}
+
 	@GetMapping("/")
 	public String getMainPage(@AuthUser User authUser, Model model,
 		@RequestParam(value = "postCategory", defaultValue = categoryDefaultValue) String postCategory) {
@@ -33,9 +39,13 @@ public class MainPostController {
 
 	@PostMapping("/")
 	public String searchMainPage(@AuthUser User authUser, @Valid @ModelAttribute MainPostDto mainPostDto,
-		BindingResult bindingResult,
+		BindingResult bindingResult, Model model,
 		@RequestParam(value = "postCategory", defaultValue = categoryDefaultValue) String postCategory) {
+		if (bindingResult.hasErrors()) {
+			return "main";
+		}
 		mainPostDto = simplePostService.searchSimplePost(authUser, postCategory, mainPostDto);
+		model.addAttribute("mainPostDto", mainPostDto);
 		return "main";
 	}
 }
