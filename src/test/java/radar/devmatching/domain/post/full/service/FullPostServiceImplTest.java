@@ -127,7 +127,7 @@ class FullPostServiceImplTest {
 			assertThat(presentPostResponse.getCreateDate()).isEqualTo(simplePost.getCreateDate());
 			assertThat(presentPostResponse.getApplyCount()).isEqualTo(applyCount);
 			assertThat(presentPostResponse.getContent()).isEqualTo(simplePost.getFullPost().getContent());
-			assertThat(presentPostResponse.getMainCommentResponse()).isEqualTo(mainCommentResponses);
+			assertThat(presentPostResponse.getMainCommentResponses()).isEqualTo(mainCommentResponses);
 
 			assertThat(simplePost.getClickCount()).isEqualTo(1);
 		}

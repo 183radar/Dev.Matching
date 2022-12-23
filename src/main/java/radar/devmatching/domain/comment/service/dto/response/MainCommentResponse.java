@@ -10,13 +10,13 @@ import radar.devmatching.domain.comment.entity.MainComment;
 @Builder(access = AccessLevel.PRIVATE)
 public class MainCommentResponse {
 
-	private final CommentResponse mainCommentResponse;
+	private final CommentResponse commentResponse;
 
 	private final List<CommentResponse> subCommentResponses;
 
 	public static MainCommentResponse of(MainComment mainComment) {
 		return MainCommentResponse.builder()
-			.mainCommentResponse(CommentResponse.of(mainComment.getComment()))
+			.commentResponse(CommentResponse.of(mainComment.getComment()))
 			.subCommentResponses(
 				mainComment.getSubComments()
 					.stream()
@@ -25,8 +25,8 @@ public class MainCommentResponse {
 			).build();
 	}
 
-	public CommentResponse getMainCommentResponse() {
-		return mainCommentResponse;
+	public CommentResponse getCommentResponse() {
+		return commentResponse;
 	}
 
 	public List<CommentResponse> getSubCommentResponses() {

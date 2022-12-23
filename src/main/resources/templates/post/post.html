@@ -3,13 +3,49 @@
 
 <body>
 <main th:object="${presentPostResponse}">
-    <div class="col-xl-6">
+    <div class="col-xl-12">
         <div class="card mb-4">
-            <div class="card-header" th:text="">
-                <i class="fas fa-chart-bar me-1"></i>
+            <div class="card-header" th:text="'제목: ' + *{title}">
+                <i class="fas fa-chart-area me-1"></i>
             </div>
             <div class="card-body">
-                <canvas height="200" width="50"></canvas>
+                <div class="row mb-3">
+                    <div class="col-md-2 form-group row">
+                        <input class="form-control-plaintext" readonly th:value="'닉네임: ' + *{nickname}" type="text">
+                    </div>
+                    <div class="col-md-2 form-group row">
+                        <input class="form-control-plaintext" readonly th:value="'카테고리: ' + *{category}" type="text">
+                    </div>
+                    <div class="col-md-2 form-group row">
+                        <input class="form-control-plaintext" readonly th:value="'지역: ' + *{region}" type="text">
+                    </div>
+                    <div class="col-md-2 form-group row">
+                        <input class="form-control-plaintext" readonly th:value="'모집 인원수: ' + *{userNum}" type="text">
+                    </div>
+                    <div class="col-md-1 form-group row">
+                        <input class="form-control-plaintext" readonly th:value="'신청자 수: ' + *{applyCount}" type="text">
+                    </div>
+                    <div class="col-md-1 form-group row">
+                        <input class="form-control-plaintext" readonly th:value="'조회수: ' + *{clickCount}" type="text">
+                    </div>
+                    <div class="col-md-3 form-group row">
+                        <input class="form-control-plaintext" readonly th:value="'생성일: ' + *{createDate}" type="text">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-12">
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="col-md-12 form-group row" th:text="*{content}"></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-8" th:each="mainCommentResponse : *{mainCommentResponses}">
+        <div class="card mb-4">
+            <div class="card-header" th:text="${mainCommentResponse.commentResponse.simpleUserResponse.nickname}">
+                <i class="fas fa-chart-area me-1"></i>
             </div>
         </div>
     </div>

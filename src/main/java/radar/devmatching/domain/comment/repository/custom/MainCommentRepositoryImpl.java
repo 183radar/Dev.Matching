@@ -1,5 +1,6 @@
 package radar.devmatching.domain.comment.repository.custom;
 
+import static radar.devmatching.domain.comment.entity.QComment.*;
 import static radar.devmatching.domain.comment.entity.QMainComment.*;
 import static radar.devmatching.domain.comment.entity.QSubComment.*;
 import static radar.devmatching.domain.post.full.entity.QFullPost.*;
@@ -27,9 +28,9 @@ public class MainCommentRepositoryImpl implements MainCommentCustomRepository {
 	public List<MainComment> getAllComments(Long fullPostId) {
 		return queryFactory
 			.selectFrom(mainComment)
-			.leftJoin(mainComment.comment).fetchJoin()
+			.leftJoin(mainComment.comment, comment).fetchJoin()
 			.leftJoin(mainComment.subComments, subComment).fetchJoin()
-			.leftJoin(subComment.comment).fetchJoin()
+			.leftJoin(subComment.comment, comment).fetchJoin()
 			.where(mainComment.fullPost.id.eq(fullPostId))
 			.fetch();
 	}

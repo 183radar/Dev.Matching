@@ -15,6 +15,8 @@ public class PresentPostResponse {
 
 	private final String title;
 
+	private final String nickname;
+
 	private final PostCategory category;
 
 	private final Region region;
@@ -29,12 +31,13 @@ public class PresentPostResponse {
 
 	private final String content;
 
-	private final List<MainCommentResponse> mainCommentResponse;
+	private final List<MainCommentResponse> mainCommentResponses;
 
 	public static PresentPostResponse of(SimplePost simplePost, int applyCount,
 		List<MainCommentResponse> mainCommentResponse) {
 		return PresentPostResponse.builder()
 			.title(simplePost.getTitle())
+			.nickname(simplePost.getLeader().getNickName())
 			.category(simplePost.getCategory())
 			.region(simplePost.getRegion())
 			.userNum(simplePost.getUserNum())
@@ -42,12 +45,16 @@ public class PresentPostResponse {
 			.createDate(simplePost.getCreateDate())
 			.applyCount(applyCount)
 			.content(simplePost.getFullPost().getContent())
-			.mainCommentResponse(mainCommentResponse)
+			.mainCommentResponses(mainCommentResponse)
 			.build();
 	}
 
 	public String getTitle() {
 		return title;
+	}
+
+	public String getNickname() {
+		return nickname;
 	}
 
 	public PostCategory getCategory() {
@@ -78,7 +85,7 @@ public class PresentPostResponse {
 		return content;
 	}
 
-	public List<MainCommentResponse> getMainCommentResponse() {
-		return mainCommentResponse;
+	public List<MainCommentResponse> getMainCommentResponses() {
+		return mainCommentResponses;
 	}
 }

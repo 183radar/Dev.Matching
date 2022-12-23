@@ -39,13 +39,12 @@ public class MainPostController {
 
 	@PostMapping("/")
 	public String searchMainPage(@AuthUser User authUser, @Valid @ModelAttribute MainPostDto mainPostDto,
-		BindingResult bindingResult, Model model,
+		BindingResult bindingResult,
 		@RequestParam(value = "postCategory", defaultValue = categoryDefaultValue) String postCategory) {
 		if (bindingResult.hasErrors()) {
 			return "main";
 		}
 		mainPostDto = simplePostService.searchSimplePost(authUser, postCategory, mainPostDto);
-		model.addAttribute("mainPostDto", mainPostDto);
 		return "main";
 	}
 }
