@@ -16,11 +16,11 @@ public class MainCommentResponse {
 
 	public static MainCommentResponse of(MainComment mainComment) {
 		return MainCommentResponse.builder()
-			.commentResponse(CommentResponse.of(mainComment.getComment()))
+			.commentResponse(CommentResponse.of(mainComment.getComment(), mainComment.getId()))
 			.subCommentResponses(
 				mainComment.getSubComments()
 					.stream()
-					.map(subComment -> CommentResponse.of(subComment.getComment()))
+					.map(subComment -> CommentResponse.of(subComment.getComment(), subComment.getId()))
 					.collect(Collectors.toList())
 			).build();
 	}

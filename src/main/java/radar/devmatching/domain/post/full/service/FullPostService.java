@@ -2,10 +2,11 @@ package radar.devmatching.domain.post.full.service;
 
 import radar.devmatching.domain.post.full.service.dto.UpdatePostDto;
 import radar.devmatching.domain.post.full.service.dto.response.PresentPostResponse;
+import radar.devmatching.domain.user.entity.User;
 
 public interface FullPostService {
 
-	PresentPostResponse getPostWithComment(long simplePostId);
+	PresentPostResponse getPostWithComment(long simplePostId, User loginUser);
 
 	UpdatePostDto getFullPost(long simplePostId, long userId);
 

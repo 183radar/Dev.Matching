@@ -17,6 +17,7 @@ import radar.devmatching.domain.post.full.service.dto.response.PresentPostRespon
 import radar.devmatching.domain.post.simple.entity.SimplePost;
 import radar.devmatching.domain.post.simple.exception.SimplePostNotFoundException;
 import radar.devmatching.domain.post.simple.repository.SimplePostRepository;
+import radar.devmatching.domain.user.entity.User;
 
 @Service
 @Transactional(readOnly = true)
@@ -34,7 +35,7 @@ public class FullPostServiceImpl implements FullPostService {
 	 */
 	@Override
 	@Transactional
-	public PresentPostResponse getPostWithComment(long simplePostId) {
+	public PresentPostResponse getPostWithComment(long simplePostId, User loginUser) {
 		SimplePost findPost = simplePostRepository.findPostById(simplePostId)
 			.orElseThrow(SimplePostNotFoundException::new);
 		// 나중에 새로고침 누르면 clickCount는 안 올라가도록 설정해도 좋을듯? (JWT 가져와서)
@@ -42,7 +43,7 @@ public class FullPostServiceImpl implements FullPostService {
 		int applyCount = applyService.getAcceptedApplyCount(simplePostId);
 		List<MainCommentResponse> allComments = commentService.getAllComments(findPost.getFullPost().getId());
 
-		return PresentPostResponse.of(findPost, applyCount, allComments);
+		return PresentPostResponse.of(findPost, loginUser, applyCount, allComments);
 	}
 
 	/**

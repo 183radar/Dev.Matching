@@ -7,6 +7,8 @@ import radar.devmatching.domain.user.entity.User;
 @Builder(access = AccessLevel.PRIVATE)
 public class SimpleUserResponse {
 
+	private final Long userId;
+
 	private final String username;
 
 	private final String nickname;
@@ -19,12 +21,17 @@ public class SimpleUserResponse {
 
 	public static SimpleUserResponse of(User user) {
 		return SimpleUserResponse.builder()
+			.userId(user.getId())
 			.username(user.getUsername())
 			.nickname(user.getNickName())
 			.schoolName(user.getSchoolName())
 			.githubUrl(user.getGithubUrl())
 			.introduce(user.getIntroduce())
 			.build();
+	}
+
+	public Long getUserId() {
+		return userId;
 	}
 
 	public String getUsername() {
