@@ -5,6 +5,7 @@ import java.util.Objects;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,7 +32,7 @@ public class UserServiceImpl implements UserService {
 	@Transactional
 	public UserResponse createUser(CreateUserRequest request) {
 
-		if (!(request.getNickNameCheck() && request.getUsernameCheck())) {
+		if (!request.getNickNameCheck() || !request.getUsernameCheck()) {
 			throw new RuntimeException();
 		}
 
@@ -94,6 +95,9 @@ public class UserServiceImpl implements UserService {
 	 */
 	@Override
 	public void checkDuplicateUsername(String username) {
+		if (!StringUtils.hasText(username)) {
+			throw new RuntimeException();
+		}
 		userRepository.findByUsername(username).ifPresent(user -> {
 			throw new DuplicateException(ErrorMessage.DUPLICATE_USERNAME);
 		});
