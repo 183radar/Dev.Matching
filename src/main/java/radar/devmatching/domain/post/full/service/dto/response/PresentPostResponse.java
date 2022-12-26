@@ -1,70 +1,52 @@
 package radar.devmatching.domain.post.full.service.dto.response;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import lombok.AccessLevel;
 import lombok.Builder;
-import lombok.Getter;
 import radar.devmatching.domain.comment.service.dto.response.MainCommentResponse;
-import radar.devmatching.domain.post.simple.entity.PostCategory;
-import radar.devmatching.domain.post.simple.entity.Region;
 import radar.devmatching.domain.post.simple.entity.SimplePost;
+import radar.devmatching.domain.post.simple.service.dto.response.SimplePostResponse;
+import radar.devmatching.domain.user.entity.User;
+import radar.devmatching.domain.user.service.dto.response.SimpleUserResponse;
 
-@Getter
 @Builder(access = AccessLevel.PRIVATE)
 public class PresentPostResponse {
 
-	private final String title;
+	private final SimplePostResponse simplePostResponse;
 
-	private final PostCategory category;
+	private final SimpleUserResponse loginUser;
 
-	private final Region region;
-
-	private final Integer userNum;
-
-	private final LocalDateTime createDate;
+	private final SimpleUserResponse postLeader;
 
 	private final Integer applyCount;
 
 	private final String content;
 
-	private final List<MainCommentResponse> mainCommentResponse;
+	private final List<MainCommentResponse> mainCommentResponses;
 
-	// private Long clickNum; 조회수는 나중에 추가할게
-
-	public static PresentPostResponse of(SimplePost simplePost, int applyCount,
+	public static PresentPostResponse of(SimplePost simplePost, User loginUser, int applyCount,
 		List<MainCommentResponse> mainCommentResponse) {
 		return PresentPostResponse.builder()
-			.title(simplePost.getTitle())
-			.category(simplePost.getCategory())
-			.region(simplePost.getRegion())
-			.userNum(simplePost.getUserNum())
-			.createDate(simplePost.getCreateDate())
+			.simplePostResponse(SimplePostResponse.of(simplePost))
+			.loginUser(SimpleUserResponse.of(loginUser))
+			.postLeader(SimpleUserResponse.of(simplePost.getLeader()))
 			.applyCount(applyCount)
 			.content(simplePost.getFullPost().getContent())
-			.mainCommentResponse(mainCommentResponse)
+			.mainCommentResponses(mainCommentResponse)
 			.build();
 	}
 
-	public String getTitle() {
-		return title;
+	public SimplePostResponse getSimplePostResponse() {
+		return simplePostResponse;
 	}
 
-	public PostCategory getCategory() {
-		return category;
+	public SimpleUserResponse getPostLeader() {
+		return postLeader;
 	}
 
-	public Region getRegion() {
-		return region;
-	}
-
-	public Integer getUserNum() {
-		return userNum;
-	}
-
-	public LocalDateTime getCreateDate() {
-		return createDate;
+	public SimpleUserResponse getLoginUser() {
+		return loginUser;
 	}
 
 	public Integer getApplyCount() {
@@ -75,7 +57,7 @@ public class PresentPostResponse {
 		return content;
 	}
 
-	public List<MainCommentResponse> getMainCommentResponse() {
-		return mainCommentResponse;
+	public List<MainCommentResponse> getMainCommentResponses() {
+		return mainCommentResponses;
 	}
 }

@@ -53,6 +53,18 @@ public class CreateUserRequest {
 			.build();
 	}
 
+	@Override
+	public String toString() {
+		return "CreateUserRequest{" +
+			"username='" + username + '\'' +
+			", password='" + password + '\'' +
+			", nickName='" + nickName + '\'' +
+			", schoolName='" + schoolName + '\'' +
+			", usernameCheck=" + usernameCheck +
+			", nickNameCheck=" + nickNameCheck +
+			'}';
+	}
+
 	public void usernameNonDuplicate() {
 		this.usernameCheck = true;
 	}

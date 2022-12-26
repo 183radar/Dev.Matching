@@ -8,6 +8,8 @@ import radar.devmatching.domain.post.simple.entity.SimplePost;
 
 public class SimplePostResponse {
 
+	private final Long simplePostId;
+
 	private final String title;
 
 	private final PostCategory category;
@@ -18,20 +20,26 @@ public class SimplePostResponse {
 
 	private final LocalDateTime createDate;
 
-	// private Long clickNum; 조회수는 나중에 추가할게
+	private final Long clickCount;
 
-	public SimplePostResponse(String title, PostCategory category, Region region, Integer userNum,
-		LocalDateTime createDate) {
+	public SimplePostResponse(Long simplePostId, String title, PostCategory category, Region region, Integer userNum,
+		LocalDateTime createDate, Long clickCount) {
+		this.simplePostId = simplePostId;
 		this.title = title;
 		this.category = category;
 		this.region = region;
 		this.userNum = userNum;
 		this.createDate = createDate;
+		this.clickCount = clickCount;
 	}
 
 	public static SimplePostResponse of(SimplePost simplePost) {
-		return new SimplePostResponse(simplePost.getTitle(), simplePost.getCategory(),
-			simplePost.getRegion(), simplePost.getUserNum(), simplePost.getCreateDate());
+		return new SimplePostResponse(simplePost.getId(), simplePost.getTitle(), simplePost.getCategory(),
+			simplePost.getRegion(), simplePost.getUserNum(), simplePost.getCreateDate(), simplePost.getClickCount());
+	}
+
+	public Long getSimplePostId() {
+		return simplePostId;
 	}
 
 	public String getTitle() {
@@ -52,5 +60,9 @@ public class SimplePostResponse {
 
 	public LocalDateTime getCreateDate() {
 		return createDate;
+	}
+
+	public Long getClickCount() {
+		return clickCount;
 	}
 }

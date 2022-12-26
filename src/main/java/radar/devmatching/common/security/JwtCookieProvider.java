@@ -43,7 +43,7 @@ public class JwtCookieProvider {
 
 	public static void deleteCookieFromRequest(HttpServletRequest request, HttpServletResponse response,
 		String cookieName) {
-		if (Objects.nonNull(JwtCookieProvider.getCookieFromRequest(request, cookieName))) {
+		if (Objects.nonNull(request.getCookies())) {
 			ResponseCookie deleteCookie = ResponseCookie.from(cookieName, "")
 				.path("/")
 				.maxAge(0)

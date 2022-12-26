@@ -19,7 +19,7 @@ public class SubCommentRepositoryImpl implements SubCommentCustomRepository {
 
 	@Override
 	public Long findBySimplePostIdAsSubCommentId(Long subCommentId) {
-		return queryFactory
+		Long findSimplePostId = queryFactory
 			.select(simplePost.id)
 			.from(simplePost)
 			.join(simplePost.fullPost, fullPost)
@@ -27,5 +27,6 @@ public class SubCommentRepositoryImpl implements SubCommentCustomRepository {
 			.join(mainComment.subComments, subComment)
 			.where(subComment.id.eq(subCommentId))
 			.fetchOne();
+		return findSimplePostId;
 	}
 }

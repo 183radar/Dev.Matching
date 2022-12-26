@@ -6,8 +6,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import radar.devmatching.common.exception.BusinessException;
 import radar.devmatching.common.exception.EntityNotFoundException;
+import radar.devmatching.common.exception.UsernamePasswordNotMatchException;
 import radar.devmatching.common.exception.error.ErrorMessage;
 import radar.devmatching.common.security.JwtProperties;
 import radar.devmatching.common.security.jwt.JwtToken;
@@ -33,11 +33,11 @@ public class AuthServiceImpl implements AuthService {
 			findUser = userService.getUserByUsername(username);
 		} catch (EntityNotFoundException e) {
 			log.warn("username not found : username = {}", username);
-			throw new BusinessException(ErrorMessage.AUTHENTICATION_FAIL);
+			throw new UsernamePasswordNotMatchException(ErrorMessage.AUTHENTICATION_FAIL);
 		}
 		if (!passwordEncoder.matches(password, findUser.getPassword())) {
 			log.warn("request password not match about found password : access username = {}", username);
-			throw new BusinessException(ErrorMessage.AUTHENTICATION_FAIL);
+			throw new UsernamePasswordNotMatchException(ErrorMessage.AUTHENTICATION_FAIL);
 		}
 		log.info("findUser role = {}", findUser.getUserRole());
 		String accessToken = jwtTokenProvider.createAccessToken(username, findUser.getUserRole());

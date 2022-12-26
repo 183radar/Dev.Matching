@@ -80,7 +80,7 @@ class MainPostControllerTest extends ControllerTestSetUp {
 				ResultActions result = mockMvc.perform(request);
 
 				//then
-				verify(simplePostService, only()).searchSimplePost(any(User.class), anyString(),
+				verify(simplePostService, never()).searchSimplePost(any(User.class), anyString(),
 					any(MainPostDto.class));
 
 				result.andExpect(status().isOk())

@@ -212,7 +212,7 @@ class SimplePostServiceImplTest {
 			MainPostDto findMainPostDto = simplePostService.searchSimplePost(loginUser, "ALL", mainPostDto);
 
 			//then
-			assertThat(findMainPostDto.getUserName()).isEqualTo(loginUser.getNickName());
+			assertThat(findMainPostDto.getNickname()).isEqualTo(loginUser.getNickName());
 			assertThat(findMainPostDto.getRegion()).isEqualTo(mainPostDto.getRegion());
 			assertThat(findMainPostDto.getSimplePostResponses().get(0))
 				.usingRecursiveComparison().isEqualTo(SimplePostResponse.of(simplePost));

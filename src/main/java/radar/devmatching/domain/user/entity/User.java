@@ -16,6 +16,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 import radar.devmatching.common.entity.BaseEntity;
+import radar.devmatching.common.util.ExcludeJacocoGenerated;
 import radar.devmatching.domain.matchings.apply.entity.Apply;
 import radar.devmatching.domain.matchings.matchinguser.entity.MatchingUser;
 import radar.devmatching.domain.post.simple.entity.SimplePost;
@@ -79,6 +80,7 @@ public class User extends BaseEntity {
 		this.simplePosts = new ArrayList<>();
 	}
 
+	@ExcludeJacocoGenerated
 	@Override
 	public boolean equals(Object o) {
 		if (this == o)
@@ -99,6 +101,7 @@ public class User extends BaseEntity {
 		return getSchoolName() != null ? getSchoolName().equals(user.getSchoolName()) : user.getSchoolName() == null;
 	}
 
+	@ExcludeJacocoGenerated
 	@Override
 	public int hashCode() {
 		int result = getId() != null ? getId().hashCode() : 0;
@@ -109,6 +112,7 @@ public class User extends BaseEntity {
 		return result;
 	}
 
+	@ExcludeJacocoGenerated
 	@Override
 	public String toString() {
 		return "User{" +

@@ -22,7 +22,7 @@ public class JwtAuthenticationEntryPoint {
 
 	public void commence(HttpServletRequest request, HttpServletResponse response,
 		TokenException tokenException) throws IOException {
-		log.warn("exception info={}", tokenException.getErrorMessage());
+		log.warn("exception info={}", tokenException.getErrorMessage(), tokenException);
 
 		JwtCookieProvider.deleteCookieFromRequest(request, response, JwtProperties.ACCESS_TOKEN_HEADER);
 		JwtCookieProvider.deleteCookieFromRequest(request, response, JwtProperties.REFRESH_TOKEN_HEADER);

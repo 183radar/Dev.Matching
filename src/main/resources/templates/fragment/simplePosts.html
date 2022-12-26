@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<table class="table table-bordered table-light" th:fragment="simplePosts (simplePostResponses)">
+    <thead>
+    <tr align="center">
+        <th>제목</th>
+        <th>카테고리</th>
+        <th>지역</th>
+        <th>모집인원 수</th>
+        <th>생성 시간</th>
+        <th>조회수</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr align="center" th:each="simplePostResponse : ${simplePostResponses}">
+        <td>
+            <a class="btn btn-secondary" th:href="@{'/api/posts/'+${simplePostResponse.simplePostId}}"
+               th:text="${simplePostResponse.title}"></a>
+        </td>
+        <td th:text="${simplePostResponse.category.name}"></td>
+        <td th:text="${simplePostResponse.region.name}"></td>
+        <td th:text="${simplePostResponse.userNum}"></td>
+        <td th:text="${simplePostResponse.createDate}"></td>
+        <td th:text="${simplePostResponse.clickCount}"></td>
+    </tr>
+    </tbody>
+</table>
+
+</body>
+</html>

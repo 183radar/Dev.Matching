@@ -79,7 +79,7 @@ public class JwtTokenProvider {
 	public String createNewAccessTokenFromRefreshToken(String refreshToken) {
 		Claims claims = parseClaims(refreshToken);
 		String username = claims.getSubject();
-		UserRole role = (UserRole)claims.get(JwtProperties.ROLE);
+		UserRole role = UserRole.valueOf((String)claims.get(JwtProperties.ROLE));
 		return createAccessToken(username, role);
 	}
 
