@@ -16,4 +16,14 @@ spring:
   jpa:
     hibernate:
       ddl-auto: create
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          audiences:
 #    database-platform: org.hibernate.dialect.H2Dialect
+
+jwt:
+  secret:
+  access-token-expire-time:
+  refresh-token-expire-time:
