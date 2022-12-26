@@ -2,6 +2,7 @@ package radar.devmatching.domain.user.controller;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Controller;
@@ -42,8 +43,11 @@ public class AuthController {
 
 	// TODO : SecurityContextHolder 에 Authentication 저장하기 추가.
 	@PostMapping("/signIn")
-	public String signIn(HttpServletResponse response, @ModelAttribute SignInRequest signInRequest,
+	public String signIn(HttpServletResponse response, @Valid @ModelAttribute SignInRequest signInRequest,
 		BindingResult bindingResult) {
+		if (bindingResult.hasErrors()) {
+			return "/user/signIn";
+		}
 		SignInResponse signInResponse = authService.signIn(signInRequest.getUsername(), signInRequest.getPassword());
 
 		JwtToken accessToken = signInResponse.getAccessToken();
