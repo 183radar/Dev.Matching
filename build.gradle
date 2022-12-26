@@ -80,6 +80,9 @@ configurations {
 
 tasks.named('test') {
     useJUnitPlatform()
+    jacoco {
+        exclude("*equals", "*hashCode")
+    }
     finalizedBy jacocoTestReport
 }
 
@@ -103,7 +106,9 @@ jacocoTestReport {
 
         classDirectories.setFrom(files(classDirectories.files.collect {
             fileTree(dir: it,
-                    exclude: [] + Qdomains)
+                    exclude: [
+                            'radar/devmatching/common/**'
+                    ] + Qdomains)
         }))
     }
 
@@ -127,7 +132,9 @@ jacocoTestCoverageVerification {
                 minimum = 0.00
             }
 
-            excludes = [] + Qdomains
+            excludes = [
+                    'radar/devmatching/common/**'
+            ] + Qdomains
         }
     }
 }
