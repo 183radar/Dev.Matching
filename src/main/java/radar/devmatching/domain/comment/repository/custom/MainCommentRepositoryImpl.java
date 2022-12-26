@@ -12,8 +12,6 @@ import javax.persistence.EntityManager;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
-import radar.devmatching.common.exception.EntityNotFoundException;
-import radar.devmatching.common.exception.error.ErrorMessage;
 import radar.devmatching.domain.comment.entity.MainComment;
 
 public class MainCommentRepositoryImpl implements MainCommentCustomRepository {
@@ -45,9 +43,6 @@ public class MainCommentRepositoryImpl implements MainCommentCustomRepository {
 			.where(mainComment.id.eq(mainCommentId))
 			.fetchOne();
 
-		if (findSimplePostId == null) {
-			throw new EntityNotFoundException(ErrorMessage.MAIN_COMMENT_NOT_FOUND);
-		}
 		return findSimplePostId;
 	}
 }
