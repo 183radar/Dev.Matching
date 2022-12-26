@@ -38,7 +38,7 @@ public class AuthController {
 	@GetMapping("/signIn")
 	public String signInPage(Model model) {
 		model.addAttribute("signInRequest", SignInRequest.of());
-		return "/user/signIn";
+		return "user/signIn";
 	}
 
 	// TODO : SecurityContextHolder 에 Authentication 저장하기 추가.
@@ -46,7 +46,7 @@ public class AuthController {
 	public String signIn(HttpServletResponse response, @Valid @ModelAttribute SignInRequest signInRequest,
 		BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
-			return "/user/signIn";
+			return "user/signIn";
 		}
 		SignInResponse signInResponse = authService.signIn(signInRequest.getUsername(), signInRequest.getPassword());
 

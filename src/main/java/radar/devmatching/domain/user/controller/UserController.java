@@ -43,7 +43,7 @@ public class UserController {
 	public String signUpPage(@ModelAttribute("createUserRequest") CreateUserRequest request, Model model) {
 		model.addAttribute("createUserRequest", request);
 		log.info("request info={}", request.toString());
-		return "/user/signUp";
+		return "user/signUp";
 	}
 
 	/**
