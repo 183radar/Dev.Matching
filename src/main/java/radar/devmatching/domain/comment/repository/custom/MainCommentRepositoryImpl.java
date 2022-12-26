@@ -27,19 +27,22 @@ public class MainCommentRepositoryImpl implements MainCommentCustomRepository {
 		return queryFactory
 			.selectFrom(mainComment)
 			.leftJoin(mainComment.comment, comment).fetchJoin()
-			.leftJoin(mainComment.subComments, subComment).fetchJoin()
+			.leftJoin(mainComment.subComments, subComment).fetchJoin().distinct()
+			.leftJoin(subComment.comment, comment).fetchJoin()
 			.where(mainComment.fullPost.id.eq(fullPostId))
 			.fetch();
 	}
 
 	@Override
 	public Long findBySimplePostIdAsMainCommentId(Long mainCommentId) {
-		return queryFactory
+		Long findSimplePostId = queryFactory
 			.select(simplePost.id)
 			.from(simplePost)
 			.join(simplePost.fullPost, fullPost)
 			.join(fullPost.mainComments, mainComment)
 			.where(mainComment.id.eq(mainCommentId))
 			.fetchOne();
+
+		return findSimplePostId;
 	}
 }

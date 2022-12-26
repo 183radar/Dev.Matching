@@ -22,6 +22,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import radar.devmatching.common.entity.BaseEntity;
+import radar.devmatching.common.util.ExcludeJacocoGenerated;
 import radar.devmatching.domain.matchings.apply.entity.Apply;
 import radar.devmatching.domain.matchings.matching.entity.Matching;
 import radar.devmatching.domain.post.full.entity.FullPost;
@@ -54,6 +55,9 @@ public class SimplePost extends BaseEntity {
 	@Enumerated(EnumType.STRING)
 	private PostState postState;
 
+	@Column(name = "click_count")
+	private Long clickCount;
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id")
 	private User leader;
@@ -77,6 +81,7 @@ public class SimplePost extends BaseEntity {
 		this.category = category;
 		this.region = region;
 		this.userNum = userNum;
+		this.clickCount = 0L;
 		this.postState = PostState.RECRUITING;
 		this.leader = leader;
 		leader.getSimplePosts().add(this);
@@ -99,6 +104,11 @@ public class SimplePost extends BaseEntity {
 		this.postState = PostState.END;
 	}
 
+	public void plusClickCount() {
+		this.clickCount += 1L;
+	}
+
+	@ExcludeJacocoGenerated
 	@Override
 	public String toString() {
 		return "SimplePost{" +

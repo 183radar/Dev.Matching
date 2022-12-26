@@ -2,28 +2,53 @@
 <html th:replace="~{layout :: layout(~{::main})}" xmlns:th="http://www.thymeleaf.org">
 
 <body>
-<main>
+<main th:object="${mainPostDto}">
     <div class="col-xl-6">
         <div class="card mb-4">
             <div class="card-header">
                 <i class="fas fa-chart-area me-1"></i>
                 개인 정보
             </div>
-            <!--                <div class="card-body" th:object="${form}">-->
-            <!--                    <h5 class="card-title" th:text="'안녕하세요 '+ *{memberName} + '님'"></h5>-->
-            <!--                    <div th:text="'학번: ' + *{studentNum}"></div>-->
-            <!--                    <div th:text="'대학: ' + *{collegeName}"></div>-->
-            <!--                </div>-->
+            <div class="card-body">
+                <h5 class="card-title" th:text="'안녕하세요 '+ *{nickname} + '님'"></h5>
+            </div>
         </div>
     </div>
     <div class="col-xl-6">
         <div class="card mb-4">
-            <div class="card-header">
-                <i class="fas fa-chart-bar me-1"></i>
-                공지 사항
-            </div>
             <div class="card-body">
-                <canvas height="200" width="50"></canvas>
+                <form method="post">
+                    <div class="row mb-3">
+                        <div class="btn-group" role="group">
+                            <button class="btn btn-secondary" th:onclick="|location.href='@{/}'|"
+                                    type="button">전체
+                            </button>
+                            <button class="btn btn-secondary" th:onclick="|location.href='@{/?postCategory=PROJECT}'|"
+                                    type="button">프로젝트
+                            </button>
+                            <button class="btn btn-secondary" th:onclick="|location.href='@{/?postCategory=MOGAKKO}'|"
+                                    type="button">모각코
+                            </button>
+                            <button class="btn btn-secondary" th:onclick="|location.href='@{/?postCategory=STUDY}'|"
+                                    type="button">스터디
+                            </button>
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-select" th:field="*{region}">
+                                <option th:each="region : ${regions}" th:text="${region.name}"
+                                        th:value="${region}">지역
+                                </option>
+                            </select>
+                        </div>
+                        <div class="col-md-7">
+                            <input class="form-control" placeholder="검색" th:errorclass="is-invalid"
+                                   th:field="*{searchCondition}" type="text"/>
+                            <div class="invalid-feedback" th:errors="*{searchCondition}">에러 메시지</div>
+                        </div>
+                        <button class="col-md-2 btn btn-primary" type="submit">검색</button>
+                    </div>
+                </form>
+                <table th:replace="~{fragment/simplePosts :: simplePosts(*{simplePostResponses})}"></table>
             </div>
         </div>
     </div>

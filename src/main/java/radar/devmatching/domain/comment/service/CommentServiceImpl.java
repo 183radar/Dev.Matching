@@ -34,10 +34,10 @@ public class CommentServiceImpl implements CommentService {
 
 	@Override
 	@Transactional
-	public void createMainComment(long simplePostId, User user, CreateCommentRequest createCommentRequest) {
+	public void createMainComment(long simplePostId, User loginUser, CreateCommentRequest createCommentRequest) {
 		SimplePost simplePost = simplePostRepository.findById(simplePostId)
 			.orElseThrow(SimplePostNotFoundException::new);
-		mainCommentRepository.save(createCommentRequest.toMainCommentEntity(simplePost, user));
+		mainCommentRepository.save(createCommentRequest.toMainCommentEntity(simplePost, loginUser));
 	}
 
 	@Override
@@ -45,8 +45,9 @@ public class CommentServiceImpl implements CommentService {
 	public long createSubComment(long mainCommentId, User loginUser, CreateCommentRequest createCommentRequest) {
 		MainComment mainComment = mainCommentRepository.findMainCommentById(mainCommentId)
 			.orElseThrow(() -> new EntityNotFoundException(ErrorMessage.MAIN_COMMENT_NOT_FOUND));
-		subCommentRepository.save(createCommentRequest.toSubCommentEntity(mainComment, loginUser));
-		return mainComment.getFullPost().getSimplePost().getId();
+		SubComment subComment = subCommentRepository.save(
+			createCommentRequest.toSubCommentEntity(mainComment, loginUser));
+		return subCommentRepository.findBySimplePostIdAsSubCommentId(subComment.getId());
 	}
 
 	@Override
@@ -91,6 +92,7 @@ public class CommentServiceImpl implements CommentService {
 	}
 
 	@Override
+	@Transactional
 	public long updateSubComment(long subCommentId, UpdateCommentDto updateCommentDto, User loginUser) {
 		SubComment subComment = validationSubCommentOwner(subCommentId, loginUser);
 		subComment.update(updateCommentDto.getContent());
@@ -109,6 +111,7 @@ public class CommentServiceImpl implements CommentService {
 	}
 
 	@Override
+	@Transactional
 	public void deleteSubComment(long subCommentId, User loginUser) {
 		SubComment subComment = validationSubCommentOwner(subCommentId, loginUser);
 		subCommentRepository.delete(subComment);

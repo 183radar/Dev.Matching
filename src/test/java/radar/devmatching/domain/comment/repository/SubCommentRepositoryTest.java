@@ -12,11 +12,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import lombok.extern.slf4j.Slf4j;
+import radar.devmatching.common.exception.EntityNotFoundException;
+import radar.devmatching.common.exception.error.ErrorMessage;
 import radar.devmatching.domain.comment.entity.Comment;
 import radar.devmatching.domain.comment.entity.MainComment;
 import radar.devmatching.domain.comment.entity.SubComment;
+import radar.devmatching.domain.matchings.matching.entity.Matching;
 import radar.devmatching.domain.post.full.entity.FullPost;
 import radar.devmatching.domain.post.full.repository.FullPostRepository;
+import radar.devmatching.domain.post.simple.entity.SimplePost;
 import radar.devmatching.domain.post.simple.repository.SimplePostRepository;
 import radar.devmatching.domain.user.entity.User;
 import radar.devmatching.domain.user.repository.UserRepository;
@@ -91,6 +95,53 @@ class SubCommentRepositoryTest {
 
 		//then
 		assertThat(persistenceUnitUtil.isLoaded(findSubComment.getComment())).isTrue();
+	}
+
+	@Nested
+	@DisplayName("findBySimplePostIdAsSubCommentId 메서드는")
+	class findBySimplePostIdAsSubCommentIdMethod {
+
+		@Test
+		@DisplayName("정상 흐름이면 subCommentId에 해당하는 댓글이 포함된 게시글의 simplePostId값을 가져온다")
+		void correctThanReturnSimplePostId() throws Exception {
+			//given
+			User user = userRepository.save(createUser());
+			FullPost fullPost = FullPost.builder().content("내용").build();
+			SimplePost simplePost = SimplePost.builder()
+				.leader(user)
+				.matching(Matching.builder().build())
+				.fullPost(fullPost)
+				.build();
+			simplePostRepository.save(simplePost);
+			MainComment mainComment = MainComment.builder()
+				.fullPost(fullPost)
+				.comment(createComment())
+				.build();
+			mainCommentRepository.save(mainComment);
+			SubComment subComment = SubComment.builder()
+				.mainComment(mainComment)
+				.comment(createComment())
+				.build();
+			subCommentRepository.save(subComment);
+
+			//when
+			Long findSimplePostId = subCommentRepository.findBySimplePostIdAsSubCommentId(subComment.getId());
+
+			//then
+			assertThat(findSimplePostId).isNotNull();
+			assertThat(findSimplePostId).isEqualTo(simplePost.getId());
+		}
+
+		@Test
+		@DisplayName("subCommentId에 해당하는 엔티티가 없을 경우 예외를 반환한다")
+		void ifSubCommentIdNotExistThanReturnNull() throws Exception {
+			//given
+			//when
+			//then
+			assertThatThrownBy(() -> subCommentRepository.findBySimplePostIdAsSubCommentId(1L))
+				.isInstanceOf(EntityNotFoundException.class)
+				.hasMessage(ErrorMessage.SUB_COMMENT_NOT_FOUND.getMessage());
+		}
 	}
 
 	@Nested

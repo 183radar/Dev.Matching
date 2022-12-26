@@ -17,13 +17,9 @@ public class CreateCommentRequest {
 	@Length(max = 10000)
 	private final String content;
 
-	private CommentType commentType;
+	private final CommentType commentType;
 
 	@Builder
-	private CreateCommentRequest(String content) {
-		this.content = content;
-	}
-
 	public CreateCommentRequest(String content, CommentType commentType) {
 		this.content = content;
 		this.commentType = commentType;

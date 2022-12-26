@@ -2,6 +2,9 @@ package radar.devmatching.domain.user.service.dto.request;
 
 import javax.validation.constraints.NotBlank;
 
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor
 public class SignInRequest {
 
 	@NotBlank
