@@ -1,7 +1,6 @@
 package radar.devmatching.domain.user.controller;
 
-import static org.springframework.http.HttpHeaders.*;
-
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
@@ -35,12 +34,11 @@ import radar.devmatching.domain.user.service.dto.response.SignOutResponse;
 public class AuthController {
 
 	private final AuthService authService;
-	private final JwtCookieProvider jwtCookieProvider;
 
 	@GetMapping("/signIn")
-	public String goLogin(Model model) {
-		model.addAttribute("signInRequest", new SignInRequest());
-		return "user/signIn";
+	public String signInPage(Model model) {
+		model.addAttribute("signInRequest", SignInRequest.of());
+		return "/user/signIn";
 	}
 
 	// TODO : SecurityContextHolder 에 Authentication 저장하기 추가.
@@ -48,44 +46,35 @@ public class AuthController {
 	public String signIn(HttpServletResponse response, @Valid @ModelAttribute SignInRequest signInRequest,
 		BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
-			return "user/signIn";
+			return "/user/signIn";
 		}
-
 		SignInResponse signInResponse = authService.signIn(signInRequest.getUsername(), signInRequest.getPassword());
 
 		JwtToken accessToken = signInResponse.getAccessToken();
 		JwtToken refreshToken = signInResponse.getRefreshToken();
 
-		ResponseCookie accessTokenCookie = jwtCookieProvider.createCookie(accessToken.getHeader(),
+		ResponseCookie accessTokenCookie = JwtCookieProvider.createCookie(accessToken.getHeader(),
 			accessToken.getToken(),
 			accessToken.getExpireTime());
-		ResponseCookie refreshTokenCookie = jwtCookieProvider.createCookie(refreshToken.getHeader(),
+		ResponseCookie refreshTokenCookie = JwtCookieProvider.createCookie(refreshToken.getHeader(),
 			refreshToken.getToken(),
 			refreshToken.getExpireTime());
 
-		response.setHeader(SET_COOKIE, accessTokenCookie.toString());
-		response.addHeader(SET_COOKIE, refreshTokenCookie.toString());
-
+		JwtCookieProvider.setCookie(response, accessTokenCookie);
+		JwtCookieProvider.setCookie(response, refreshTokenCookie);
+		log.info("signIn execute");
 		return "redirect:/";
 	}
 
 	@GetMapping("/signOut")
-	public void signOut(@AuthUser User user, HttpServletResponse response) {
+	public String signOut(HttpServletRequest request, HttpServletResponse response, @AuthUser User user) {
 		SignOutResponse signOutResponse = authService.singOut();
 		log.info("access User={}", user);
 		log.info("logout process execute");
-		ResponseCookie accessTokenCookie = ResponseCookie.from(signOutResponse.getAccessTokenHeader(), "")
-			.path("/")
-			.maxAge(0)
-			.httpOnly(true)
-			.build();
-		ResponseCookie refreshTokenCookie = ResponseCookie.from(signOutResponse.getRefreshTokenHeader(), "")
-			.path("/")
-			.maxAge(0)
-			.httpOnly(true)
-			.build();
-		response.setHeader(SET_COOKIE, accessTokenCookie.toString());
-		response.addHeader(SET_COOKIE, refreshTokenCookie.toString());
+		JwtCookieProvider.deleteCookieFromRequest(request, response, signOutResponse.getAccessTokenHeader());
+		JwtCookieProvider.deleteCookieFromRequest(request, response, signOutResponse.getRefreshTokenHeader());
+
+		return "redirect:/api/users/signIn";
 	}
 
 }

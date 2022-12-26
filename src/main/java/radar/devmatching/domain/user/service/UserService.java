@@ -16,4 +16,8 @@ public interface UserService {
 	UserResponse updateUser(UpdateUserRequest request, Long requestUserId, User authUser);
 
 	void deleteUser(Long requestUserId, User authUser);
+
+	void checkDuplicateUsername(String username);
+
+	void checkDuplicateNickName(String nickName, Long userId);
 }

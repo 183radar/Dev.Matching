@@ -1,9 +1,12 @@
 package radar.devmatching.common.security;
 
+import static org.springframework.http.HttpHeaders.*;
+
 import java.util.Arrays;
 import java.util.Objects;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.http.ResponseCookie;
 
@@ -32,5 +35,22 @@ public class JwtCookieProvider {
 			.findFirst()
 			.orElseThrow(() -> new JwtTokenNotFoundException(ErrorMessage.TOKEN_NOT_FOUND))
 			.getValue();
+	}
+
+	public static void setCookie(HttpServletResponse response, ResponseCookie cookie) {
+		response.addHeader(SET_COOKIE, cookie.toString());
+	}
+
+	public static void deleteCookieFromRequest(HttpServletRequest request, HttpServletResponse response,
+		String cookieName) {
+		if (Objects.nonNull(request.getCookies())) {
+			ResponseCookie deleteCookie = ResponseCookie.from(cookieName, "")
+				.path("/")
+				.maxAge(0)
+				.httpOnly(true)
+				.build();
+
+			response.addHeader(SET_COOKIE, deleteCookie.toString());
+		}
 	}
 }
