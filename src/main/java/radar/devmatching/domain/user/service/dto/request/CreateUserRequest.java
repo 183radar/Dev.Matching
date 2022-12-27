@@ -69,8 +69,16 @@ public class CreateUserRequest {
 		this.usernameCheck = true;
 	}
 
+	public void usernameDuplicateCheckClear() {
+		this.usernameCheck = false;
+	}
+
 	public void nickNameNonDuplicate() {
 		this.nickNameCheck = true;
+	}
+
+	public void nickNameDuplicateCheckClear() {
+		this.nickNameCheck = false;
 	}
 
 	public String getUsername() {
