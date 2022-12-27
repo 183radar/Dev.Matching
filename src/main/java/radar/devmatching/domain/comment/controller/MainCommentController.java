@@ -31,7 +31,7 @@ public class MainCommentController {
 	public String getCreateMainComment(@PathVariable long simplePostId, Model model) {
 		simplePostService.getSimplePostOnly(simplePostId);
 		model.addAttribute("createCommentRequest",
-			CreateCommentRequest.of(CreateCommentRequest.CommentType.MAIN));
+			CreateCommentRequest.of(simplePostId, CreateCommentRequest.CommentType.MAIN));
 		return "comment/createComment";
 	}
 

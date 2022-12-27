@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum PostState {
 	RECRUITING("모집중"),
-	END("완료");
+	END("모집 완료");
 
 	private final String name;
 }

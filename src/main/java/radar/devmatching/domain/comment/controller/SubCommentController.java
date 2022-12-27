@@ -29,7 +29,7 @@ public class SubCommentController {
 	public String getCreateSubComment(@PathVariable long mainCommentId, Model model) {
 		commentService.mainCommentExistById(mainCommentId);
 		model.addAttribute("createCommentRequest",
-			CreateCommentRequest.of(CreateCommentRequest.CommentType.SUB));
+			CreateCommentRequest.of(mainCommentId, CreateCommentRequest.CommentType.SUB));
 		return "comment/createComment";
 	}
 

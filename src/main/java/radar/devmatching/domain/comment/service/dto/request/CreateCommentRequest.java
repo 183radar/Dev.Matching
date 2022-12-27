@@ -13,6 +13,8 @@ import radar.devmatching.domain.user.entity.User;
 
 public class CreateCommentRequest {
 
+	private final Long entityId;
+
 	@NotBlank
 	@Length(max = 10000)
 	private final String content;
@@ -20,13 +22,14 @@ public class CreateCommentRequest {
 	private final CommentType commentType;
 
 	@Builder
-	public CreateCommentRequest(String content, CommentType commentType) {
+	public CreateCommentRequest(Long entityId, String content, CommentType commentType) {
+		this.entityId = entityId;
 		this.content = content;
 		this.commentType = commentType;
 	}
 
-	public static CreateCommentRequest of(CommentType commentType) {
-		return new CreateCommentRequest(null, commentType);
+	public static CreateCommentRequest of(Long entityId, CommentType commentType) {
+		return new CreateCommentRequest(entityId, null, commentType);
 	}
 
 	public MainComment toMainCommentEntity(SimplePost simplePost, User user) {
@@ -50,6 +53,10 @@ public class CreateCommentRequest {
 					.user(user)
 					.build()
 			).build();
+	}
+
+	public Long getEntityId() {
+		return entityId;
 	}
 
 	public String getContent() {

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<div class="card-body" th:fragment="comment(id)">
+    <form method="post"
+          th:action="${#strings.equals(createCommentRequest.commentType.name, 'MAIN') ? '/api/posts/'+id+'/createMainComment' : '/api/mainComments/'+id+'/createSubComment'}">
+        <div class="form-floating">
+            <input class="form-control" placeholder="제목" th:errorclass="is-invalid"
+                   th:field="${createCommentRequest.content}"
+                   type="text"/>
+            <label for="content">내용</label>
+            <div class="invalid-feedback" th:errors="${createCommentRequest.content}">에러 메시지</div>
+        </div>
+        <button class="col-md-2 btn btn-primary" type="submit">생성</button>
+    </form>
+</div>
+
+</body>
+</html>
+

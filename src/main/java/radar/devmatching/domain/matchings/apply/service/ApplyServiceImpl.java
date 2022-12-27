@@ -20,6 +20,7 @@ import radar.devmatching.domain.matchings.apply.service.dto.response.ApplyRespon
 import radar.devmatching.domain.post.simple.entity.SimplePost;
 import radar.devmatching.domain.post.simple.repository.SimplePostRepository;
 import radar.devmatching.domain.user.entity.User;
+import radar.devmatching.domain.user.repository.UserRepository;
 
 @Slf4j
 @Service
@@ -27,12 +28,14 @@ import radar.devmatching.domain.user.entity.User;
 @RequiredArgsConstructor
 public class ApplyServiceImpl implements ApplyService {
 
+	private final UserRepository userRepository;
 	private final ApplyRepository applyRepository;
 	private final SimplePostRepository simplePostRepository;
 
 	@Override
 	@Transactional
 	public Apply createApply(Long simplePostId, User authUser) {
+		authUser = userRepository.findById(authUser.getId()).get();
 		SimplePost simplePost = simplePostRepository.findById(simplePostId)
 			.orElseThrow(() -> new EntityNotFoundException(ErrorMessage.SIMPLE_POST_NOT_FOUND));
 
