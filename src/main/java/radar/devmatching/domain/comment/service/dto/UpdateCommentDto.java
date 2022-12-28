@@ -13,6 +13,8 @@ import radar.devmatching.domain.comment.entity.SubComment;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class UpdateCommentDto {
 
+	private Long entityId;
+
 	@NotBlank
 	@Length(max = 10000)
 	private String content;
@@ -20,21 +22,34 @@ public class UpdateCommentDto {
 	private CommentType commentType;
 
 	@Builder
-	private UpdateCommentDto(String content) {
-		this.content = content;
-	}
-
-	public UpdateCommentDto(String content, CommentType commentType) {
+	public UpdateCommentDto(Long entityId, String content, CommentType commentType) {
+		this.entityId = entityId;
 		this.content = content;
 		this.commentType = commentType;
 	}
 
-	public static UpdateCommentDto of(MainComment mainComment, CommentType commentType) {
-		return new UpdateCommentDto(mainComment.getComment().getContent(), commentType);
+	public static UpdateCommentDto of(long mainCommentId, MainComment mainComment, CommentType commentType) {
+		return new UpdateCommentDto(mainCommentId, mainComment.getComment().getContent(), commentType);
 	}
 
-	public static UpdateCommentDto of(SubComment subComment, CommentType commentType) {
-		return new UpdateCommentDto(subComment.getComment().getContent(), commentType);
+	public static UpdateCommentDto of(long subCommentId, SubComment subComment, CommentType commentType) {
+		return new UpdateCommentDto(subCommentId, subComment.getComment().getContent(), commentType);
+	}
+
+	public Long getEntityId() {
+		return entityId;
+	}
+
+	public void setEntityId(Long entityId) {
+		this.entityId = entityId;
+	}
+
+	public CommentType getCommentType() {
+		return commentType;
+	}
+
+	public void setCommentType(CommentType commentType) {
+		this.commentType = commentType;
 	}
 
 	public String getContent() {

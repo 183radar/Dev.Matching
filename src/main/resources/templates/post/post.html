@@ -49,7 +49,7 @@
         </div>
     </div>
     <div th:if="*{#strings.equals(postLeader.userId, loginUser.userId)}">
-        <button class="btn btn-secondary"
+        <button class="btn btn-secondary" th:if="*{#strings.equals(simplePostResponse.postState.name, '모집중')}"
                 th:onclick="|location.href='@{/api/posts/{id}/end(id=*{simplePostResponse.simplePostId})}'|">
             모집 완료
         </button>

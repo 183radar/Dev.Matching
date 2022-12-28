@@ -13,13 +13,13 @@ import radar.devmatching.domain.user.entity.User;
 
 public class CreateCommentRequest {
 
-	private final Long entityId;
+	private Long entityId;
 
 	@NotBlank
 	@Length(max = 10000)
 	private final String content;
 
-	private final CommentType commentType;
+	private CommentType commentType;
 
 	@Builder
 	public CreateCommentRequest(Long entityId, String content, CommentType commentType) {
@@ -59,12 +59,20 @@ public class CreateCommentRequest {
 		return entityId;
 	}
 
+	public void setEntityId(Long entityId) {
+		this.entityId = entityId;
+	}
+
 	public String getContent() {
 		return content;
 	}
 
 	public CommentType getCommentType() {
 		return commentType;
+	}
+
+	public void setCommentType(CommentType commentType) {
+		this.commentType = commentType;
 	}
 
 	public enum CommentType {

@@ -33,6 +33,7 @@ public class SubComment extends BaseEntity {
 	private MainComment mainComment;
 
 	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+	@JoinColumn(name = "comment_id")
 	private Comment comment;
 
 	@Builder

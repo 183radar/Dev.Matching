@@ -66,13 +66,13 @@ public class FullPostController {
 	@GetMapping("/{simplePostId}/delete")
 	public String deletePost(@AuthUser User authUser, @PathVariable long simplePostId) {
 		fullPostService.deletePost(simplePostId, authUser.getId());
-		return "post/myPosts";
+		return "redirect:/api/posts/my";
 	}
 
 	@GetMapping("/{simplePostId}/end")
 	public String closePost(@AuthUser User authUser, @PathVariable long simplePostId) {
 		fullPostService.closePost(simplePostId, authUser.getId());
-		return "post/post";
+		return "redirect:/api/posts/" + simplePostId;
 	}
 
 }

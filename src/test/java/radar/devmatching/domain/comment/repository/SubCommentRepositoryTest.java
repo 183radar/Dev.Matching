@@ -116,7 +116,7 @@ class SubCommentRepositoryTest {
 			SimplePost simplePost2 = SimplePost.builder()
 				.leader(user)
 				.matching(Matching.builder().build())
-				.fullPost(fullPost)
+				.fullPost(FullPost.builder().build())
 				.build();
 			simplePostRepository.save(simplePost2);
 			MainComment mainComment = MainComment.builder()
