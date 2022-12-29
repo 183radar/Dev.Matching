@@ -3,6 +3,7 @@ package radar.devmatching.common.exception.handler;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.boot.autoconfigure.web.servlet.error.ErrorViewResolver;
 import org.springframework.ui.Model;
@@ -26,9 +27,10 @@ public class GlobalExceptionHandler {
 
 	@ExceptionHandler(EntityNotFoundException.class)
 	public ModelAndView catchEntityNotFoundException(EntityNotFoundException e,
-		HttpServletRequest request) {
+		HttpServletRequest request, HttpServletResponse response) {
 		log.error(ERROR_MESSAGE, e);
 		Map<String, Object> models = Map.of("status", e.getErrorMessage().getStatus().value());
+		response.setStatus(e.getErrorMessage().getStatus().value());
 		return errorViewResolver.resolveErrorView(request, e.getErrorMessage().getStatus(), models);
 	}
 

@@ -237,6 +237,7 @@ class SimplePostServiceImplTest {
 				SimplePost simplePost = createSimplePost(loginUser, matching);
 				ReflectionTestUtils.setField(simplePost, "id", 1L);
 				CreatePostRequest postRequest = createPostRequest();
+				given(userRepository.findById(anyLong())).willReturn(Optional.of(loginUser));
 				given(matchingService.createMatching(loginUser)).willReturn(matching);
 				given(simplePostRepository.save(any(SimplePost.class))).willReturn(simplePost);
 
