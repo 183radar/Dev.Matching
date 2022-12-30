@@ -4,6 +4,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.Length;
+import org.hibernate.validator.constraints.Range;
 
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -15,6 +16,8 @@ import radar.devmatching.domain.post.simple.entity.SimplePost;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class UpdatePostDto {
 
+	private Long simplePostId;
+
 	@NotBlank
 	@Length(max = 200)
 	private String title;
@@ -25,7 +28,8 @@ public class UpdatePostDto {
 	@NotNull
 	private Region region;
 
-	@Length(min = 1, max = 100)
+	@NotNull
+	@Range(min = 2, max = 100)
 	private Integer userNum;
 
 	@NotBlank
@@ -33,7 +37,9 @@ public class UpdatePostDto {
 	private String content;
 
 	@Builder
-	public UpdatePostDto(String title, PostCategory category, Region region, Integer userNum, String content) {
+	public UpdatePostDto(Long simplePostId, String title, PostCategory category, Region region, Integer userNum,
+		String content) {
+		this.simplePostId = simplePostId;
 		this.title = title;
 		this.category = category;
 		this.region = region;
@@ -43,12 +49,17 @@ public class UpdatePostDto {
 
 	public static UpdatePostDto of(SimplePost simplePost) {
 		return UpdatePostDto.builder()
+			.simplePostId(simplePost.getId())
 			.title(simplePost.getTitle())
 			.category(simplePost.getCategory())
 			.region(simplePost.getRegion())
 			.userNum(simplePost.getUserNum())
 			.content(simplePost.getFullPost().getContent())
 			.build();
+	}
+
+	public Long getSimplePostId() {
+		return simplePostId;
 	}
 
 	public String getTitle() {

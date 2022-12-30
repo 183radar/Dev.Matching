@@ -11,6 +11,7 @@
         <th>모집인원 수</th>
         <th>생성 시간</th>
         <th>조회수</th>
+        <th>상태</th>
     </tr>
     </thead>
     <tbody>
@@ -22,8 +23,9 @@
         <td th:text="${simplePostResponse.category.name}"></td>
         <td th:text="${simplePostResponse.region.name}"></td>
         <td th:text="${simplePostResponse.userNum}"></td>
-        <td th:text="${simplePostResponse.createDate}"></td>
+        <td th:text="${simplePostResponse.createDate.toString}"></td>
         <td th:text="${simplePostResponse.clickCount}"></td>
+        <td th:text="${simplePostResponse.postState.name}"></td>
     </tr>
     </tbody>
 </table>

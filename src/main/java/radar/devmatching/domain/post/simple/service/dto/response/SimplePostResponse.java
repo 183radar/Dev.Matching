@@ -3,6 +3,7 @@ package radar.devmatching.domain.post.simple.service.dto.response;
 import java.time.LocalDateTime;
 
 import radar.devmatching.domain.post.simple.entity.PostCategory;
+import radar.devmatching.domain.post.simple.entity.PostState;
 import radar.devmatching.domain.post.simple.entity.Region;
 import radar.devmatching.domain.post.simple.entity.SimplePost;
 
@@ -22,8 +23,10 @@ public class SimplePostResponse {
 
 	private final Long clickCount;
 
+	private final PostState postState;
+
 	public SimplePostResponse(Long simplePostId, String title, PostCategory category, Region region, Integer userNum,
-		LocalDateTime createDate, Long clickCount) {
+		LocalDateTime createDate, Long clickCount, PostState postState) {
 		this.simplePostId = simplePostId;
 		this.title = title;
 		this.category = category;
@@ -31,11 +34,13 @@ public class SimplePostResponse {
 		this.userNum = userNum;
 		this.createDate = createDate;
 		this.clickCount = clickCount;
+		this.postState = postState;
 	}
 
 	public static SimplePostResponse of(SimplePost simplePost) {
 		return new SimplePostResponse(simplePost.getId(), simplePost.getTitle(), simplePost.getCategory(),
-			simplePost.getRegion(), simplePost.getUserNum(), simplePost.getCreateDate(), simplePost.getClickCount());
+			simplePost.getRegion(), simplePost.getUserNum(), simplePost.getCreateDate(), simplePost.getClickCount(),
+			simplePost.getPostState());
 	}
 
 	public Long getSimplePostId() {
@@ -64,5 +69,9 @@ public class SimplePostResponse {
 
 	public Long getClickCount() {
 		return clickCount;
+	}
+
+	public PostState getPostState() {
+		return postState;
 	}
 }

@@ -12,8 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import lombok.extern.slf4j.Slf4j;
-import radar.devmatching.common.exception.EntityNotFoundException;
-import radar.devmatching.common.exception.error.ErrorMessage;
 import radar.devmatching.domain.comment.entity.Comment;
 import radar.devmatching.domain.comment.entity.MainComment;
 import radar.devmatching.domain.comment.entity.SubComment;
@@ -113,6 +111,12 @@ class SubCommentRepositoryTest {
 				.fullPost(fullPost)
 				.build();
 			simplePostRepository.save(simplePost);
+			SimplePost simplePost2 = SimplePost.builder()
+				.leader(user)
+				.matching(Matching.builder().build())
+				.fullPost(FullPost.builder().build())
+				.build();
+			simplePostRepository.save(simplePost2);
 			MainComment mainComment = MainComment.builder()
 				.fullPost(fullPost)
 				.comment(createComment())
@@ -130,17 +134,6 @@ class SubCommentRepositoryTest {
 			//then
 			assertThat(findSimplePostId).isNotNull();
 			assertThat(findSimplePostId).isEqualTo(simplePost.getId());
-		}
-
-		@Test
-		@DisplayName("subCommentId에 해당하는 엔티티가 없을 경우 예외를 반환한다")
-		void ifSubCommentIdNotExistThanReturnNull() throws Exception {
-			//given
-			//when
-			//then
-			assertThatThrownBy(() -> subCommentRepository.findBySimplePostIdAsSubCommentId(1L))
-				.isInstanceOf(EntityNotFoundException.class)
-				.hasMessage(ErrorMessage.SUB_COMMENT_NOT_FOUND.getMessage());
 		}
 	}
 

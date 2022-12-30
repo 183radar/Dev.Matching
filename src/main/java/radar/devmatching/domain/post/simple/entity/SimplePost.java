@@ -64,10 +64,12 @@ public class SimplePost extends BaseEntity {
 
 	//SimplePost가 FullPost의 생명주기를 관리한다. (FullPost 삭제 시 Comment들도 전부 자동 삭제됨)
 	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+	@JoinColumn(name = "full_post_id")
 	private FullPost fullPost;
 
 	//SimplePost가 Matching의 생명주기를 관리한다. (Matching 삭제 시 MatchingUser들도 전부 삭제됨)
 	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+	@JoinColumn(name = "matching_id")
 	private Matching matching;
 
 	// simplePost가 Apply의 생명주기를 관리한다.

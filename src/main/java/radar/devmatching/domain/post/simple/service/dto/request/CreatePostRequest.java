@@ -4,6 +4,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.Length;
+import org.hibernate.validator.constraints.Range;
 
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -28,15 +29,20 @@ public class CreatePostRequest {
 	@NotNull
 	private Region region;
 
+	@NotNull
+	@Range(min = 2, max = 100)
+	private Integer userNum;
+
 	@NotBlank
 	@Length(max = 10000)
 	private String content;
 
 	@Builder
-	public CreatePostRequest(String title, PostCategory category, Region region, String content) {
+	public CreatePostRequest(String title, PostCategory category, Region region, Integer userNum, String content) {
 		this.title = title;
 		this.category = category;
 		this.region = region;
+		this.userNum = userNum;
 		this.content = content;
 	}
 
@@ -49,7 +55,7 @@ public class CreatePostRequest {
 			.title(this.title)
 			.category(this.category)
 			.region(this.region)
-			.userNum(1)
+			.userNum(userNum)
 			.leader(user)
 			.matching(matching)
 			.fullPost(
@@ -69,6 +75,10 @@ public class CreatePostRequest {
 
 	public Region getRegion() {
 		return region;
+	}
+
+	public Integer getUserNum() {
+		return userNum;
 	}
 
 	public String getContent() {

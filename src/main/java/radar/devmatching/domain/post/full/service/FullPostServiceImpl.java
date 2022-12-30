@@ -38,7 +38,7 @@ public class FullPostServiceImpl implements FullPostService {
 	public PresentPostResponse getPostWithComment(long simplePostId, User loginUser) {
 		SimplePost findPost = simplePostRepository.findPostById(simplePostId)
 			.orElseThrow(SimplePostNotFoundException::new);
-		// 나중에 새로고침 누르면 clickCount는 안 올라가도록 설정해도 좋을듯? (JWT 가져와서)
+		// 나중에 새로고침 누르면 clickCount는 안 올라가도록 설정해도 좋을듯?
 		findPost.plusClickCount();
 		int applyCount = applyService.getAcceptedApplyCount(simplePostId);
 		List<MainCommentResponse> allComments = commentService.getAllComments(findPost.getFullPost().getId());

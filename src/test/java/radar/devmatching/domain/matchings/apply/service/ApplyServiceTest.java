@@ -26,6 +26,7 @@ import radar.devmatching.domain.post.simple.entity.Region;
 import radar.devmatching.domain.post.simple.entity.SimplePost;
 import radar.devmatching.domain.post.simple.repository.SimplePostRepository;
 import radar.devmatching.domain.user.entity.User;
+import radar.devmatching.domain.user.repository.UserRepository;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("ApplyService의")
@@ -36,6 +37,8 @@ class ApplyServiceTest {
 	private static final Long TEST_SIMPLE_POST_ID = 3L;
 
 	@Mock
+	UserRepository userRepository;
+	@Mock
 	ApplyRepository applyRepository;
 	@Mock
 	SimplePostRepository simplePostRepository;
@@ -44,7 +47,7 @@ class ApplyServiceTest {
 
 	@BeforeEach
 	void setUp() {
-		applyService = new ApplyServiceImpl(applyRepository, simplePostRepository);
+		applyService = new ApplyServiceImpl(userRepository, applyRepository, simplePostRepository);
 	}
 
 	private User basicUser() {

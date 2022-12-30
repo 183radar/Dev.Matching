@@ -11,9 +11,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.SessionAttributes;
 
 import lombok.RequiredArgsConstructor;
 import radar.devmatching.common.security.resolver.AuthUser;
+import radar.devmatching.domain.post.simple.entity.PostCategory;
+import radar.devmatching.domain.post.simple.entity.Region;
 import radar.devmatching.domain.post.simple.service.SimplePostService;
 import radar.devmatching.domain.post.simple.service.dto.request.CreatePostRequest;
 import radar.devmatching.domain.post.simple.service.dto.response.SimplePostResponse;
@@ -22,9 +25,20 @@ import radar.devmatching.domain.user.entity.User;
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("api/posts")
+@SessionAttributes({"regions", "categories"})
 public class SimplePostController {
 
 	private final SimplePostService simplePostService;
+
+	@ModelAttribute("regions")
+	public Region[] regions() {
+		return Region.values();
+	}
+
+	@ModelAttribute("categories")
+	public PostCategory[] categories() {
+		return PostCategory.values();
+	}
 
 	@GetMapping("/new")
 	public String getCreatePost(Model model) {

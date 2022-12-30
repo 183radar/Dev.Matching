@@ -29,7 +29,7 @@ public class SubCommentController {
 	public String getCreateSubComment(@PathVariable long mainCommentId, Model model) {
 		commentService.mainCommentExistById(mainCommentId);
 		model.addAttribute("createCommentRequest",
-			CreateCommentRequest.of(CreateCommentRequest.CommentType.SUB));
+			CreateCommentRequest.of(mainCommentId, CreateCommentRequest.CommentType.SUB));
 		return "comment/createComment";
 	}
 
@@ -37,6 +37,8 @@ public class SubCommentController {
 	public String createSubComment(@AuthUser User authUser, @PathVariable long mainCommentId,
 		@Valid @ModelAttribute CreateCommentRequest createCommentRequest, BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
+			createCommentRequest.setEntityId(mainCommentId);
+			createCommentRequest.setCommentType(CreateCommentRequest.CommentType.SUB);
 			return "comment/createComment";
 		}
 		long simplePostId = commentService.createSubComment(mainCommentId, authUser, createCommentRequest);
@@ -54,16 +56,18 @@ public class SubCommentController {
 	public String updateSubComment(@AuthUser User authUser, @PathVariable long subCommentId,
 		@Valid @ModelAttribute UpdateCommentDto updateCommentDto, BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
+			updateCommentDto.setEntityId(subCommentId);
+			updateCommentDto.setCommentType(UpdateCommentDto.CommentType.SUB);
 			return "comment/updateComment";
 		}
 		long simplePostId = commentService.updateSubComment(subCommentId, updateCommentDto, authUser);
 		return "redirect:/api/posts/" + simplePostId;
 	}
 
-	@PostMapping("subComments/{subCommentId}/delete")
+	@GetMapping("subComments/{subCommentId}/delete")
 	public String deleteSubComment(@AuthUser User authUser, @PathVariable long subCommentId) {
-		commentService.deleteSubComment(subCommentId, authUser);
-		return "redirect:/api/posts/my";
+		Long simplePostId = commentService.deleteSubComment(subCommentId, authUser);
+		return "redirect:/api/posts/" + simplePostId;
 	}
 
 }
