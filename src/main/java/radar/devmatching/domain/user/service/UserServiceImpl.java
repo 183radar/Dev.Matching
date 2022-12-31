@@ -86,14 +86,6 @@ public class UserServiceImpl implements UserService {
 		userRepository.delete(authUser);
 	}
 
-	private void changeNickName(String nickName, User user) {
-		if (user.getNickName().equals(nickName)) {
-			return;
-		}
-		checkDuplicateNickName(nickName, user.getId());
-		user.changeNickName(nickName);
-	}
-
 	/**
 	 * 회원 가입시에만 사용
 	 */

@@ -126,4 +126,6 @@ public class UserController {
 		userService.deleteUser(requestUserId, authUser);
 		return "redirect:/api/users/signIn";
 	}
+
+	// TODO : 비밀번호 변경, 닉네임 변경 페이지 만들기.
 }
