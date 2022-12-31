@@ -22,14 +22,18 @@ public class ApplyController {
 	@GetMapping(value = "/api/posts/{simplePostId}/apply")
 	public String createApply(@PathVariable(name = "simplePostId") Long simplePostId, @AuthUser User authUser) {
 		applyService.createApply(simplePostId, authUser);
-		return "/";
+		return "redirect:/api/posts/" + simplePostId;
 	}
 
-	@GetMapping(value = "/api/users/{userId}/apply")
-	public String getApplyListInUser(@PathVariable(name = "userId") Long userId, @AuthUser User authUser, Model model) {
-		List<ApplyResponse> allApplyList = applyService.getAllApplyList(authUser, userId);
-		model.addAttribute("allApplyList", allApplyList);
-		return "/";
+	/**
+	 * 사용자가 신청한 개시글 리스트 반환
+	 * TODO : 신청한 순서대로 반환
+	 */
+	@GetMapping(value = "/api/users/apply")
+	public String getApplyListInUser(@AuthUser User authUser, Model model) {
+		List<ApplyResponse> applyList = applyService.getAllApplyList(authUser);
+		model.addAttribute("applyList", applyList);
+		return "/matching/apply/applyList";
 	}
 
 }

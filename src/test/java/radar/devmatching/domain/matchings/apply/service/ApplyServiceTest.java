@@ -151,7 +151,7 @@ class ApplyServiceTest {
 			Apply apply = Apply.builder().applyUser(user).applySimplePost(simplePost).build();
 			//when
 			//then
-			assertThatThrownBy(() -> applyService.getAllApplyList(user, TEST_USER_ID_EX))
+			assertThatThrownBy(() -> applyService.getAllApplyList(user))
 				.isInstanceOf(InvalidAccessException.class);
 		}
 	}

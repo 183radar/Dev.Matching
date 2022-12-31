@@ -2,7 +2,7 @@ package radar.devmatching.domain.matchings.apply.service;
 
 import java.util.List;
 
-import radar.devmatching.domain.matchings.apply.service.dto.response.ApplyResponse;
+import radar.devmatching.domain.matchings.apply.service.dto.response.ApplyLeaderResponse;
 import radar.devmatching.domain.user.entity.User;
 
 public interface ApplyLeaderService {
@@ -11,5 +11,5 @@ public interface ApplyLeaderService {
 
 	void denyApply(User authUser, Long applyId, Long simplePostId);
 
-	List<ApplyResponse> getAllApplyList(User authUser, Long simplePostId);
+	List<ApplyLeaderResponse> getAllApplyList(User authUser, Long simplePostId);
 }

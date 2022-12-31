@@ -10,7 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import radar.devmatching.common.exception.EntityNotFoundException;
-import radar.devmatching.common.exception.InvalidAccessException;
 import radar.devmatching.common.exception.error.ErrorMessage;
 import radar.devmatching.domain.matchings.apply.entity.Apply;
 import radar.devmatching.domain.matchings.apply.entity.ApplyState;
@@ -51,12 +50,13 @@ public class ApplyServiceImpl implements ApplyService {
 	}
 
 	@Override
-	public List<ApplyResponse> getAllApplyList(User authUser, Long userId) {
-		if (!Objects.equals(authUser.getId(), userId)) {
-			throw new InvalidAccessException(ErrorMessage.INVALID_ACCESS);
-		}
+	public List<ApplyResponse> getAllApplyList(User authUser) {
+		//
+		// return userTouch(authUser).getApplyList().stream()
+		// 	.map(ApplyResponse::of)
+		// 	.collect(Collectors.toList());
 
-		return authUser.getApplyList().stream()
+		return applyRepository.findAppliesByUserId(authUser.getId()).stream()
 			.map(ApplyResponse::of)
 			.collect(Collectors.toList());
 	}
@@ -73,6 +73,12 @@ public class ApplyServiceImpl implements ApplyService {
 	public Apply getApply(Long applyId) {
 		return applyRepository.findById(applyId)
 			.orElseThrow(() -> new EntityNotFoundException(ErrorMessage.APPLY_NOT_FOUND));
+	}
+
+	private User userTouch(User authUser) {
+		return userRepository.findById(authUser.getId()).orElseThrow(
+			() -> new EntityNotFoundException(ErrorMessage.USER_NOT_FOUND)
+		);
 	}
 
 }
