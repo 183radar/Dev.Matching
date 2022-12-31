@@ -30,6 +30,7 @@ import radar.devmatching.domain.post.simple.service.dto.MainPostDto;
 import radar.devmatching.domain.post.simple.service.dto.request.CreatePostRequest;
 import radar.devmatching.domain.post.simple.service.dto.response.SimplePostResponse;
 import radar.devmatching.domain.user.entity.User;
+import radar.devmatching.domain.user.repository.UserRepository;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("SimplePostService 클래스의")
@@ -38,6 +39,8 @@ class SimplePostServiceImplTest {
 	private final static User loginUser = createUser();
 	private final static Matching matching = Matching.builder().build();
 
+	@Mock
+	UserRepository userRepository;
 	@Mock
 	SimplePostRepository simplePostRepository;
 	@Mock
@@ -60,7 +63,7 @@ class SimplePostServiceImplTest {
 
 	@BeforeEach
 	void setup() {
-		this.simplePostService = new SimplePostServiceImpl(simplePostRepository, matchingService);
+		this.simplePostService = new SimplePostServiceImpl(userRepository, simplePostRepository, matchingService);
 	}
 
 	private SimplePost createSimplePost(User user, Matching matching) {
@@ -234,6 +237,7 @@ class SimplePostServiceImplTest {
 				SimplePost simplePost = createSimplePost(loginUser, matching);
 				ReflectionTestUtils.setField(simplePost, "id", 1L);
 				CreatePostRequest postRequest = createPostRequest();
+				given(userRepository.findById(anyLong())).willReturn(Optional.of(loginUser));
 				given(matchingService.createMatching(loginUser)).willReturn(matching);
 				given(simplePostRepository.save(any(SimplePost.class))).willReturn(simplePost);
 

@@ -7,10 +7,10 @@
         <div class="card mb-4">
             <div class="card-header">
                 <i class="fas fa-chart-bar me-1"></i>
-                댓글 생성
+                댓글 수정
             </div>
-            <div class="card-body">
-                <canvas height="200" width="50"></canvas>
+            <div class="card-body"
+                 th:replace="~{fragment/comment :: updateComment(${#strings.equals(updateCommentDto.commentType.name, 'MAIN') ? '/api/mainComments/'+updateCommentDto.entityId+'/edit' : '/api/subComments/'+updateCommentDto.entityId+'/edit'})}">
             </div>
         </div>
     </div>

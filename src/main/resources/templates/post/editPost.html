@@ -3,14 +3,49 @@
 
 <body>
 <main>
-    <div class="col-xl-6">
+    <div class="col-xl-12">
         <div class="card mb-4">
             <div class="card-header">
                 <i class="fas fa-chart-bar me-1"></i>
-                게시글
+                게시글 수정
             </div>
-            <div class="card-body">
-                <canvas height="200" width="50"></canvas>
+            <div class="card-body" th:object="${updatePostDto}">
+                <form method="post" th:action="'/api/posts/'+*{simplePostId}+'/edit'">
+                    <div class="form-floating">
+                        <input class="form-control" placeholder="제목" th:errorclass="is-invalid" th:field="*{title}"
+                               type="text"/>
+                        <label for="title">제목</label>
+                        <div class="invalid-feedback" th:errors="*{title}">에러 메시지</div>
+                    </div>
+                    <div class="form-floating">
+                        <select class="form-select" th:field="*{region}">
+                            <option th:each="region : ${regions}" th:text="${region.name}"
+                                    th:value="${region}">지역
+                            </option>
+                        </select>
+                    </div>
+                    <div class="form-floating">
+                        <select class="form-select" th:field="*{category}">
+                            <option th:each="category : ${categories}" th:text="${category.name}"
+                                    th:value="${category}">
+                                카테고리
+                            </option>
+                        </select>
+                    </div>
+                    <div class="form-floating">
+                        <input class="form-control" placeholder="인원 수" th:errorclass="is-invalid" th:field="*{userNum}"
+                               type="text"/>
+                        <label for="userNum">인원 수</label>
+                        <div class="invalid-feedback" th:errors="*{userNum}">에러 메시지</div>
+                    </div>
+                    <div class="form-floating">
+                        <input class="form-control" placeholder="내용" th:errorclass="is-invalid" th:field="*{content}"
+                               type="text"/>
+                        <label for="content">내용</label>
+                        <div class="invalid-feedback" th:errors="*{content}">에러 메시지</div>
+                    </div>
+                    <button class="col-md-2 btn btn-primary" type="submit">수정</button>
+                </form>
             </div>
         </div>
     </div>

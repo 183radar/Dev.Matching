@@ -10,7 +10,7 @@
                 내 게시글
             </div>
             <div class="card-body">
-                <canvas height="200" width="50"></canvas>
+                <table th:replace="~{fragment/simplePosts :: simplePosts(${myPosts})}"></table>
             </div>
         </div>
     </div>

@@ -39,6 +39,7 @@ public class MainComment extends BaseEntity {
 
 	//Comment의 생명주기를 MainComment가 관리한다. MainComment 저장 시 Comment도 같이 저장되며 삭제도 동일하다.
 	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+	@JoinColumn(name = "comment_id")
 	private Comment comment;
 
 	//MainComment 삭제 시 SubComment도 자동으로 삭제한다.

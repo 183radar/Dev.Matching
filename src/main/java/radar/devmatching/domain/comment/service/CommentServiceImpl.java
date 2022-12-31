@@ -69,14 +69,14 @@ public class CommentServiceImpl implements CommentService {
 	public UpdateCommentDto getMainCommentOnly(long mainCommentId) {
 		MainComment mainComment = mainCommentRepository.findMainCommentById(mainCommentId)
 			.orElseThrow(() -> new EntityNotFoundException(ErrorMessage.MAIN_COMMENT_NOT_FOUND));
-		return UpdateCommentDto.of(mainComment, UpdateCommentDto.CommentType.MAIN);
+		return UpdateCommentDto.of(mainCommentId, mainComment, UpdateCommentDto.CommentType.MAIN);
 	}
 
 	@Override
 	public UpdateCommentDto getSubCommentOnly(long subCommentId) {
 		SubComment subComment = subCommentRepository.findSubCommentById(subCommentId)
 			.orElseThrow(() -> new EntityNotFoundException(ErrorMessage.SUB_COMMENT_NOT_FOUND));
-		return UpdateCommentDto.of(subComment, UpdateCommentDto.CommentType.SUB);
+		return UpdateCommentDto.of(subCommentId, subComment, UpdateCommentDto.CommentType.SUB);
 	}
 
 	@Override
@@ -105,16 +105,26 @@ public class CommentServiceImpl implements CommentService {
 
 	@Override
 	@Transactional
-	public void deleteMainComment(long mainCommentId, User authUser) {
+	public Long deleteMainComment(long mainCommentId, User authUser) {
 		MainComment mainComment = validationMainCommentOwner(mainCommentId, authUser);
+		Long simplePostId = mainCommentRepository.findBySimplePostIdAsMainCommentId(mainCommentId);
+		if (Objects.isNull(simplePostId)) {
+			throw new EntityNotFoundException(ErrorMessage.SIMPLE_POST_NOT_FOUND);
+		}
 		mainCommentRepository.delete(mainComment);
+		return simplePostId;
 	}
 
 	@Override
 	@Transactional
-	public void deleteSubComment(long subCommentId, User loginUser) {
+	public Long deleteSubComment(long subCommentId, User loginUser) {
 		SubComment subComment = validationSubCommentOwner(subCommentId, loginUser);
+		Long simplePostId = subCommentRepository.findBySimplePostIdAsSubCommentId(subCommentId);
+		if (Objects.isNull(simplePostId)) {
+			throw new EntityNotFoundException(ErrorMessage.SIMPLE_POST_NOT_FOUND);
+		}
 		subCommentRepository.delete(subComment);
+		return simplePostId;
 	}
 
 	private MainComment validationMainCommentOwner(long mainCommentId, User loginUser) {

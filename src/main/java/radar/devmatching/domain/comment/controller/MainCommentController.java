@@ -31,7 +31,7 @@ public class MainCommentController {
 	public String getCreateMainComment(@PathVariable long simplePostId, Model model) {
 		simplePostService.getSimplePostOnly(simplePostId);
 		model.addAttribute("createCommentRequest",
-			CreateCommentRequest.of(CreateCommentRequest.CommentType.MAIN));
+			CreateCommentRequest.of(simplePostId, CreateCommentRequest.CommentType.MAIN));
 		return "comment/createComment";
 	}
 
@@ -39,6 +39,8 @@ public class MainCommentController {
 	public String createMainComment(@AuthUser User authUser, @PathVariable long simplePostId,
 		@Valid @ModelAttribute CreateCommentRequest createCommentRequest, BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
+			createCommentRequest.setEntityId(simplePostId);
+			createCommentRequest.setCommentType(CreateCommentRequest.CommentType.MAIN);
 			return "comment/createComment";
 		}
 		commentService.createMainComment(simplePostId, authUser, createCommentRequest);
@@ -56,6 +58,8 @@ public class MainCommentController {
 	public String updateMainComment(@AuthUser User authUser, @PathVariable long mainCommentId,
 		@Valid @ModelAttribute UpdateCommentDto updateCommentDto, BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
+			updateCommentDto.setEntityId(mainCommentId);
+			updateCommentDto.setCommentType(UpdateCommentDto.CommentType.MAIN);
 			return "comment/updateComment";
 		}
 		long simplePostId = commentService.updateMainComment(mainCommentId, updateCommentDto, authUser);
@@ -64,8 +68,8 @@ public class MainCommentController {
 
 	@GetMapping("mainComments/{mainCommentId}/delete")
 	public String deleteMainComment(@AuthUser User authUser, @PathVariable long mainCommentId) {
-		commentService.deleteMainComment(mainCommentId, authUser);
-		return "redirect:/api/posts/my";
+		Long simplePostId = commentService.deleteMainComment(mainCommentId, authUser);
+		return "redirect:/api/posts/" + simplePostId;
 	}
 
 }

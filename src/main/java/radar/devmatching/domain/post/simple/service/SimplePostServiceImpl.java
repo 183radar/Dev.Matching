@@ -20,18 +20,21 @@ import radar.devmatching.domain.post.simple.service.dto.MainPostDto;
 import radar.devmatching.domain.post.simple.service.dto.request.CreatePostRequest;
 import radar.devmatching.domain.post.simple.service.dto.response.SimplePostResponse;
 import radar.devmatching.domain.user.entity.User;
+import radar.devmatching.domain.user.repository.UserRepository;
 
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class SimplePostServiceImpl implements SimplePostService {
 
+	private final UserRepository userRepository;
 	private final SimplePostRepository simplePostRepository;
 	private final MatchingService matchingService;
 
 	@Override
 	@Transactional
 	public long createPost(CreatePostRequest createPostRequest, User user) {
+		user = userRepository.findById(user.getId()).get();
 		Matching matching = matchingService.createMatching(user);
 		SimplePost savedPost = simplePostRepository.save(createPostRequest.toEntity(user, matching));
 		return savedPost.getId();

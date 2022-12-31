@@ -5,6 +5,7 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.test.context.support.WithSecurityContextFactory;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import radar.devmatching.common.security.CustomUserDetails;
 import radar.devmatching.common.security.jwt.JwtAuthenticationToken;
@@ -18,6 +19,7 @@ public class WithCustomUserSecurityContextFactory implements WithSecurityContext
 		User user = User.builder()
 			.username(customUser.username())
 			.build();
+		ReflectionTestUtils.setField(user, "id", 1L);
 		user.changeUserRole(customUser.userRole());
 		UserDetails principal = new CustomUserDetails(user);
 

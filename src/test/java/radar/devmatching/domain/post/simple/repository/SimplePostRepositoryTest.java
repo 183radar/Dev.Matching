@@ -174,8 +174,8 @@ class SimplePostRepositoryTest {
 	}
 
 	@Test
-	@DisplayName("findByPostState 메서드는 PostState 상태에 따라 게시글들을 최신순으로 반환한다")
-	void findByPostStateTest() throws Exception {
+	@DisplayName("findByPostStateOrderByCreateDateDesc 메서드는 PostState 상태에 따라 게시글들을 최신순으로 반환한다")
+	void findByPostStateOrderByCreateDateDescTest() throws Exception {
 		//given
 		User user = userRepository.save(createUser());
 		SimplePost closedPost = createSimplePost(user, FullPost.builder().content("내용1").build());

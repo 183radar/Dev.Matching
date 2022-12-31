@@ -252,7 +252,7 @@ class CommentServiceImplTest {
 			//then
 			verify(mainCommentRepository).findMainCommentById(mainComment.getId());
 			assertThat(updateCommentDto).usingRecursiveComparison()
-				.isEqualTo(UpdateCommentDto.of(mainComment, UpdateCommentDto.CommentType.MAIN));
+				.isEqualTo(UpdateCommentDto.of(mainComment.getId(), mainComment, UpdateCommentDto.CommentType.MAIN));
 		}
 
 		@Test
@@ -284,7 +284,7 @@ class CommentServiceImplTest {
 			//then
 			verify(subCommentRepository).findSubCommentById(subComment.getId());
 			assertThat(updateCommentDto).usingRecursiveComparison()
-				.isEqualTo(UpdateCommentDto.of(subComment, UpdateCommentDto.CommentType.SUB));
+				.isEqualTo(UpdateCommentDto.of(subComment.getId(), subComment, UpdateCommentDto.CommentType.SUB));
 		}
 
 		@Test

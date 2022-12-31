@@ -3,6 +3,7 @@ package radar.devmatching.domain.post.full.service;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -16,18 +17,25 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import radar.devmatching.common.exception.InvalidAccessException;
 import radar.devmatching.common.exception.error.ErrorMessage;
+import radar.devmatching.domain.comment.entity.Comment;
+import radar.devmatching.domain.comment.entity.MainComment;
+import radar.devmatching.domain.comment.entity.SubComment;
 import radar.devmatching.domain.comment.service.CommentService;
+import radar.devmatching.domain.comment.service.dto.response.MainCommentResponse;
 import radar.devmatching.domain.matchings.apply.service.ApplyService;
 import radar.devmatching.domain.matchings.matching.entity.Matching;
 import radar.devmatching.domain.post.full.entity.FullPost;
 import radar.devmatching.domain.post.full.service.dto.UpdatePostDto;
+import radar.devmatching.domain.post.full.service.dto.response.PresentPostResponse;
 import radar.devmatching.domain.post.simple.entity.PostCategory;
 import radar.devmatching.domain.post.simple.entity.PostState;
 import radar.devmatching.domain.post.simple.entity.Region;
 import radar.devmatching.domain.post.simple.entity.SimplePost;
 import radar.devmatching.domain.post.simple.exception.SimplePostNotFoundException;
 import radar.devmatching.domain.post.simple.repository.SimplePostRepository;
+import radar.devmatching.domain.post.simple.service.dto.response.SimplePostResponse;
 import radar.devmatching.domain.user.entity.User;
+import radar.devmatching.domain.user.service.dto.response.SimpleUserResponse;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("FullPostServiceImple 클래스의")
@@ -85,56 +93,63 @@ class FullPostServiceImplTest {
 	@Nested
 	@DisplayName("getPostWithComment 메서드는")
 	class GetPostWithCommentMethod {
-		// TODO
-		// @Test
-		// @DisplayName("정상 상황이면 simplePost와 applyCount와 Comment를 가져와 PresentPostResponse에 넣어 반환하고, 조회수를 늘린다")
-		// void correct() throws Exception {
-		// 	//given
-		// 	SimplePost simplePost = createSimplePost(createUser(), Matching.builder().build(), fullPost);
-		// 	MainComment mainComment = MainComment.builder()
-		// 		.comment(Comment.builder().content("내용").user(createUser()).build())
-		// 		.fullPost(fullPost)
-		// 		.build();
-		// 	SubComment.builder()
-		// 		.mainComment(mainComment)
-		// 		.comment(Comment.builder().content("내용").user(createUser()).build())
-		// 		.build();
-		// 	int applyCount = 2;
-		// 	List<MainCommentResponse> mainCommentResponses = List.of(MainCommentResponse.of(mainComment));
-		// 	given(simplePostRepository.findPostById(anyLong())).willReturn(Optional.of(simplePost));
-		// 	given(applyService.getAcceptedApplyCount(anyLong())).willReturn(applyCount);
-		// 	given(commentService.getAllComments(anyLong())).willReturn(mainCommentResponses);
-		//
-		// 	//when
-		// 	PresentPostResponse presentPostResponse = fullPostService.getPostWithComment(anyLong());
-		//
-		// 	//then
-		// 	verify(simplePostRepository, only()).findPostById(anyLong());
-		// 	verify(applyService, only()).getAcceptedApplyCount(anyLong());
-		// 	verify(commentService, only()).getAllComments(anyLong());
-		//
-		// 	assertThat(presentPostResponse.getApplyCount()).isEqualTo(applyCount);
-		// 	assertThat(presentPostResponse.getContent()).isEqualTo(simplePost.getFullPost().getContent());
-		// 	assertThat(presentPostResponse.getMainCommentResponses()).isEqualTo(mainCommentResponses);
-		//
-		// 	assertThat(simplePost.getClickCount()).isEqualTo(1);
-		// }
-		//
-		// @Test
-		// @DisplayName("simplePostId에 해당하는 게시글이 없을 경우 에러가 발생하고, 조회수가 안 오른다")
-		// void notExistBySimplePostId() throws Exception {
-		// 	//given
-		// 	SimplePost simplePost = createSimplePost(createUser(), Matching.builder().build(), fullPost);
-		// 	Long clickCount = simplePost.getClickCount();
-		//
-		// 	//when
-		// 	//then
-		// 	assertThatThrownBy(() -> fullPostService.getPostWithComment(anyLong()))
-		// 		.isInstanceOf(SimplePostNotFoundException.class);
-		// 	assertThat(clickCount).isEqualTo(simplePost.getClickCount());
-		// 	verify(applyService, never()).getAcceptedApplyCount(anyLong());
-		// 	verify(commentService, never()).getAllComments(anyLong());
-		// }
+		@Test
+		@DisplayName("정상 흐름이면 simplePost와 applyCount와 Comment를 가져와 PresentPostResponse에 넣어 반환하고, 조회수를 늘린다")
+		void correct() throws Exception {
+			//given
+			User loginUser = createUser();
+			SimplePost simplePost = createSimplePost(createUser(), Matching.builder().build(), fullPost);
+			MainComment mainComment = MainComment.builder()
+				.comment(Comment.builder().content("내용").user(createUser()).build())
+				.fullPost(fullPost)
+				.build();
+			SubComment.builder()
+				.mainComment(mainComment)
+				.comment(Comment.builder().content("내용").user(loginUser).build())
+				.build();
+			int applyCount = 2;
+			List<MainCommentResponse> mainCommentResponses = List.of(MainCommentResponse.of(mainComment));
+			given(simplePostRepository.findPostById(anyLong())).willReturn(Optional.of(simplePost));
+			given(applyService.getAcceptedApplyCount(anyLong())).willReturn(applyCount);
+			given(commentService.getAllComments(anyLong())).willReturn(mainCommentResponses);
+
+			//when
+			PresentPostResponse presentPostResponse = fullPostService.getPostWithComment(anyLong(), loginUser);
+
+			//then
+			verify(simplePostRepository).findPostById(anyLong());
+			verify(applyService).getAcceptedApplyCount(anyLong());
+			verify(commentService).getAllComments(anyLong());
+
+			assertThat(presentPostResponse.getSimplePostResponse()).usingRecursiveComparison()
+				.isEqualTo(SimplePostResponse.of(simplePost));
+			assertThat(presentPostResponse.getPostLeader()).usingRecursiveComparison()
+				.isEqualTo(SimpleUserResponse.of(simplePost.getLeader()));
+			assertThat(presentPostResponse.getLoginUser()).usingRecursiveComparison()
+				.isEqualTo(SimpleUserResponse.of(loginUser));
+			assertThat(presentPostResponse.getApplyCount()).isEqualTo(applyCount);
+			assertThat(presentPostResponse.getContent()).isEqualTo(simplePost.getFullPost().getContent());
+			assertThat(presentPostResponse.getMainCommentResponses()).isEqualTo(mainCommentResponses);
+
+			assertThat(simplePost.getClickCount()).isEqualTo(1);
+		}
+
+		@Test
+		@DisplayName("simplePostId에 해당하는 게시글이 없을 경우 에러가 발생하고, 조회수가 안 오른다")
+		void notExistBySimplePostId() throws Exception {
+			//given
+			User loginUser = createUser();
+			SimplePost simplePost = createSimplePost(loginUser, Matching.builder().build(), fullPost);
+			Long clickCount = simplePost.getClickCount();
+
+			//when
+			//then
+			assertThatThrownBy(() -> fullPostService.getPostWithComment(anyLong(), loginUser))
+				.isInstanceOf(SimplePostNotFoundException.class);
+			assertThat(clickCount).isEqualTo(simplePost.getClickCount());
+			verify(applyService, never()).getAcceptedApplyCount(anyLong());
+			verify(commentService, never()).getAllComments(anyLong());
+		}
 	}
 
 	@Nested

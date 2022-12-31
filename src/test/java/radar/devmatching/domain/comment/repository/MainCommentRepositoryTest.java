@@ -13,8 +13,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
-import radar.devmatching.common.exception.EntityNotFoundException;
-import radar.devmatching.common.exception.error.ErrorMessage;
 import radar.devmatching.domain.comment.entity.Comment;
 import radar.devmatching.domain.comment.entity.MainComment;
 import radar.devmatching.domain.comment.entity.SubComment;
@@ -236,17 +234,6 @@ class MainCommentRepositoryTest {
 			//then
 			assertThat(findSimplePostId).isNotNull();
 			assertThat(findSimplePostId).isEqualTo(simplePost.getId());
-		}
-
-		@Test
-		@DisplayName("mainCommentId에 해당하는 엔티티가 없을 경우 예외를 반환한다")
-		void ifMainCommentIdNotExistThanReturnNull() throws Exception {
-			//given
-			//when
-			//then
-			assertThatThrownBy(() -> mainCommentRepository.findBySimplePostIdAsMainCommentId(1L))
-				.isInstanceOf(EntityNotFoundException.class)
-				.hasMessage(ErrorMessage.MAIN_COMMENT_NOT_FOUND.getMessage());
 		}
 	}
 }

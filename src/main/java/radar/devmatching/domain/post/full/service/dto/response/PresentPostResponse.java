@@ -3,27 +3,31 @@ package radar.devmatching.domain.post.full.service.dto.response;
 import java.util.List;
 
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.NoArgsConstructor;
 import radar.devmatching.domain.comment.service.dto.response.MainCommentResponse;
 import radar.devmatching.domain.post.simple.entity.SimplePost;
 import radar.devmatching.domain.post.simple.service.dto.response.SimplePostResponse;
 import radar.devmatching.domain.user.entity.User;
 import radar.devmatching.domain.user.service.dto.response.SimpleUserResponse;
 
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder(access = AccessLevel.PRIVATE)
 public class PresentPostResponse {
 
-	private final SimplePostResponse simplePostResponse;
+	private SimplePostResponse simplePostResponse;
 
-	private final SimpleUserResponse loginUser;
+	private SimpleUserResponse loginUser;
 
-	private final SimpleUserResponse postLeader;
+	private SimpleUserResponse postLeader;
 
-	private final Integer applyCount;
+	private Integer applyCount;
 
-	private final String content;
+	private String content;
 
-	private final List<MainCommentResponse> mainCommentResponses;
+	private List<MainCommentResponse> mainCommentResponses;
 
 	public static PresentPostResponse of(SimplePost simplePost, User loginUser, int applyCount,
 		List<MainCommentResponse> mainCommentResponse) {
