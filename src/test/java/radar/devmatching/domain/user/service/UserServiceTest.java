@@ -166,7 +166,7 @@ public class UserServiceTest {
 			//given
 			User user = createUser();
 			UpdateUserRequest request = UpdateUserRequest.builder()
-				.nickName("updateNickName")
+				// .nickName("updateNickName")
 				.schoolName("updateSchoolName")
 				.githubUrl("updateGithubUrl")
 				.introduce("updateIntroduce")
@@ -175,7 +175,7 @@ public class UserServiceTest {
 			//when
 			UserResponse userResponse = userService.updateUser(request, TEST_USER_ID, user);
 			//then
-			assertThat(userResponse.getNickName()).isEqualTo(request.getNickName());
+			// assertThat(userResponse.getNickName()).isEqualTo(request.getNickName());
 			assertThat(userResponse.getSchoolName()).isEqualTo(request.getSchoolName());
 			assertThat(userResponse.getGithubUrl()).isEqualTo(request.getGithubUrl());
 			assertThat(userResponse.getIntroduce()).isEqualTo(request.getIntroduce());
@@ -187,7 +187,7 @@ public class UserServiceTest {
 			//given
 			User user = createUser();
 			UpdateUserRequest request = UpdateUserRequest.builder()
-				.nickName("updateNickName")
+				// .nickName("updateNickName")
 				.schoolName("updateSchoolName")
 				.githubUrl("updateGithubUrl")
 				.introduce("updateIntroduce")
@@ -205,12 +205,12 @@ public class UserServiceTest {
 			User user = createUser();
 			User findUser = createUserEX();
 			UpdateUserRequest request = UpdateUserRequest.builder()
-				.nickName("updateNickName")
+				// .nickName("updateNickName")
 				.schoolName("updateSchoolName")
 				.githubUrl("updateGithubUrl")
 				.introduce("updateIntroduce")
 				.build();
-			given(userRepository.findByNickName(request.getNickName())).willReturn(Optional.of(findUser));
+			given(userRepository.findByNickName(any())).willReturn(Optional.of(findUser));
 			//when
 			//then
 			assertThatThrownBy(() -> userService.updateUser(request, TEST_USER_ID, user))

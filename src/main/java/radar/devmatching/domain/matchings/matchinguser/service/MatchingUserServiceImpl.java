@@ -1,5 +1,8 @@
 package radar.devmatching.domain.matchings.matchinguser.service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -11,6 +14,7 @@ import radar.devmatching.domain.matchings.matchinguser.entity.MatchingUser;
 import radar.devmatching.domain.matchings.matchinguser.entity.MatchingUserRole;
 import radar.devmatching.domain.matchings.matchinguser.exception.AlreadyJoinMatchingUserException;
 import radar.devmatching.domain.matchings.matchinguser.repository.MatchingUserRepository;
+import radar.devmatching.domain.matchings.matchinguser.service.dto.response.MatchingUserResponse;
 import radar.devmatching.domain.user.entity.User;
 
 @Slf4j
@@ -33,9 +37,16 @@ public class MatchingUserServiceImpl implements MatchingUserService {
 		return matchingUser;
 	}
 
+	public List<MatchingUserResponse> getMatchingUserList(Long userId) {
+		return matchingUserRepository.findMatchingUserList(userId).stream()
+			.map(MatchingUserResponse::of)
+			.collect(Collectors.toList());
+	}
+
 	@Override
 	@Transactional
 	public void deleteMatchingUser(Long matchingId, Long userId) {
 		matchingUserRepository.deleteByMatchingIdAndUserId(matchingId, userId);
 	}
+
 }

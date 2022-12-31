@@ -18,7 +18,7 @@ public interface ApplyService {
 	 */
 	Apply createApply(Long simplePostId, User authUser);
 
-	List<ApplyResponse> getAllApplyList(User authUser, Long userId);
+	List<ApplyResponse> getAllApplyList(User authUser);
 
 	int getAcceptedApplyCount(Long simplePostId);
 

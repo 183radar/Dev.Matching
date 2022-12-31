@@ -6,4 +6,8 @@ public class InvalidTokenException extends TokenException {
 	public InvalidTokenException(Throwable e) {
 		super(ErrorMessage.INVALID_TOKEN, e);
 	}
+
+	public InvalidTokenException() {
+		super(ErrorMessage.INVALID_TOKEN);
+	}
 }

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html th:replace="~{layout :: layout(~{::main})}" xmlns:th="http://www.thymeleaf.org">
+<body>
+<main class="col-xl-8">
+    <div class="card mb-4">
+        <div class="card-header"><h3 class="text-center font-weight-light my-4">매칭 목록</h3></div>
+        <div class="card-body">
+
+            <table class="table table-bordered table-light">
+                <thead>
+                <tr align="center">
+                    <th>제목</th>
+                    <th>권한</th>
+                    <th>모집인원 수</th>
+                    <th>상태</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr align="center" th:each="matchingUser : ${matchingUserList}">
+                    <td>
+                        <a class="btn btn-secondary" th:href="@{'/api/matching/'+${matchingUser.getMatchingId()}}"
+                           th:text="${matchingUser.getMatchingTitle()}"></a>
+                    </td>
+                    <td th:text="${matchingUser.getMatchingUserRole().getName()}"></td>
+                    <td th:text="${matchingUser.getUserCount()}"></td>
+                    <td th:text="${matchingUser.getPostState().getName()}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+</body>
+</html>

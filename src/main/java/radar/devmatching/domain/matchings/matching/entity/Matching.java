@@ -28,6 +28,10 @@ public class Matching extends BaseEntity {
 	@Column(name = "matching_id")
 	private Long id;
 
+	private String matchingTitle;
+
+	private String matchingInfo;
+
 	@OneToOne(mappedBy = "matching", fetch = FetchType.LAZY)
 	private SimplePost simplePost;
 
@@ -40,7 +44,22 @@ public class Matching extends BaseEntity {
 		matchingUsers = new ArrayList<>();
 	}
 
+	@Override
+	public String toString() {
+		return "Matching{" +
+			"id=" + id +
+			", matchingTitle='" + matchingTitle + '\'' +
+			", matchingInfo='" + matchingInfo + '\'' +
+			'}';
+	}
+
 	public void setSimplePost(SimplePost simplePost) {
+		this.matchingTitle = simplePost.getTitle();
 		this.simplePost = simplePost;
+	}
+
+	public void update(String matchingTitle, String matchingInfo) {
+		this.matchingTitle = matchingTitle;
+		this.matchingInfo = matchingInfo;
 	}
 }

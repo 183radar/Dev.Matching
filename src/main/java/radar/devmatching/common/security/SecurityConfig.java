@@ -25,6 +25,8 @@ public class SecurityConfig {
 		return web -> web.ignoring()
 			.antMatchers("/h2-console/**")
 			.antMatchers("/api/users/signIn")
+			.antMatchers("/api/users/signUp/**")
+			.antMatchers("/api/users/duplicate/**")
 			.antMatchers("/js/scripts.js");
 
 	}

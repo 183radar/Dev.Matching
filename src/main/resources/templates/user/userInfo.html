@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html th:replace="~{layout :: layout(~{::main})}" xmlns:th="http://www.thymeleaf.org">
+
+<body>
+<main>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-5">
+                <div class="card shadow-lg border-0 rounded-lg mt-5">
+                    <div class="card-header"><h3 class="text-center font-weight-light my-4">회원정보</h3></div>
+                    <div class="card-body" th:object="${userInfo}">
+                        <form>
+                            <div class="form-floating mb-3">
+                                아이디
+                                <input class="form-control" placeholder="username"
+                                       th:field="*{username}"
+                                       type="text"
+                                       disabled>
+                            </div>
+                            <div class="form-floating mb-3">
+                                닉네임
+                                <input class="form-control" placeholder="nickName"
+                                       th:field="*{nickName}"
+                                       type="text"
+                                       disabled>
+                            </div>
+                            <div class="form-floating mb-3">
+                                학교
+                                <input class="form-control" placeholder="schoolName"
+                                       th:field="*{schoolName}"
+                                       type="text"
+                                       disabled>
+                            </div>
+                            <div class="form-floating mb-3">
+                                깃허브 주소
+                                <input class="form-control" placeholder="githubUrl"
+                                       th:field="*{githubUrl}"
+                                       type="text"
+                                       disabled>
+                            </div>
+                            <div class="form-floating mb-3">
+                                자기소개
+                                <input class="form-control" placeholder="introduce"
+                                       th:field="*{introduce}"
+                                       type="text"
+                                       disabled>
+                            </div>
+                            <button type="button" th:onclick="|location.href='@{__${#httpServletRequest.requestURI}__/update}'|">수정하기</button>
+                            <button type="button" th:onclick="|location.href='@{__${#httpServletRequest.requestURI}__/delete}'|">계정 삭제하기</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+</main>
+</body>
+</html>

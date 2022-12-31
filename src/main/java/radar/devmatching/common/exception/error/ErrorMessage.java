@@ -10,6 +10,8 @@ public enum ErrorMessage {
 	DUPLICATE_USERNAME("duplicate username", HttpStatus.CONFLICT),
 	DUPLICATE_NICKNAME("duplicate nickName", HttpStatus.CONFLICT),
 	USER_NOT_FOUND("not exist user", HttpStatus.BAD_REQUEST),
+	EMPTY_USERNAME("empty username", HttpStatus.BAD_REQUEST),
+	EMPTY_NICKNAME("empty nickName", HttpStatus.BAD_REQUEST),
 
 	//MatchingUser
 	ALREADY_JOIN("already join user", HttpStatus.BAD_REQUEST),

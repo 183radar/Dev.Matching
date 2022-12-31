@@ -14,7 +14,7 @@ import radar.devmatching.common.exception.error.ErrorMessage;
 import radar.devmatching.domain.matchings.apply.entity.Apply;
 import radar.devmatching.domain.matchings.apply.entity.ApplyState;
 import radar.devmatching.domain.matchings.apply.repository.ApplyRepository;
-import radar.devmatching.domain.matchings.apply.service.dto.response.ApplyResponse;
+import radar.devmatching.domain.matchings.apply.service.dto.response.ApplyLeaderResponse;
 import radar.devmatching.domain.matchings.matching.entity.Matching;
 import radar.devmatching.domain.matchings.matchinguser.service.MatchingUserService;
 import radar.devmatching.domain.post.simple.entity.SimplePost;
@@ -63,11 +63,11 @@ public class ApplyLeaderServiceImpl implements ApplyLeaderService {
 	}
 
 	@Override
-	public List<ApplyResponse> getAllApplyList(User authUser, Long simplePostId) {
+	public List<ApplyLeaderResponse> getAllApplyList(User authUser, Long simplePostId) {
 		validatePermission(authUser, null, simplePostId);
 
 		return applyRepository.findAllByApplySimplePostId(simplePostId).stream()
-			.map(ApplyResponse::of)
+			.map(ApplyLeaderResponse::of)
 			.collect(Collectors.toList());
 	}
 

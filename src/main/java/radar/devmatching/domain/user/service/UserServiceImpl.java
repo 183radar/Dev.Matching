@@ -14,6 +14,7 @@ import radar.devmatching.common.exception.InvalidAccessException;
 import radar.devmatching.common.exception.error.ErrorMessage;
 import radar.devmatching.domain.user.entity.User;
 import radar.devmatching.domain.user.exception.DuplicateException;
+import radar.devmatching.domain.user.exception.EmptySpaceException;
 import radar.devmatching.domain.user.repository.UserRepository;
 import radar.devmatching.domain.user.service.dto.request.CreateUserRequest;
 import radar.devmatching.domain.user.service.dto.request.UpdateUserRequest;
@@ -32,6 +33,7 @@ public class UserServiceImpl implements UserService {
 	@Transactional
 	public UserResponse createUser(CreateUserRequest request) {
 
+		// TODO : 예외 설정하기
 		if (!request.getNickNameCheck() || !request.getUsernameCheck()) {
 			throw new RuntimeException();
 		}
@@ -47,6 +49,7 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public UserResponse getUser(Long requestUserId, User authUser) {
 		validatePermission(requestUserId, authUser);
+		log.info("get user info={}", authUser);
 		return UserResponse.of(authUser);
 	}
 
@@ -66,42 +69,39 @@ public class UserServiceImpl implements UserService {
 	public UserResponse updateUser(UpdateUserRequest request, Long requestUserId, User authUser) {
 		validatePermission(requestUserId, authUser);
 
-		changeNickName(request.getNickName(), authUser);
-		// TODO : schoolName 빈값으로 들어오면 예외던져야함
-		authUser.changeSchoolName(request.getSchoolName());
-		authUser.changeGithubUrl(request.getGithubUrl());
-		authUser.changeIntroduce(request.getIntroduce());
-		log.info("update user data:{}", authUser);
-		return UserResponse.of(authUser);
+		User user = userRepository.findById(requestUserId).get();
+
+		user.changeSchoolName(request.getSchoolName());
+		user.changeGithubUrl(request.getGithubUrl());
+		user.changeIntroduce(request.getIntroduce());
+		log.info("update user data:{}", user);
+		return UserResponse.of(user);
 	}
 
 	@Override
 	@Transactional
 	public void deleteUser(Long requestUserId, User authUser) {
 		validatePermission(requestUserId, authUser);
+		log.info("delete user={}", authUser);
 		userRepository.delete(authUser);
-	}
-
-	private void changeNickName(String nickName, User user) {
-		if (user.getNickName().equals(nickName)) {
-			return;
-		}
-		checkDuplicateNickName(nickName, user.getId());
-		user.changeNickName(nickName);
 	}
 
 	/**
 	 * 회원 가입시에만 사용
 	 */
 	@Override
-	public void checkDuplicateUsername(String username) {
+	public void checkDuplicateUsername(CreateUserRequest request) {
+
+		String username = request.getUsername();
 		if (!StringUtils.hasText(username)) {
-			throw new RuntimeException();
+			throw new EmptySpaceException(ErrorMessage.EMPTY_USERNAME);
 		}
+		request.usernameDuplicateCheckClear();
 		userRepository.findByUsername(username).ifPresent(user -> {
 			throw new DuplicateException(ErrorMessage.DUPLICATE_USERNAME);
 		});
-
+		request.usernameNonDuplicate();
+		log.info("checkDuplicateUsername request info={}", request);
 	}
 
 	/**
@@ -115,6 +115,21 @@ public class UserServiceImpl implements UserService {
 				throw new DuplicateException(ErrorMessage.DUPLICATE_NICKNAME);
 			}
 		});
+	}
+
+	@Override
+	public void checkDuplicateNickName(CreateUserRequest request) {
+		String nickName = request.getNickName();
+		if (!StringUtils.hasText(nickName)) {
+			throw new EmptySpaceException(ErrorMessage.EMPTY_NICKNAME);
+		}
+
+		request.nickNameDuplicateCheckClear();
+		userRepository.findByNickName(nickName).ifPresent(user -> {
+			throw new DuplicateException(ErrorMessage.DUPLICATE_NICKNAME);
+		});
+		request.nickNameNonDuplicate();
+		log.info("checkDuplicateNickName request info={}", request);
 	}
 
 	/**

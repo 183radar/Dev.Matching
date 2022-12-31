@@ -17,7 +17,9 @@ public interface UserService {
 
 	void deleteUser(Long requestUserId, User authUser);
 
-	void checkDuplicateUsername(String username);
+	void checkDuplicateUsername(CreateUserRequest request);
 
 	void checkDuplicateNickName(String nickName, Long userId);
+
+	void checkDuplicateNickName(CreateUserRequest request);
 }

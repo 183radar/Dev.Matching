@@ -20,7 +20,7 @@
                     <nav class="sb-sidenav-menu-nested nav">
                         <a class="nav-link" th:href="@{/api/posts/new}">게시글 생성</a>
                         <a class="nav-link" th:href="@{/api/posts/my}">내 게시글</a>
-                        <a class="nav-link" th:href="@{/api/posts/applicationPosts}">신청한 게시글</a>
+                        <a class="nav-link" th:href="@{/api/users/apply}">신청한 게시글</a>
                     </nav>
                 </div>
 
@@ -33,7 +33,7 @@
                 </a>
                 <div aria-labelledby="headingOne" class="collapse" data-bs-parent="#sidenavAccordion" id="gradeSide">
                     <nav class="sb-sidenav-menu-nested nav">
-                        <a class="nav-link" th:href="@{/grade/myGrade}">진행중인 매칭</a>
+                        <a class="nav-link" th:href="@{/api/matching/list}">진행중인 매칭</a>
                     </nav>
                 </div>
 

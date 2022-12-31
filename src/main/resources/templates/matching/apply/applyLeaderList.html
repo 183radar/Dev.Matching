@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html th:replace="~{layout :: layout(~{::main})}" xmlns:th="http://www.thymeleaf.org">
+<body>
+<main class="col-xl-8">
+    <div class="card mb-4">
+        <div class="card-header"><h3 class="text-center font-weight-light my-4">신청 현황</h3></div>
+        <div class="card-body">
+
+            <table class="table table-bordered table-light">
+                <thead>
+                <tr align="center">
+                    <th>닉네임</th>
+                    <th>학교</th>
+                    <th>신청 상태</th>
+                    <th>수정</th>
+
+
+                </tr>
+                </thead>
+                <tbody>
+                <tr align="center" th:each="apply : ${applyList}">
+                    <td th:text="${apply.getNickName()}"></td>
+                    <td th:text="${apply.getSchoolName()}"></td>
+                    <td th:text="${apply.getState().getName()}"></td>
+                    <td>
+                        <button th:if="${#strings.equals(apply.getState().getName(), '승인됨')}"
+                                th:onclick="|location.href='@{__${#httpServletRequest.requestURI}__/{applyId}/deny(applyId=${apply.getApplyId()})}'|"
+                                type="button">거절
+                        </button>
+                        <button th:if="${#strings.equals(apply.getState().getName(), '거절됨')} or ${#strings.equals(apply.getState().getName(), '승인 대기중')}"
+                                th:onclick="|location.href='@{__${#httpServletRequest.requestURI}__/{applyId}/accept(applyId=${apply.getApplyId()})}'|"
+                                type="button">수락
+                        </button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+</body>
+</html>
