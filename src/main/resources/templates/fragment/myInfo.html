@@ -8,6 +8,7 @@
        role="button"><i class="fas fa-user fa-fw"></i></a>
     <ul aria-labelledby="navbarDropdown" class="dropdown-menu dropdown-menu-end">
         <li><a class="dropdown-item" th:href="@{/api/users/signIn}">로그인</a></li>
+        <li><a class="dropdown-item" th:href="@{/api/users/signUp}">회원가입</a></li>
         <div sec:authorize="isAuthenticated()">
             <li><a class="dropdown-item"
                    th:href="@{/api/users/{userId}(userId=${#authentication.getPrincipal().getUser().getId()})}">회원
