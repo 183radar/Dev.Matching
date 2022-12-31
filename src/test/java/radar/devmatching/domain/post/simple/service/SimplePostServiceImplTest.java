@@ -18,7 +18,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import radar.devmatching.common.exception.InvalidParamException;
 import radar.devmatching.common.exception.error.ErrorMessage;
 import radar.devmatching.domain.matchings.matching.entity.Matching;
-import radar.devmatching.domain.matchings.matching.service.MatchingService;
+import radar.devmatching.domain.matchings.matching.service.MatchingLeaderService;
 import radar.devmatching.domain.post.full.entity.FullPost;
 import radar.devmatching.domain.post.simple.entity.PostCategory;
 import radar.devmatching.domain.post.simple.entity.PostState;
@@ -44,7 +44,7 @@ class SimplePostServiceImplTest {
 	@Mock
 	SimplePostRepository simplePostRepository;
 	@Mock
-	MatchingService matchingService;
+	MatchingLeaderService matchingLeaderService;
 
 	SimplePostService simplePostService;
 
@@ -63,7 +63,7 @@ class SimplePostServiceImplTest {
 
 	@BeforeEach
 	void setup() {
-		this.simplePostService = new SimplePostServiceImpl(userRepository, simplePostRepository, matchingService);
+		this.simplePostService = new SimplePostServiceImpl(userRepository, simplePostRepository, matchingLeaderService);
 	}
 
 	private SimplePost createSimplePost(User user, Matching matching) {
@@ -238,7 +238,7 @@ class SimplePostServiceImplTest {
 				ReflectionTestUtils.setField(simplePost, "id", 1L);
 				CreatePostRequest postRequest = createPostRequest();
 				given(userRepository.findById(anyLong())).willReturn(Optional.of(loginUser));
-				given(matchingService.createMatching(loginUser)).willReturn(matching);
+				given(matchingLeaderService.createMatching(loginUser)).willReturn(matching);
 				given(simplePostRepository.save(any(SimplePost.class))).willReturn(simplePost);
 
 				//when
