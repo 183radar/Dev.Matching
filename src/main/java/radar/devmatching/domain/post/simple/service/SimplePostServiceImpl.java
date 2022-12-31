@@ -10,7 +10,7 @@ import lombok.RequiredArgsConstructor;
 import radar.devmatching.common.exception.InvalidParamException;
 import radar.devmatching.common.exception.error.ErrorMessage;
 import radar.devmatching.domain.matchings.matching.entity.Matching;
-import radar.devmatching.domain.matchings.matching.service.MatchingService;
+import radar.devmatching.domain.matchings.matching.service.MatchingLeaderService;
 import radar.devmatching.domain.post.simple.entity.PostCategory;
 import radar.devmatching.domain.post.simple.entity.PostState;
 import radar.devmatching.domain.post.simple.entity.SimplePost;
@@ -29,13 +29,13 @@ public class SimplePostServiceImpl implements SimplePostService {
 
 	private final UserRepository userRepository;
 	private final SimplePostRepository simplePostRepository;
-	private final MatchingService matchingService;
+	private final MatchingLeaderService matchingLeaderService;
 
 	@Override
 	@Transactional
 	public long createPost(CreatePostRequest createPostRequest, User user) {
 		user = userRepository.findById(user.getId()).get();
-		Matching matching = matchingService.createMatching(user);
+		Matching matching = matchingLeaderService.createMatching(user);
 		SimplePost savedPost = simplePostRepository.save(createPostRequest.toEntity(user, matching));
 		return savedPost.getId();
 	}
