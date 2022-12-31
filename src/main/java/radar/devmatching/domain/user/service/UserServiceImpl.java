@@ -91,7 +91,7 @@ public class UserServiceImpl implements UserService {
 	 */
 	@Override
 	public void checkDuplicateUsername(CreateUserRequest request) {
-		log.info("checkDuplicateUsername request info={}", request);
+
 		String username = request.getUsername();
 		if (!StringUtils.hasText(username)) {
 			throw new EmptySpaceException(ErrorMessage.EMPTY_USERNAME);
@@ -101,6 +101,7 @@ public class UserServiceImpl implements UserService {
 			throw new DuplicateException(ErrorMessage.DUPLICATE_USERNAME);
 		});
 		request.usernameNonDuplicate();
+		log.info("checkDuplicateUsername request info={}", request);
 	}
 
 	/**
@@ -118,7 +119,6 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public void checkDuplicateNickName(CreateUserRequest request) {
-		log.info("checkDuplicateNickName request info={}", request);
 		String nickName = request.getNickName();
 		if (!StringUtils.hasText(nickName)) {
 			throw new EmptySpaceException(ErrorMessage.EMPTY_NICKNAME);
@@ -129,6 +129,7 @@ public class UserServiceImpl implements UserService {
 			throw new DuplicateException(ErrorMessage.DUPLICATE_NICKNAME);
 		});
 		request.nickNameNonDuplicate();
+		log.info("checkDuplicateNickName request info={}", request);
 	}
 
 	/**

@@ -84,12 +84,13 @@ public class UserController {
 	@PostMapping("/duplicate/nickName")
 	public String checkDuplicateNickName(@ModelAttribute("creatUserRequest") CreateUserRequest request, Model model,
 		RedirectAttributes redirectAttributes) {
-		userService.checkDuplicateNickName(request.getNickName(), null);
+		userService.checkDuplicateNickName(request);
 		redirectAttributes.addFlashAttribute("msg", request.getNickName() + ": 사용가능한 이름 입니다.");
 		model.addAttribute("createUserRequest", request);
 		return "redirect:/api/users/signUp/page";
 	}
 
+	// TODO : 다른 사람이 접근할경우에는 다른 뷰를 사용
 	@GetMapping("/{userId}")
 	public String getUser(@PathVariable(name = "userId") Long requestUserId, @AuthUser User authUser, Model model) {
 		UserResponse user = userService.getUser(requestUserId, authUser);
