@@ -28,8 +28,7 @@ public class JwtCookieProvider {
 	}
 
 	public static String getCookieFromRequest(String cookieName) {
-		ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes)RequestContextHolder.currentRequestAttributes();
-		HttpServletRequest request = servletRequestAttributes.getRequest();
+		HttpServletRequest request = getRequest();
 
 		if (Objects.isNull(request.getCookies())) {
 			throw new JwtTokenNotFoundException(ErrorMessage.TOKEN_NOT_FOUND);
@@ -43,8 +42,7 @@ public class JwtCookieProvider {
 	}
 
 	public static void setCookie(ResponseCookie... cookie) {
-		ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes)RequestContextHolder.currentRequestAttributes();
-		HttpServletResponse response = servletRequestAttributes.getResponse();
+		HttpServletResponse response = getResponse();
 
 		for (ResponseCookie responseCookie : cookie) {
 			response.addHeader(SET_COOKIE, responseCookie.toString());
@@ -52,8 +50,7 @@ public class JwtCookieProvider {
 	}
 
 	public static void deleteCookieFromRequest(String... cookieName) {
-		ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes)RequestContextHolder.currentRequestAttributes();
-		HttpServletRequest request = servletRequestAttributes.getRequest();
+		HttpServletRequest request = getRequest();
 
 		for (String cookie : cookieName) {
 			if (Objects.nonNull(request.getCookies())) {
@@ -66,6 +63,16 @@ public class JwtCookieProvider {
 				JwtCookieProvider.setCookie(deleteCookie);
 			}
 		}
+	}
+
+	private static HttpServletRequest getRequest() {
+		ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes)RequestContextHolder.currentRequestAttributes();
+		return servletRequestAttributes.getRequest();
+	}
+
+	private static HttpServletResponse getResponse() {
+		ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes)RequestContextHolder.currentRequestAttributes();
+		return servletRequestAttributes.getResponse();
 	}
 
 }
