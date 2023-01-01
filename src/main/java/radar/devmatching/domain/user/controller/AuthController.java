@@ -1,7 +1,5 @@
 package radar.devmatching.domain.user.controller;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.springframework.http.ResponseCookie;
@@ -43,7 +41,7 @@ public class AuthController {
 
 	// TODO : SecurityContextHolder 에 Authentication 저장하기 추가.
 	@PostMapping("/signIn")
-	public String signIn(HttpServletResponse response, @Valid @ModelAttribute SignInRequest signInRequest,
+	public String signIn(@Valid @ModelAttribute SignInRequest signInRequest,
 		BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
 			return "user/signIn";
@@ -60,19 +58,18 @@ public class AuthController {
 			refreshToken.getToken(),
 			refreshToken.getExpireTime());
 
-		JwtCookieProvider.setCookie(response, accessTokenCookie);
-		JwtCookieProvider.setCookie(response, refreshTokenCookie);
+		JwtCookieProvider.setCookie(accessTokenCookie, refreshTokenCookie);
 		log.info("signIn execute");
 		return "redirect:/";
 	}
 
 	@GetMapping("/signOut")
-	public String signOut(HttpServletRequest request, HttpServletResponse response, @AuthUser User user) {
+	public String signOut(@AuthUser User user) {
 		SignOutResponse signOutResponse = authService.singOut();
 		log.info("access User={}", user);
 		log.info("logout process execute");
-		JwtCookieProvider.deleteCookieFromRequest(request, response, signOutResponse.getAccessTokenHeader());
-		JwtCookieProvider.deleteCookieFromRequest(request, response, signOutResponse.getRefreshTokenHeader());
+		JwtCookieProvider.deleteCookieFromRequest(signOutResponse.getAccessTokenHeader(),
+			signOutResponse.getRefreshTokenHeader());
 
 		return "redirect:/api/users/signIn";
 	}

@@ -9,6 +9,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.http.ResponseCookie;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import lombok.extern.slf4j.Slf4j;
 import radar.devmatching.common.exception.error.ErrorMessage;
@@ -25,7 +27,10 @@ public class JwtCookieProvider {
 			.build();
 	}
 
-	public static String getCookieFromRequest(HttpServletRequest request, String cookieName) {
+	public static String getCookieFromRequest(String cookieName) {
+		ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes)RequestContextHolder.currentRequestAttributes();
+		HttpServletRequest request = servletRequestAttributes.getRequest();
+
 		if (Objects.isNull(request.getCookies())) {
 			throw new JwtTokenNotFoundException(ErrorMessage.TOKEN_NOT_FOUND);
 		}
@@ -37,20 +42,30 @@ public class JwtCookieProvider {
 			.getValue();
 	}
 
-	public static void setCookie(HttpServletResponse response, ResponseCookie cookie) {
-		response.addHeader(SET_COOKIE, cookie.toString());
-	}
+	public static void setCookie(ResponseCookie... cookie) {
+		ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes)RequestContextHolder.currentRequestAttributes();
+		HttpServletResponse response = servletRequestAttributes.getResponse();
 
-	public static void deleteCookieFromRequest(HttpServletRequest request, HttpServletResponse response,
-		String cookieName) {
-		if (Objects.nonNull(request.getCookies())) {
-			ResponseCookie deleteCookie = ResponseCookie.from(cookieName, "")
-				.path("/")
-				.maxAge(0)
-				.httpOnly(true)
-				.build();
-
-			response.addHeader(SET_COOKIE, deleteCookie.toString());
+		for (ResponseCookie responseCookie : cookie) {
+			response.addHeader(SET_COOKIE, responseCookie.toString());
 		}
 	}
+
+	public static void deleteCookieFromRequest(String... cookieName) {
+		ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes)RequestContextHolder.currentRequestAttributes();
+		HttpServletRequest request = servletRequestAttributes.getRequest();
+
+		for (String cookie : cookieName) {
+			if (Objects.nonNull(request.getCookies())) {
+				ResponseCookie deleteCookie = ResponseCookie.from(cookie, "")
+					.path("/")
+					.maxAge(0)
+					.httpOnly(true)
+					.build();
+
+				JwtCookieProvider.setCookie(deleteCookie);
+			}
+		}
+	}
+
 }
