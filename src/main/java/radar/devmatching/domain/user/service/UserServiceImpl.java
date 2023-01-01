@@ -1,7 +1,5 @@
 package radar.devmatching.domain.user.service;
 
-import java.util.Objects;
-
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,7 +8,6 @@ import org.springframework.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import radar.devmatching.common.exception.EntityNotFoundException;
-import radar.devmatching.common.exception.InvalidAccessException;
 import radar.devmatching.common.exception.error.ErrorMessage;
 import radar.devmatching.domain.user.entity.User;
 import radar.devmatching.domain.user.exception.DuplicateException;
@@ -18,6 +15,7 @@ import radar.devmatching.domain.user.exception.EmptySpaceException;
 import radar.devmatching.domain.user.repository.UserRepository;
 import radar.devmatching.domain.user.service.dto.request.CreateUserRequest;
 import radar.devmatching.domain.user.service.dto.request.UpdateUserRequest;
+import radar.devmatching.domain.user.service.dto.response.SimpleUserResponse;
 import radar.devmatching.domain.user.service.dto.response.UserResponse;
 
 @Slf4j
@@ -47,10 +45,15 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public UserResponse getUser(Long requestUserId, User authUser) {
-		validatePermission(requestUserId, authUser);
+	public UserResponse getUser(User authUser) {
 		log.info("get user info={}", authUser);
 		return UserResponse.of(authUser);
+	}
+
+	@Override
+	public SimpleUserResponse getSimpleUser(User authUser) {
+		log.info("get simple user info={}", authUser);
+		return SimpleUserResponse.of(authUser);
 	}
 
 	@Override
@@ -66,22 +69,19 @@ public class UserServiceImpl implements UserService {
 	 */
 	@Override
 	@Transactional
-	public UserResponse updateUser(UpdateUserRequest request, Long requestUserId, User authUser) {
-		validatePermission(requestUserId, authUser);
+	public UserResponse updateUser(UpdateUserRequest request, User authUser) {
 
-		User user = userRepository.findById(requestUserId).get();
+		User user = touchUser(authUser);
 
-		user.changeSchoolName(request.getSchoolName());
-		user.changeGithubUrl(request.getGithubUrl());
-		user.changeIntroduce(request.getIntroduce());
+		user.update(request.getSchoolName(), request.getGithubUrl(), request.getIntroduce());
+
 		log.info("update user data:{}", user);
 		return UserResponse.of(user);
 	}
 
 	@Override
 	@Transactional
-	public void deleteUser(Long requestUserId, User authUser) {
-		validatePermission(requestUserId, authUser);
+	public void deleteUser(User authUser) {
 		log.info("delete user={}", authUser);
 		userRepository.delete(authUser);
 	}
@@ -104,19 +104,6 @@ public class UserServiceImpl implements UserService {
 		log.info("checkDuplicateUsername request info={}", request);
 	}
 
-	/**
-	 * 닉네임 중복 확인
-	 * BusinessException 정의되면 예외 변경 예정
-	 */
-	@Override
-	public void checkDuplicateNickName(String nickName, Long userId) {
-		userRepository.findByNickName(nickName).ifPresent(user -> {
-			if (!Objects.equals(user.getId(), userId) || userId == null) {
-				throw new DuplicateException(ErrorMessage.DUPLICATE_NICKNAME);
-			}
-		});
-	}
-
 	@Override
 	public void checkDuplicateNickName(CreateUserRequest request) {
 		String nickName = request.getNickName();
@@ -132,15 +119,9 @@ public class UserServiceImpl implements UserService {
 		log.info("checkDuplicateNickName request info={}", request);
 	}
 
-	/**
-	 * 사용자가 접근하는 userId가 사용자 아이디와 일치하는지 감사
-	 * @param requestUserId
-	 * @param authUser
-	 */
-	private void validatePermission(Long requestUserId, User authUser) {
-		if (!Objects.equals(requestUserId, authUser.getId())) {
-			throw new InvalidAccessException(ErrorMessage.INVALID_ACCESS);
-		}
+	private User touchUser(User user) {
+		return userRepository.findById(user.getId())
+			.orElseThrow(() -> new EntityNotFoundException(ErrorMessage.USER_NOT_FOUND));
 	}
 
 }

@@ -1,5 +1,7 @@
 package radar.devmatching.domain.user.controller;
 
+import java.util.Objects;
+
 import javax.validation.Valid;
 
 import org.springframework.stereotype.Controller;
@@ -45,7 +47,6 @@ public class UserController {
 	}
 
 	/**
-	 * TODO : DuplicateException 던져지
 	 * TODO : 아이디, 닉네임 중복확인후 다른 아이디, 닉네임 요청하면 예외 던지기
 	 */
 	@PostMapping(value = "/signUp/page")
@@ -91,16 +92,25 @@ public class UserController {
 	}
 
 	// TODO : 다른 사람이 접근할경우에는 다른 뷰를 사용
-	@GetMapping("/{userId}")
-	public String getUser(@PathVariable(name = "userId") Long requestUserId, @AuthUser User authUser, Model model) {
-		UserResponse user = userService.getUser(requestUserId, authUser);
+	@GetMapping()
+	public String getUser(@AuthUser User authUser, Model model) {
+		UserResponse user = userService.getUser(authUser);
 		model.addAttribute("userInfo", user);
 		return "user/userInfo";
 	}
 
-	@GetMapping("/{userId}/update")
-	public String updateUser(@PathVariable(name = "userId") Long requestUserId, @AuthUser User authUser, Model model) {
-		UserResponse user = userService.getUser(requestUserId, authUser);
+	@GetMapping("/{userId}")
+	public String getSimpleUser(@PathVariable Long userId, @AuthUser User user, Model model) {
+		if (Objects.equals(userId, user.getId())) {
+			return "redirect:/api/users";
+		}
+		model.addAttribute("simpleUserInfo", userService.getSimpleUser(user));
+		return "user/simpleUserInfo";
+	}
+
+	@GetMapping("/update")
+	public String updateUser(@AuthUser User authUser, Model model) {
+		UserResponse user = userService.getUser(authUser);
 		model.addAttribute("userInfo", user);
 		return "user/userUpdate";
 	}
@@ -108,23 +118,23 @@ public class UserController {
 	/**
 	 * TODO : schoolname 빈칸으로 들어오면 valid 걸러내거나 exception 던져 처리하거나 고민중
 	 */
-	@PostMapping("/{userId}/update")
+	@PostMapping("/update")
 	public String updateUser(@Valid @ModelAttribute UpdateUserRequest request, BindingResult bindingResult,
-		@PathVariable(name = "userId") Long requestUserId, @AuthUser User authUser) {
+		@AuthUser User authUser) {
 		if (bindingResult.hasErrors()) {
-			return "redirect:/api/users/" + requestUserId + "/update";
+			return "redirect:/api/users/update";
 		}
-		userService.updateUser(request, requestUserId, authUser);
-		return "redirect:/api/users/" + requestUserId;
+		userService.updateUser(request, authUser);
+		return "redirect:/api/users/";
 	}
 
 	/**
 	 * batch 사용해서 한달뒤에 삭제하는 기능 추가할지 고민
 	 * ex: user에 삭제 시간 설정해주고 한달뒤에 삭제
 	 */
-	@GetMapping("/{userId}/delete")
-	public String deleteUser(@PathVariable(name = "userId") Long requestUserId, @AuthUser User authUser) {
-		userService.deleteUser(requestUserId, authUser);
+	@GetMapping("/delete")
+	public String deleteUser(@AuthUser User authUser) {
+		userService.deleteUser(authUser);
 		return "redirect:/api/users/signIn";
 	}
 
