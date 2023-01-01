@@ -15,6 +15,9 @@ import radar.devmatching.domain.matchings.apply.service.ApplyLeaderService;
 import radar.devmatching.domain.matchings.apply.service.dto.response.ApplyLeaderResponse;
 import radar.devmatching.domain.user.entity.User;
 
+/**
+ * TODO : 접근 사용자가 방장인지 검증
+ */
 @Slf4j
 @Controller
 @RequiredArgsConstructor

@@ -3,54 +3,55 @@
 
 <body>
 <main>
-  <div class="container">
-    <div class="row justify-content-center">
-      <div class="col-lg-5">
-        <div class="card shadow-lg border-0 rounded-lg mt-5">
-          <div class="card-header"><h3 class="text-center font-weight-light my-4">회원정보</h3></div>
-          <div class="card-body" th:object="${userInfo}">
-            <form method="post" th:action>
-              <div class="form-floating mb-3">
-                아이디
-                <input class="form-control" placeholder="username"
-                       th:field="*{username}"
-                       type="text"
-                       disabled>
-              </div>
-              <div class="form-floating mb-3">
-                닉네임
-                <input class="form-control" placeholder="nickName"
-                       th:field="*{nickName}"
-                       type="text"
-                       disabled>
-              </div>
-              <div class="form-floating mb-3">
-                학교
-                <input class="form-control" placeholder="schoolName"
-                       th:field="*{schoolName}"
-                       type="text"
-                       >
-              </div>
-              <div class="form-floating mb-3">
-                깃허브 주소
-                <input class="form-control" placeholder="githubUrl"
-                       th:field="*{githubUrl}"
-                       type="text"
-                       >
-              </div>
-              <div class="form-floating mb-3">
-                자기소개
-                <input class="form-control" placeholder="introduce"
-                       th:field="*{introduce}"
-                       type="text"
-                       >
-              </div>
-              <button type="submit">수정하기</button>
-              <button type="button" th:onclick="|location.href='@{/api/users/{userId}(userId=*{id})}'|">취소</button>
-            </form>
-          </div>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-5">
+                <div class="card shadow-lg border-0 rounded-lg mt-5">
+                    <div class="card-header"><h3 class="text-center font-weight-light my-4">회원정보</h3></div>
+                    <div class="card-body" th:object="${userInfo}">
+                        <form method="post" th:action>
+                            <div class="form-floating mb-3">
+                                아이디
+                                <input class="form-control" disabled
+                                       placeholder="username"
+                                       th:field="*{username}"
+                                       type="text">
+                            </div>
+                            <div class="form-floating mb-3">
+                                닉네임
+                                <input class="form-control" disabled
+                                       placeholder="nickName"
+                                       th:field="*{nickName}"
+                                       type="text">
+                            </div>
+                            <div class="form-floating mb-3">
+                                학교
+                                <input class="form-control" placeholder="schoolName"
+                                       th:field="*{schoolName}"
+                                       type="text"
+                                >
+                            </div>
+                            <div class="form-floating mb-3">
+                                깃허브 주소
+                                <input class="form-control" placeholder="githubUrl"
+                                       th:field="*{githubUrl}"
+                                       type="text"
+                                >
+                            </div>
+                            <div class="form-floating mb-3">
+                                자기소개
+                                <input class="form-control" placeholder="introduce"
+                                       th:field="*{introduce}"
+                                       type="text"
+                                >
+                            </div>
+                            <button type="submit">수정하기</button>
+                            <button th:onclick="|location.href='@{/api/users}'|" type="button">취소</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
 </main>
 </body>

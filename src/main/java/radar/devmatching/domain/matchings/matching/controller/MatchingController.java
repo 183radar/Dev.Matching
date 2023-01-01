@@ -29,11 +29,14 @@ public class MatchingController {
 		return "matching/matching/matchingInfo";
 	}
 
+	/**
+	 * TODO : 접근 사용자 검증 들어가야함
+	 */
 	@GetMapping("/{matchingId}/update")
 	public String updateMatchingPage(@PathVariable Long matchingId, @AuthUser User user, Model model) {
 		MatchingUpdate matchingUpdate = matchingService.getMatchingUpdateData(matchingId);
 		model.addAttribute("matchingUpdate", matchingUpdate);
-		return "/matching/matching/matchingUpdate";
+		return "matching/matching/matchingUpdate";
 	}
 
 	@PostMapping("/{matchingId}/update")
