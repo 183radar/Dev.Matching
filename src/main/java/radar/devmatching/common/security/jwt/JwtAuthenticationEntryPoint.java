@@ -2,7 +2,6 @@ package radar.devmatching.common.security.jwt;
 
 import java.io.IOException;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.stereotype.Component;
@@ -20,12 +19,11 @@ import radar.devmatching.common.security.jwt.exception.TokenException;
 @Component
 public class JwtAuthenticationEntryPoint {
 
-	public void commence(HttpServletRequest request, HttpServletResponse response,
-		TokenException tokenException) throws IOException {
+	public void commence(HttpServletResponse response, TokenException tokenException) throws IOException {
 		log.warn("exception info={}", tokenException.getErrorMessage(), tokenException);
 
-		JwtCookieProvider.deleteCookieFromRequest(request, response, JwtProperties.ACCESS_TOKEN_HEADER);
-		JwtCookieProvider.deleteCookieFromRequest(request, response, JwtProperties.REFRESH_TOKEN_HEADER);
+		JwtCookieProvider.deleteCookieFromRequest(JwtProperties.ACCESS_TOKEN_HEADER,
+			JwtProperties.REFRESH_TOKEN_HEADER);
 
 		response.sendRedirect("/api/users/signIn");
 	}

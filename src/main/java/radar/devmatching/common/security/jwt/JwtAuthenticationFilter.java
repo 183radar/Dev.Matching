@@ -39,7 +39,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			filterChain.doFilter(request, response);
 		} catch (TokenException e) {
 			SecurityContextHolder.clearContext();
-			jwtAuthenticationEntryPoint.commence(request, response, e);
+			jwtAuthenticationEntryPoint.commence(response, e);
 		}
 	}
 
@@ -59,7 +59,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	}
 
 	private String accessAuthentication(HttpServletRequest request) {
-		String accessToken = JwtCookieProvider.getCookieFromRequest(request, JwtProperties.ACCESS_TOKEN_HEADER);
+		String accessToken = JwtCookieProvider.getCookieFromRequest(JwtProperties.ACCESS_TOKEN_HEADER);
 		log.info("access Token = {}", accessToken);
 		if (Objects.isNull(accessToken)) {
 			throw new JwtTokenNotFoundException(ErrorMessage.ACCESS_TOKEN_NOT_FOUND);
@@ -76,7 +76,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	private String refreshAuthentication(HttpServletRequest request, HttpServletResponse response) {
 
 		String accessToken = null;
-		String refreshToken = JwtCookieProvider.getCookieFromRequest(request, JwtProperties.REFRESH_TOKEN_HEADER);
+		String refreshToken = JwtCookieProvider.getCookieFromRequest(JwtProperties.REFRESH_TOKEN_HEADER);
 
 		/**
 		 * refreshToken 유효성 검사

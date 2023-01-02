@@ -42,7 +42,8 @@
                 <tbody>
                 <tr align="center" th:each="matchingUser : ${matching.getMatchingUserList()}">
                     <td>
-                        <a class="btn btn-secondary" th:href="@{'/api/matching/'}"
+                        <a class="btn btn-secondary"
+                           th:href="@{'/api/users/'+${matchingUser.getUser().getId()}}"
                            th:text="${matchingUser.getUser().getNickName()}"></a>
                     </td>
                     <td th:text="${matchingUser.getMatchingUserRole().getName()}"></td>
