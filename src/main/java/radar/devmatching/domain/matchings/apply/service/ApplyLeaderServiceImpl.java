@@ -79,7 +79,7 @@ public class ApplyLeaderServiceImpl implements ApplyLeaderService {
 	 * @param simplePostId
 	 */
 	private Apply validatePermission(User authUser, Long applyId, Long simplePostId) {
-		SimplePost simplePost = simplePostService.getSimplePostOnly(simplePostId);
+		SimplePost simplePost = simplePostService.findById(simplePostId);
 
 		User leader = simplePost.getLeader();
 		if (!Objects.equals(leader.getId(), authUser.getId())) {

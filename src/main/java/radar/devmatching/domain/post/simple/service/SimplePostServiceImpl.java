@@ -31,6 +31,26 @@ public class SimplePostServiceImpl implements SimplePostService {
 	private final SimplePostRepository simplePostRepository;
 	private final MatchingLeaderService matchingLeaderService;
 
+	/**
+	 * 단순 조회에 예외 처리를 한 곳에서 처리하기 위해 만든 메서드
+	 * 나중에 순환참조같은 문제 발생할 것 같으면 서비스 계층 세분화해서 나누어도 좋을 듯
+	 */
+
+	@Override
+	public SimplePost findById(long simplePostId) {
+		return simplePostRepository.findById(simplePostId).orElseThrow(SimplePostNotFoundException::new);
+	}
+
+	@Override
+	public SimplePost findPostById(long simplePostId) {
+		return simplePostRepository.findPostById(simplePostId).orElseThrow(SimplePostNotFoundException::new);
+	}
+
+	@Override
+	public void deleteById(long simplePostId) {
+		simplePostRepository.deleteById(simplePostId);
+	}
+
 	@Override
 	@Transactional
 	public long createPost(CreatePostRequest createPostRequest, User user) {
@@ -38,11 +58,6 @@ public class SimplePostServiceImpl implements SimplePostService {
 		Matching matching = matchingLeaderService.createMatching(user);
 		SimplePost savedPost = simplePostRepository.save(createPostRequest.toEntity(user, matching));
 		return savedPost.getId();
-	}
-
-	@Override
-	public SimplePost getSimplePostOnly(long simplePostId) {
-		return simplePostRepository.findById(simplePostId).orElseThrow(SimplePostNotFoundException::new);
 	}
 
 	@Override

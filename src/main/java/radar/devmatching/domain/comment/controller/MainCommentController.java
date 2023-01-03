@@ -29,7 +29,7 @@ public class MainCommentController {
 
 	@GetMapping("posts/{simplePostId}/createMainComment")
 	public String getCreateMainComment(@PathVariable long simplePostId, Model model) {
-		simplePostService.getSimplePostOnly(simplePostId);
+		simplePostService.findById(simplePostId);
 		model.addAttribute("createCommentRequest",
 			CreateCommentRequest.of(simplePostId, CreateCommentRequest.CommentType.MAIN));
 		return "comment/createComment";

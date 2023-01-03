@@ -11,12 +11,12 @@ import radar.devmatching.common.exception.InvalidAccessException;
 import radar.devmatching.common.exception.error.ErrorMessage;
 import radar.devmatching.domain.comment.service.CommentService;
 import radar.devmatching.domain.comment.service.dto.response.MainCommentResponse;
+import radar.devmatching.domain.matchings.apply.repository.ApplyRepository;
 import radar.devmatching.domain.matchings.apply.service.ApplyService;
 import radar.devmatching.domain.post.full.service.dto.UpdatePostDto;
 import radar.devmatching.domain.post.full.service.dto.response.PresentPostResponse;
 import radar.devmatching.domain.post.simple.entity.SimplePost;
-import radar.devmatching.domain.post.simple.exception.SimplePostNotFoundException;
-import radar.devmatching.domain.post.simple.repository.SimplePostRepository;
+import radar.devmatching.domain.post.simple.service.SimplePostService;
 import radar.devmatching.domain.user.entity.User;
 
 @Service
@@ -24,8 +24,9 @@ import radar.devmatching.domain.user.entity.User;
 @RequiredArgsConstructor
 public class FullPostServiceImpl implements FullPostService {
 
-	private final SimplePostRepository simplePostRepository;
+	private final SimplePostService simplePostService;
 	private final ApplyService applyService;
+	private final ApplyRepository applyRepository;
 	private final CommentService commentService;
 
 	/**
@@ -36,14 +37,17 @@ public class FullPostServiceImpl implements FullPostService {
 	@Override
 	@Transactional
 	public PresentPostResponse getPostWithComment(long simplePostId, User loginUser) {
-		SimplePost findPost = simplePostRepository.findPostById(simplePostId)
-			.orElseThrow(SimplePostNotFoundException::new);
+		SimplePost findPost = simplePostService.findPostById(simplePostId);
+
 		// 나중에 새로고침 누르면 clickCount는 안 올라가도록 설정해도 좋을듯?
 		findPost.plusClickCount();
 		int applyCount = applyService.getAcceptedApplyCount(simplePostId);
+		boolean isAppliedLoginUser = applyRepository.findByApplySimplePostIdAndApplyUserId(simplePostId,
+				loginUser.getId())
+			.isPresent();
 		List<MainCommentResponse> allComments = commentService.getAllComments(findPost.getFullPost().getId());
 
-		return PresentPostResponse.of(findPost, loginUser, applyCount, allComments);
+		return PresentPostResponse.of(findPost, loginUser, applyCount, isAppliedLoginUser, allComments);
 	}
 
 	/**
@@ -55,8 +59,7 @@ public class FullPostServiceImpl implements FullPostService {
 	@Override
 	public UpdatePostDto getFullPost(long simplePostId, long userId) {
 		isLeaderValidation(simplePostId, userId);
-		SimplePost findPost = simplePostRepository.findPostById(simplePostId)
-			.orElseThrow(SimplePostNotFoundException::new);
+		SimplePost findPost = simplePostService.findPostById(simplePostId);
 		return UpdatePostDto.of(findPost);
 	}
 
@@ -64,8 +67,7 @@ public class FullPostServiceImpl implements FullPostService {
 	@Transactional
 	public void updatePost(long simplePostId, long userId, UpdatePostDto updatePostDto) {
 		isLeaderValidation(simplePostId, userId);
-		SimplePost findPost = simplePostRepository.findPostById(simplePostId)
-			.orElseThrow(SimplePostNotFoundException::new);
+		SimplePost findPost = simplePostService.findPostById(simplePostId);
 		findPost.update(updatePostDto.getTitle(), updatePostDto.getCategory(), updatePostDto.getRegion(),
 			updatePostDto.getUserNum(), updatePostDto.getContent());
 	}
@@ -74,21 +76,19 @@ public class FullPostServiceImpl implements FullPostService {
 	@Transactional
 	public void deletePost(long simplePostId, long userId) {
 		isLeaderValidation(simplePostId, userId);
-		simplePostRepository.deleteById(simplePostId);
+		simplePostService.deleteById(simplePostId);
 	}
 
 	@Override
 	@Transactional
 	public void closePost(long simplePostId, long userId) {
 		isLeaderValidation(simplePostId, userId);
-		SimplePost findPost = simplePostRepository.findPostById(simplePostId)
-			.orElseThrow(SimplePostNotFoundException::new);
+		SimplePost findPost = simplePostService.findPostById(simplePostId);
 		findPost.closePost();
 	}
 
 	private void isLeaderValidation(long simplePostId, long userId) {
-		SimplePost findPost = simplePostRepository.findById(simplePostId)
-			.orElseThrow(SimplePostNotFoundException::new);
+		SimplePost findPost = simplePostService.findById(simplePostId);
 		if (!Objects.equals(findPost.getLeader().getId(), userId)) {
 			throw new InvalidAccessException(ErrorMessage.NOT_LEADER);
 		}

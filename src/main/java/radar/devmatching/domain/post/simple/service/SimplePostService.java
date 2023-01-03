@@ -16,7 +16,11 @@ public interface SimplePostService {
 
 	List<SimplePostResponse> getApplicationPosts(long userId);
 
-	SimplePost getSimplePostOnly(long simplePostId);
+	SimplePost findById(long simplePostId);
+
+	SimplePost findPostById(long simplePostId);
+
+	void deleteById(long simplePostId);
 
 	MainPostDto getMainPostDto(User loginUser, String postCategory);
 

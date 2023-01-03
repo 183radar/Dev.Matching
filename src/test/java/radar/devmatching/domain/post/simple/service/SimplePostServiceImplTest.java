@@ -126,7 +126,7 @@ class SimplePostServiceImplTest {
 			//given
 			//when
 			//then
-			assertThatThrownBy(() -> simplePostService.getSimplePostOnly(anyLong()))
+			assertThatThrownBy(() -> simplePostService.findById(anyLong()))
 				.isInstanceOf(SimplePostNotFoundException.class);
 		}
 
@@ -138,7 +138,7 @@ class SimplePostServiceImplTest {
 			given(simplePostRepository.findById(anyLong())).willReturn(Optional.of(simplePost));
 
 			//when
-			SimplePost findSimplePost = simplePostService.getSimplePostOnly(anyLong());
+			SimplePost findSimplePost = simplePostService.findById(anyLong());
 
 			//then
 			assertThat(findSimplePost).isEqualTo(simplePost);

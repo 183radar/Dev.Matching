@@ -70,7 +70,7 @@ public class MainCommentControllerTest extends ControllerTestSetUp {
 			void notExistByCorrespondedEntity() throws Exception {
 				//given
 				willThrow(new SimplePostNotFoundException()).given(simplePostService)
-					.getSimplePostOnly(anyLong());
+					.findById(anyLong());
 
 				//when
 				ResultActions result = mockMvc.perform(get(BASIC_URL + "/posts/1/createMainComment"));
