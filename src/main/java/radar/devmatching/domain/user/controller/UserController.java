@@ -18,6 +18,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import radar.devmatching.common.security.jwt.JwtTokenInfo;
 import radar.devmatching.common.security.resolver.AuthUser;
 import radar.devmatching.domain.user.entity.User;
 import radar.devmatching.domain.user.service.UserService;
@@ -92,9 +93,9 @@ public class UserController {
 	}
 
 	// TODO : 다른 사람이 접근할경우에는 다른 뷰를 사용
-	@GetMapping()
-	public String getUser(@AuthUser User authUser, Model model) {
-		UserResponse user = userService.getUser(authUser);
+	@GetMapping
+	public String getUser(@AuthUser JwtTokenInfo tokenInfo, Model model) {
+		UserResponse user = userService.getUser(tokenInfo.getUserId());
 		model.addAttribute("userInfo", user);
 		return "user/userInfo";
 	}
@@ -109,8 +110,8 @@ public class UserController {
 	}
 
 	@GetMapping("/update")
-	public String updateUser(@AuthUser User authUser, Model model) {
-		UserResponse user = userService.getUser(authUser);
+	public String updateUser(@AuthUser JwtTokenInfo tokenInfo, Model model) {
+		UserResponse user = userService.getUser(tokenInfo.getUserId());
 		model.addAttribute("userInfo", user);
 		return "user/userUpdate";
 	}
@@ -120,11 +121,11 @@ public class UserController {
 	 */
 	@PostMapping("/update")
 	public String updateUser(@Valid @ModelAttribute UpdateUserRequest request, BindingResult bindingResult,
-		@AuthUser User authUser) {
+		@AuthUser JwtTokenInfo tokenInfo) {
 		if (bindingResult.hasErrors()) {
 			return "redirect:/api/users/update";
 		}
-		userService.updateUser(request, authUser);
+		userService.updateUser(request, tokenInfo.getUserId());
 		return "redirect:/api/users/";
 	}
 
@@ -133,8 +134,8 @@ public class UserController {
 	 * ex: user에 삭제 시간 설정해주고 한달뒤에 삭제
 	 */
 	@GetMapping("/delete")
-	public String deleteUser(@AuthUser User authUser) {
-		userService.deleteUser(authUser);
+	public String deleteUser(@AuthUser JwtTokenInfo jwtTokenInfo) {
+		userService.deleteUser(jwtTokenInfo.getUserId());
 		return "redirect:/api/users/signIn";
 	}
 
