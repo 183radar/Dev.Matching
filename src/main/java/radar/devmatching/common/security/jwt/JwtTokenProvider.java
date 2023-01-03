@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -105,9 +104,9 @@ public class JwtTokenProvider {
 				.map(SimpleGrantedAuthority::new)
 				.collect(Collectors.toList());
 
-		UserDetails principal = userDetailsService.loadUserByUsername(claims.getSubject());
+		// TODO : principal 을 생성할지 고민
 
-		return new JwtAuthenticationToken(principal, "", authorities);
+		return new JwtAuthenticationToken(claims.getSubject(), "", authorities);
 	}
 
 	public void validAccessToken(String token) {

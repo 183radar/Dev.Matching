@@ -37,6 +37,7 @@ public class ApplyServiceImpl implements ApplyService {
 		authUser = userRepository.findById(authUser.getId()).get();
 		SimplePost simplePost = simplePostService.findById(simplePostId);
 
+		// TODO : Querydsl 로 이름 간략하게 바꾸기
 		applyRepository.findByApplySimplePostIdAndApplyUserId(simplePostId, authUser.getId())
 			.ifPresent(apply -> {
 				throw new AlreadyApplyException(ErrorMessage.ALREADY_APPLY);
@@ -50,10 +51,6 @@ public class ApplyServiceImpl implements ApplyService {
 
 	@Override
 	public List<ApplyResponse> getAllApplyList(User authUser) {
-		//
-		// return userTouch(authUser).getApplyList().stream()
-		// 	.map(ApplyResponse::of)
-		// 	.collect(Collectors.toList());
 
 		return applyRepository.findAppliesByUserId(authUser.getId()).stream()
 			.map(ApplyResponse::of)
@@ -74,10 +71,9 @@ public class ApplyServiceImpl implements ApplyService {
 			.orElseThrow(() -> new EntityNotFoundException(ErrorMessage.APPLY_NOT_FOUND));
 	}
 
-	private User userTouch(User authUser) {
-		return userRepository.findById(authUser.getId()).orElseThrow(
-			() -> new EntityNotFoundException(ErrorMessage.USER_NOT_FOUND)
-		);
+	private SimplePost getSimplePost(Long simplePostId) {
+		return simplePostRepository.findById(simplePostId)
+			.orElseThrow(() -> new EntityNotFoundException(ErrorMessage.SIMPLE_POST_NOT_FOUND));
 	}
 
 }

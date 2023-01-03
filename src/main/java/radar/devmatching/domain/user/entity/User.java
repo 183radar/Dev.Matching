@@ -127,6 +127,12 @@ public class User extends BaseEntity {
 			'}';
 	}
 
+	public void update(String schoolName, String githubUrl, String introduce) {
+		this.schoolName = schoolName;
+		this.githubUrl = githubUrl;
+		this.introduce = introduce;
+	}
+
 	public Long getId() {
 		return id;
 	}
