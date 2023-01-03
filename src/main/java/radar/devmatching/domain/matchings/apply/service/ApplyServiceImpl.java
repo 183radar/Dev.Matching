@@ -17,7 +17,7 @@ import radar.devmatching.domain.matchings.apply.exception.AlreadyApplyException;
 import radar.devmatching.domain.matchings.apply.repository.ApplyRepository;
 import radar.devmatching.domain.matchings.apply.service.dto.response.ApplyResponse;
 import radar.devmatching.domain.post.simple.entity.SimplePost;
-import radar.devmatching.domain.post.simple.repository.SimplePostRepository;
+import radar.devmatching.domain.post.simple.service.SimplePostService;
 import radar.devmatching.domain.user.entity.User;
 import radar.devmatching.domain.user.repository.UserRepository;
 
@@ -29,14 +29,13 @@ public class ApplyServiceImpl implements ApplyService {
 
 	private final UserRepository userRepository;
 	private final ApplyRepository applyRepository;
-	private final SimplePostRepository simplePostRepository;
+	private final SimplePostService simplePostService;
 
 	@Override
 	@Transactional
 	public Apply createApply(Long simplePostId, User authUser) {
 		authUser = userRepository.findById(authUser.getId()).get();
-		SimplePost simplePost = simplePostRepository.findById(simplePostId)
-			.orElseThrow(() -> new EntityNotFoundException(ErrorMessage.SIMPLE_POST_NOT_FOUND));
+		SimplePost simplePost = simplePostService.findById(simplePostId);
 
 		applyRepository.findByApplySimplePostIdAndApplyUserId(simplePostId, authUser.getId())
 			.ifPresent(apply -> {

@@ -19,8 +19,7 @@ import radar.devmatching.domain.comment.service.dto.UpdateCommentDto;
 import radar.devmatching.domain.comment.service.dto.request.CreateCommentRequest;
 import radar.devmatching.domain.comment.service.dto.response.MainCommentResponse;
 import radar.devmatching.domain.post.simple.entity.SimplePost;
-import radar.devmatching.domain.post.simple.exception.SimplePostNotFoundException;
-import radar.devmatching.domain.post.simple.repository.SimplePostRepository;
+import radar.devmatching.domain.post.simple.service.SimplePostService;
 import radar.devmatching.domain.user.entity.User;
 
 @Service
@@ -28,15 +27,14 @@ import radar.devmatching.domain.user.entity.User;
 @RequiredArgsConstructor
 public class CommentServiceImpl implements CommentService {
 
-	private final SimplePostRepository simplePostRepository;
+	private final SimplePostService simplePostService;
 	private final MainCommentRepository mainCommentRepository;
 	private final SubCommentRepository subCommentRepository;
 
 	@Override
 	@Transactional
 	public void createMainComment(long simplePostId, User loginUser, CreateCommentRequest createCommentRequest) {
-		SimplePost simplePost = simplePostRepository.findById(simplePostId)
-			.orElseThrow(SimplePostNotFoundException::new);
+		SimplePost simplePost = simplePostService.findById(simplePostId);
 		mainCommentRepository.save(createCommentRequest.toMainCommentEntity(simplePost, loginUser));
 	}
 

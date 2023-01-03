@@ -14,7 +14,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import radar.devmatching.common.exception.EntityNotFoundException;
 import radar.devmatching.common.exception.InvalidAccessException;
 import radar.devmatching.domain.matchings.apply.entity.Apply;
 import radar.devmatching.domain.matchings.apply.exception.AlreadyApplyException;
@@ -24,7 +23,8 @@ import radar.devmatching.domain.post.full.entity.FullPost;
 import radar.devmatching.domain.post.simple.entity.PostCategory;
 import radar.devmatching.domain.post.simple.entity.Region;
 import radar.devmatching.domain.post.simple.entity.SimplePost;
-import radar.devmatching.domain.post.simple.repository.SimplePostRepository;
+import radar.devmatching.domain.post.simple.exception.SimplePostNotFoundException;
+import radar.devmatching.domain.post.simple.service.SimplePostService;
 import radar.devmatching.domain.user.entity.User;
 import radar.devmatching.domain.user.repository.UserRepository;
 
@@ -41,13 +41,13 @@ class ApplyServiceTest {
 	@Mock
 	ApplyRepository applyRepository;
 	@Mock
-	SimplePostRepository simplePostRepository;
+	SimplePostService simplePostService;
 
 	ApplyService applyService;
 
 	@BeforeEach
 	void setUp() {
-		applyService = new ApplyServiceImpl(userRepository, applyRepository, simplePostRepository);
+		applyService = new ApplyServiceImpl(userRepository, applyRepository, simplePostService);
 	}
 
 	private User basicUser() {
@@ -95,7 +95,7 @@ class ApplyServiceTest {
 			User user = createUser();
 			Matching matching = Matching.builder().build();
 			SimplePost simplePost = createSimplePost(user, FullPost.builder().content("test").build(), matching);
-			given(simplePostRepository.findById(any())).willReturn(Optional.of(simplePost));
+			given(simplePostService.findById(any())).willReturn(simplePost);
 			//when
 			Apply apply = applyService.createApply(TEST_SIMPLE_POST_ID, user);
 			//then
@@ -109,11 +109,11 @@ class ApplyServiceTest {
 			User user = createUser();
 			Matching matching = Matching.builder().build();
 			SimplePost simplePost = createSimplePost(user, FullPost.builder().content("test").build(), matching);
-			given(simplePostRepository.findById(any())).willReturn(Optional.empty());
+			willThrow(new SimplePostNotFoundException()).given(simplePostService).findById(any());
 			//when
 			//then
 			assertThatThrownBy(() -> applyService.createApply(TEST_SIMPLE_POST_ID, user))
-				.isInstanceOf(EntityNotFoundException.class);
+				.isInstanceOf(SimplePostNotFoundException.class);
 			verify(applyRepository, never()).save(any(Apply.class));
 		}
 
@@ -125,7 +125,7 @@ class ApplyServiceTest {
 			Matching matching = Matching.builder().build();
 			SimplePost simplePost = createSimplePost(user, FullPost.builder().content("test").build(), matching);
 			Apply apply = Apply.builder().applyUser(user).applySimplePost(simplePost).build();
-			given(simplePostRepository.findById(any())).willReturn(Optional.of(simplePost));
+			given(simplePostService.findById(any())).willReturn(simplePost);
 			given(applyRepository.findByApplySimplePostIdAndApplyUserId(any(), any())).willReturn(
 				Optional.of(apply));
 			//when

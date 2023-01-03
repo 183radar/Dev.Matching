@@ -51,8 +51,10 @@ class FullPostControllerTest extends ControllerTestSetUp {
 				User loginUser = createUser(2L);
 				SimplePost simplePost = createSimplePost(loginUser, Matching.builder().build(),
 					FullPost.builder().build(), simplePostId);
+				PresentPostResponse presentPostResponse = PresentPostResponse.of(simplePost, loginUser,
+					2, true, new ArrayList<>());
 				given(fullPostService.getPostWithComment(anyLong(), any(User.class)))
-					.willReturn(PresentPostResponse.of(simplePost, loginUser, 2, new ArrayList<>()));
+					.willReturn(presentPostResponse);
 
 				//when
 				ResultActions result = mockMvc.perform(get(BASIC_URL + "/" + simplePostId));
@@ -61,7 +63,7 @@ class FullPostControllerTest extends ControllerTestSetUp {
 				result.andExpect(status().isOk())
 					.andExpect(handler().handlerType(FullPostController.class))
 					.andExpect(handler().methodName("getFullPost"))
-					.andExpect(model().attributeExists("presentPostResponse"))
+					.andExpect(model().attribute("presentPostResponse", presentPostResponse))
 					.andExpect(view().name("post/post"));
 			}
 

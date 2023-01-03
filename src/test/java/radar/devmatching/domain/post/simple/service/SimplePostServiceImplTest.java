@@ -117,8 +117,8 @@ class SimplePostServiceImplTest {
 	}
 
 	@Nested
-	@DisplayName("getSimplePostOnly 메서드는")
-	class getSimplePostOnlyMethodIs {
+	@DisplayName("findById 메서드는")
+	class FindByIdMethod {
 
 		@Test
 		@DisplayName("db에 존재하지 않는 simplePostId를 넘기면 에러를 낸다.")
@@ -139,6 +139,35 @@ class SimplePostServiceImplTest {
 
 			//when
 			SimplePost findSimplePost = simplePostService.findById(anyLong());
+
+			//then
+			assertThat(findSimplePost).isEqualTo(simplePost);
+		}
+	}
+
+	@Nested
+	@DisplayName("findPostById 메서드는")
+	class FindPostById {
+
+		@Test
+		@DisplayName("db에 존재하지 않는 simplePostId를 넘기면 에러를 낸다.")
+		void ifNotExistIdThanThrowException() throws Exception {
+			//given
+			//when
+			//then
+			assertThatThrownBy(() -> simplePostService.findPostById(anyLong()))
+				.isInstanceOf(SimplePostNotFoundException.class);
+		}
+
+		@Test
+		@DisplayName("db에 존재하는 simplePostId를 넘기면 simplePost만 가져온다.")
+		void ifExistIdThanGetSimplePost() throws Exception {
+			//given
+			SimplePost simplePost = createSimplePost(loginUser, matching);
+			given(simplePostRepository.findPostById(anyLong())).willReturn(Optional.of(simplePost));
+
+			//when
+			SimplePost findSimplePost = simplePostService.findPostById(anyLong());
 
 			//then
 			assertThat(findSimplePost).isEqualTo(simplePost);

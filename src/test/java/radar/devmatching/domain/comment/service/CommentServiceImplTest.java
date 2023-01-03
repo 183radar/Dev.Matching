@@ -33,7 +33,7 @@ import radar.devmatching.domain.post.simple.entity.PostCategory;
 import radar.devmatching.domain.post.simple.entity.Region;
 import radar.devmatching.domain.post.simple.entity.SimplePost;
 import radar.devmatching.domain.post.simple.exception.SimplePostNotFoundException;
-import radar.devmatching.domain.post.simple.repository.SimplePostRepository;
+import radar.devmatching.domain.post.simple.service.SimplePostService;
 import radar.devmatching.domain.user.entity.User;
 
 @ExtendWith(MockitoExtension.class)
@@ -43,7 +43,7 @@ class CommentServiceImplTest {
 	// private final static User loginUser = createUser();
 
 	@Mock
-	SimplePostRepository simplePostRepository;
+	SimplePostService simplePostService;
 	@Mock
 	MainCommentRepository mainCommentRepository;
 	@Mock
@@ -80,7 +80,7 @@ class CommentServiceImplTest {
 
 	@BeforeEach
 	void setUp() {
-		this.commentService = new CommentServiceImpl(simplePostRepository, mainCommentRepository, subCommentRepository);
+		this.commentService = new CommentServiceImpl(simplePostService, mainCommentRepository, subCommentRepository);
 	}
 
 	private MainComment createMainComment(FullPost fullPost, User user) {
@@ -116,6 +116,9 @@ class CommentServiceImplTest {
 		@DisplayName("simplePostId에 해당하는 게시글 엔티티가 없을 경우 예외를 반환한다")
 		void simplePostNotExistThanThrow() throws Exception {
 			//given
+			willThrow(new SimplePostNotFoundException()).given(simplePostService)
+				.findById(anyLong());
+
 			//when
 			//then
 			assertThatThrownBy(() -> commentService.createMainComment(1L, any(User.class), null))
@@ -133,13 +136,13 @@ class CommentServiceImplTest {
 				.commentType(CreateCommentRequest.CommentType.MAIN)
 				.build();
 			SimplePost simplePost = createSimplePost(loginUser, Matching.builder().build(), FullPost.builder().build());
-			given(simplePostRepository.findById(simplePost.getId())).willReturn(Optional.of(simplePost));
+			given(simplePostService.findById(simplePost.getId())).willReturn(simplePost);
 
 			//when
 			commentService.createMainComment(simplePost.getId(), loginUser, createCommentRequest);
 
 			//then
-			verify(simplePostRepository).findById(simplePost.getId());
+			verify(simplePostService).findById(simplePost.getId());
 			verify(mainCommentRepository).save(any(MainComment.class));
 		}
 	}

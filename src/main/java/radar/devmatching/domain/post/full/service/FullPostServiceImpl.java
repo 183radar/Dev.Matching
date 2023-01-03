@@ -25,8 +25,8 @@ import radar.devmatching.domain.user.entity.User;
 public class FullPostServiceImpl implements FullPostService {
 
 	private final SimplePostService simplePostService;
-	private final ApplyService applyService;
 	private final ApplyRepository applyRepository;
+	private final ApplyService applyService;
 	private final CommentService commentService;
 
 	/**
