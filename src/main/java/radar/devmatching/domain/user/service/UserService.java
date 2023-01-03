@@ -10,17 +10,21 @@ public interface UserService {
 
 	UserResponse createUser(CreateUserRequest request);
 
-	UserResponse getUser(User authUser);
+	UserResponse getUser(Long userId);
 
 	SimpleUserResponse getSimpleUser(User authUser);
 
 	UserResponse getUserByUsername(String username);
 
-	UserResponse updateUser(UpdateUserRequest request, User authUser);
+	UserResponse updateUser(UpdateUserRequest request, Long userId);
 
-	void deleteUser(User authUser);
+	void deleteUser(Long userId);
 
 	void checkDuplicateUsername(CreateUserRequest request);
 
 	void checkDuplicateNickName(CreateUserRequest request);
+
+	User getUserEntity(Long userId);
+
+	User getUserEntityByUsername(String username);
 }

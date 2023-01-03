@@ -45,9 +45,10 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public UserResponse getUser(User authUser) {
-		log.info("get user info={}", authUser);
-		return UserResponse.of(authUser);
+	public UserResponse getUser(Long userId) {
+		User user = getUserEntity(userId);
+		log.info("get user info={}", user);
+		return UserResponse.of(user);
 	}
 
 	@Override
@@ -58,8 +59,7 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public UserResponse getUserByUsername(String username) {
-		User user = userRepository.findByUsername(username)
-			.orElseThrow(() -> new EntityNotFoundException(ErrorMessage.USER_NOT_FOUND));
+		User user = getUserEntityByUsername(username);
 		log.info("signIn user={}", user);
 		return UserResponse.of(user);
 	}
@@ -69,9 +69,9 @@ public class UserServiceImpl implements UserService {
 	 */
 	@Override
 	@Transactional
-	public UserResponse updateUser(UpdateUserRequest request, User authUser) {
+	public UserResponse updateUser(UpdateUserRequest request, Long userId) {
 
-		User user = touchUser(authUser);
+		User user = getUserEntity(userId);
 
 		user.update(request.getSchoolName(), request.getGithubUrl(), request.getIntroduce());
 
@@ -81,9 +81,10 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	@Transactional
-	public void deleteUser(User authUser) {
-		log.info("delete user={}", authUser);
-		userRepository.delete(authUser);
+	public void deleteUser(Long userId) {
+
+		log.info("delete user={}", userId);
+		userRepository.deleteById(userId);
 	}
 
 	/**
@@ -96,6 +97,7 @@ public class UserServiceImpl implements UserService {
 		if (!StringUtils.hasText(username)) {
 			throw new EmptySpaceException(ErrorMessage.EMPTY_USERNAME);
 		}
+
 		request.usernameDuplicateCheckClear();
 		userRepository.findByUsername(username).ifPresent(user -> {
 			throw new DuplicateException(ErrorMessage.DUPLICATE_USERNAME);
@@ -119,8 +121,13 @@ public class UserServiceImpl implements UserService {
 		log.info("checkDuplicateNickName request info={}", request);
 	}
 
-	private User touchUser(User user) {
-		return userRepository.findById(user.getId())
+	public User getUserEntity(Long userId) {
+		return userRepository.findById(userId)
+			.orElseThrow(() -> new EntityNotFoundException(ErrorMessage.USER_NOT_FOUND));
+	}
+
+	public User getUserEntityByUsername(String username) {
+		return userRepository.findByUsername(username)
 			.orElseThrow(() -> new EntityNotFoundException(ErrorMessage.USER_NOT_FOUND));
 	}
 
