@@ -53,7 +53,7 @@ class FullPostControllerTest extends ControllerTestSetUp {
 					FullPost.builder().build(), simplePostId);
 				PresentPostResponse presentPostResponse = PresentPostResponse.of(simplePost, loginUser,
 					2, true, new ArrayList<>());
-				given(fullPostService.getPostWithComment(anyLong(), any(User.class)))
+				given(fullPostService.getPostWithComment(anyLong(), anyLong()))
 					.willReturn(presentPostResponse);
 
 				//when
@@ -71,7 +71,7 @@ class FullPostControllerTest extends ControllerTestSetUp {
 			@DisplayName("해당되는 엔티티가 없을 경우 404가 전달된다")
 			void notExistByCorrespondedEntity() throws Exception {
 				//given
-				given(fullPostService.getPostWithComment(anyLong(), any(User.class)))
+				given(fullPostService.getPostWithComment(anyLong(), anyLong()))
 					.willThrow(new SimplePostNotFoundException());
 
 				//when
@@ -100,7 +100,7 @@ class FullPostControllerTest extends ControllerTestSetUp {
 				Long simplePostId = 1L;
 				SimplePost simplePost = createSimplePost(createUser(2L), Matching.builder().build(),
 					FullPost.builder().build(), simplePostId);
-				given(fullPostService.getFullPost(anyLong(), anyLong()))
+				given(fullPostService.getUpdateFullPost(anyLong(), anyLong()))
 					.willReturn(UpdatePostDto.of(simplePost));
 
 				//when
@@ -118,7 +118,7 @@ class FullPostControllerTest extends ControllerTestSetUp {
 			@DisplayName("해당되는 엔티티가 없을 경우 404가 전달된다")
 			void notExistByCorrespondedEntity() throws Exception {
 				//given
-				given(fullPostService.getFullPost(anyLong(), anyLong()))
+				given(fullPostService.getUpdateFullPost(anyLong(), anyLong()))
 					.willThrow(new SimplePostNotFoundException());
 
 				//when

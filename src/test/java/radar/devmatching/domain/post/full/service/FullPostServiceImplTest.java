@@ -35,6 +35,7 @@ import radar.devmatching.domain.post.simple.exception.SimplePostNotFoundExceptio
 import radar.devmatching.domain.post.simple.service.SimplePostService;
 import radar.devmatching.domain.post.simple.service.dto.response.SimplePostResponse;
 import radar.devmatching.domain.user.entity.User;
+import radar.devmatching.domain.user.service.UserService;
 import radar.devmatching.domain.user.service.dto.response.SimpleUserResponse;
 
 @ExtendWith(MockitoExtension.class)
@@ -43,6 +44,8 @@ class FullPostServiceImplTest {
 
 	private static final FullPost fullPost = createFullPost();
 
+	@Mock
+	private UserService userService;
 	@Mock
 	private SimplePostService simplePostService;
 	@Mock
@@ -90,7 +93,7 @@ class FullPostServiceImplTest {
 
 	@BeforeEach
 	void setup() {
-		this.fullPostService = new FullPostServiceImpl(simplePostService, applyRepository, applyService,
+		this.fullPostService = new FullPostServiceImpl(userService, simplePostService, applyRepository, applyService,
 			commentService);
 	}
 
@@ -113,12 +116,13 @@ class FullPostServiceImplTest {
 				.build();
 			int applyCount = 2;
 			List<MainCommentResponse> mainCommentResponses = List.of(MainCommentResponse.of(mainComment));
+			given(userService.getUserEntity(anyLong())).willReturn(loginUser);
 			given(simplePostService.findPostById(anyLong())).willReturn(simplePost);
 			given(applyService.getAcceptedApplyCount(anyLong())).willReturn(applyCount);
 			given(commentService.getAllComments(anyLong())).willReturn(mainCommentResponses);
 
 			//when
-			PresentPostResponse presentPostResponse = fullPostService.getPostWithComment(anyLong(), loginUser);
+			PresentPostResponse presentPostResponse = fullPostService.getPostWithComment(anyLong(), loginUser.getId());
 
 			//then
 			verify(simplePostService).findPostById(anyLong());
@@ -150,7 +154,7 @@ class FullPostServiceImplTest {
 
 			//when
 			//then
-			assertThatThrownBy(() -> fullPostService.getPostWithComment(anyLong(), loginUser))
+			assertThatThrownBy(() -> fullPostService.getPostWithComment(anyLong(), loginUser.getId()))
 				.isInstanceOf(SimplePostNotFoundException.class);
 			assertThat(clickCount).isEqualTo(simplePost.getClickCount());
 			verify(applyService, never()).getAcceptedApplyCount(anyLong());
@@ -159,8 +163,8 @@ class FullPostServiceImplTest {
 	}
 
 	@Nested
-	@DisplayName("getFullPost 메서드는")
-	class GetFullPostMethod {
+	@DisplayName("getUpdateFullPost 메서드는")
+	class GetUpdateFullPostMethod {
 
 		@Nested
 		@DisplayName("simplePostId에 해당하는 게시글이")
@@ -175,7 +179,8 @@ class FullPostServiceImplTest {
 				given(simplePostService.findPostById(anyLong())).willReturn(simplePost);
 
 				//when
-				UpdatePostDto updatePostDto = fullPostService.getFullPost(anyLong(), simplePost.getLeader().getId());
+				UpdatePostDto updatePostDto = fullPostService.getUpdateFullPost(anyLong(),
+					simplePost.getLeader().getId());
 
 				//then
 				verify(simplePostService).findById(anyLong());
@@ -192,7 +197,7 @@ class FullPostServiceImplTest {
 
 				//when
 				//then
-				assertThatThrownBy(() -> fullPostService.getFullPost(anyLong(), 12321L))
+				assertThatThrownBy(() -> fullPostService.getUpdateFullPost(anyLong(), 12321L))
 					.isInstanceOf(InvalidAccessException.class)
 					.hasMessage(ErrorMessage.NOT_LEADER.getMessage());
 				verify(simplePostService).findById(anyLong());
@@ -208,7 +213,7 @@ class FullPostServiceImplTest {
 
 				//when
 				//then
-				assertThatThrownBy(() -> fullPostService.getFullPost(1L, 1L))
+				assertThatThrownBy(() -> fullPostService.getUpdateFullPost(1L, 1L))
 					.isInstanceOf(SimplePostNotFoundException.class);
 				verify(simplePostService).findById(anyLong());
 				verify(simplePostService, never()).findPostById(anyLong());
