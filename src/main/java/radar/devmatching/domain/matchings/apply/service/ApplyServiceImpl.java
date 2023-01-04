@@ -71,9 +71,4 @@ public class ApplyServiceImpl implements ApplyService {
 			.orElseThrow(() -> new EntityNotFoundException(ErrorMessage.APPLY_NOT_FOUND));
 	}
 
-	private SimplePost getSimplePost(Long simplePostId) {
-		return simplePostRepository.findById(simplePostId)
-			.orElseThrow(() -> new EntityNotFoundException(ErrorMessage.SIMPLE_POST_NOT_FOUND));
-	}
-
 }
