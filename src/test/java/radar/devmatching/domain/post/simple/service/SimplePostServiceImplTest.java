@@ -30,7 +30,7 @@ import radar.devmatching.domain.post.simple.service.dto.MainPostDto;
 import radar.devmatching.domain.post.simple.service.dto.request.CreatePostRequest;
 import radar.devmatching.domain.post.simple.service.dto.response.SimplePostResponse;
 import radar.devmatching.domain.user.entity.User;
-import radar.devmatching.domain.user.repository.UserRepository;
+import radar.devmatching.domain.user.service.UserService;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("SimplePostService 클래스의")
@@ -40,7 +40,7 @@ class SimplePostServiceImplTest {
 	private final static Matching matching = Matching.builder().build();
 
 	@Mock
-	UserRepository userRepository;
+	UserService userService;
 	@Mock
 	SimplePostRepository simplePostRepository;
 	@Mock
@@ -63,7 +63,7 @@ class SimplePostServiceImplTest {
 
 	@BeforeEach
 	void setup() {
-		this.simplePostService = new SimplePostServiceImpl(userRepository, simplePostRepository, matchingLeaderService);
+		this.simplePostService = new SimplePostServiceImpl(userService, simplePostRepository, matchingLeaderService);
 	}
 
 	private SimplePost createSimplePost(User user, Matching matching) {
@@ -188,7 +188,7 @@ class SimplePostServiceImplTest {
 				//given
 				//when
 				//then
-				assertThatThrownBy(() -> simplePostService.getMainPostDto(loginUser, "noMatch"))
+				assertThatThrownBy(() -> simplePostService.getMainPostDto(loginUser.getId(), "noMatch"))
 					.isInstanceOf(InvalidParamException.class)
 					.hasMessage(ErrorMessage.INVALID_POST_CATEGORY.getMessage());
 			}
@@ -202,7 +202,7 @@ class SimplePostServiceImplTest {
 					.willReturn(List.of(simplePost));
 
 				//when
-				MainPostDto findMainPostDto = simplePostService.getMainPostDto(loginUser, "ALL");
+				MainPostDto findMainPostDto = simplePostService.getMainPostDto(loginUser.getId(), "ALL");
 
 				//then
 				assertThat(findMainPostDto.getSimplePostResponses().get(0))
@@ -218,7 +218,7 @@ class SimplePostServiceImplTest {
 					PostCategory.PROJECT, PostState.RECRUITING)).willReturn(List.of(simplePost));
 
 				//when
-				MainPostDto findMainPostDto = simplePostService.getMainPostDto(loginUser, "PROJECT");
+				MainPostDto findMainPostDto = simplePostService.getMainPostDto(loginUser.getId(), "PROJECT");
 
 				//then
 				assertThat(findMainPostDto.getSimplePostResponses().get(0).getCategory()).isEqualTo(
@@ -241,7 +241,7 @@ class SimplePostServiceImplTest {
 				.willReturn(List.of(simplePost));
 
 			//when
-			MainPostDto findMainPostDto = simplePostService.searchSimplePost(loginUser, "ALL", mainPostDto);
+			MainPostDto findMainPostDto = simplePostService.searchSimplePost(loginUser.getId(), "ALL", mainPostDto);
 
 			//then
 			assertThat(findMainPostDto.getNickname()).isEqualTo(loginUser.getNickName());
@@ -266,7 +266,7 @@ class SimplePostServiceImplTest {
 				SimplePost simplePost = createSimplePost(loginUser, matching);
 				ReflectionTestUtils.setField(simplePost, "id", 1L);
 				CreatePostRequest postRequest = createPostRequest();
-				given(userRepository.findById(anyLong())).willReturn(Optional.of(loginUser));
+				given(userService.getUserEntity(anyLong())).willReturn(loginUser);
 				given(matchingLeaderService.createMatching(loginUser)).willReturn(matching);
 				given(simplePostRepository.save(any(SimplePost.class))).willReturn(simplePost);
 

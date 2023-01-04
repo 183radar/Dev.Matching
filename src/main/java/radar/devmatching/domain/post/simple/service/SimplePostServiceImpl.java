@@ -20,14 +20,14 @@ import radar.devmatching.domain.post.simple.service.dto.MainPostDto;
 import radar.devmatching.domain.post.simple.service.dto.request.CreatePostRequest;
 import radar.devmatching.domain.post.simple.service.dto.response.SimplePostResponse;
 import radar.devmatching.domain.user.entity.User;
-import radar.devmatching.domain.user.repository.UserRepository;
+import radar.devmatching.domain.user.service.UserService;
 
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class SimplePostServiceImpl implements SimplePostService {
 
-	private final UserRepository userRepository;
+	private final UserService userService;
 	private final SimplePostRepository simplePostRepository;
 	private final MatchingLeaderService matchingLeaderService;
 
@@ -54,20 +54,22 @@ public class SimplePostServiceImpl implements SimplePostService {
 	@Override
 	@Transactional
 	public long createPost(CreatePostRequest createPostRequest, User user) {
-		user = userRepository.findById(user.getId()).get();
+		user = userService.getUserEntity(user.getId());
 		Matching matching = matchingLeaderService.createMatching(user);
 		SimplePost savedPost = simplePostRepository.save(createPostRequest.toEntity(user, matching));
 		return savedPost.getId();
 	}
 
 	@Override
-	public MainPostDto getMainPostDto(User loginUser, String postCategoryParam) {
+	public MainPostDto getMainPostDto(long loginUserId, String postCategoryParam) {
+		User loginUser = userService.getUserEntity(loginUserId);
 		List<SimplePost> simplePosts = getSimplePostsWhichCategoryEq(postCategoryParam);
 		return MainPostDto.of(loginUser.getNickName(), null, simplePosts);
 	}
 
 	@Override
-	public MainPostDto searchSimplePost(User loginUser, String postCategory, MainPostDto mainPostDto) {
+	public MainPostDto searchSimplePost(long loginUserId, String postCategory, MainPostDto mainPostDto) {
+		User loginUser = userService.getUserEntity(loginUserId);
 		List<SimplePost> simplePosts = simplePostRepository.findRecruitingPostBySearchCondition(postCategory,
 			mainPostDto);
 		return MainPostDto.of(loginUser.getNickName(), mainPostDto.getRegion(), simplePosts);

@@ -22,7 +22,7 @@ public interface SimplePostService {
 
 	void deleteById(long simplePostId);
 
-	MainPostDto getMainPostDto(User loginUser, String postCategory);
+	MainPostDto getMainPostDto(long loginUserId, String postCategory);
 
-	MainPostDto searchSimplePost(User loginUser, String postCategory, MainPostDto mainPostDto);
+	MainPostDto searchSimplePost(long loginUserId, String postCategory, MainPostDto mainPostDto);
 }
