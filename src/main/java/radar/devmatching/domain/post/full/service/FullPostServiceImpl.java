@@ -18,12 +18,14 @@ import radar.devmatching.domain.post.full.service.dto.response.PresentPostRespon
 import radar.devmatching.domain.post.simple.entity.SimplePost;
 import radar.devmatching.domain.post.simple.service.SimplePostService;
 import radar.devmatching.domain.user.entity.User;
+import radar.devmatching.domain.user.service.UserService;
 
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class FullPostServiceImpl implements FullPostService {
 
+	private final UserService userService;
 	private final SimplePostService simplePostService;
 	private final ApplyRepository applyRepository;
 	private final ApplyService applyService;
@@ -31,23 +33,25 @@ public class FullPostServiceImpl implements FullPostService {
 
 	/**
 	 * 게시글 화면 전체를 가져온다(게시글, 신청자 수, 댓글)
+	 *
 	 * @param simplePostId
+	 * @param loginUserId
 	 * @return
 	 */
 	@Override
 	@Transactional
-	public PresentPostResponse getPostWithComment(long simplePostId, User loginUser) {
+	public PresentPostResponse getPostWithComment(long simplePostId, long loginUserId) {
+		User user = userService.getUserEntity(loginUserId);
 		SimplePost findPost = simplePostService.findPostById(simplePostId);
 
 		// 나중에 새로고침 누르면 clickCount는 안 올라가도록 설정해도 좋을듯?
 		findPost.plusClickCount();
 		int applyCount = applyService.getAcceptedApplyCount(simplePostId);
-		boolean isAppliedLoginUser = applyRepository.findByApplySimplePostIdAndApplyUserId(simplePostId,
-				loginUser.getId())
+		boolean isAppliedLoginUser = applyRepository.findByApplySimplePostIdAndApplyUserId(simplePostId, loginUserId)
 			.isPresent();
 		List<MainCommentResponse> allComments = commentService.getAllComments(findPost.getFullPost().getId());
 
-		return PresentPostResponse.of(findPost, loginUser, applyCount, isAppliedLoginUser, allComments);
+		return PresentPostResponse.of(findPost, user, applyCount, isAppliedLoginUser, allComments);
 	}
 
 	/**
@@ -57,7 +61,7 @@ public class FullPostServiceImpl implements FullPostService {
 	 * @return
 	 */
 	@Override
-	public UpdatePostDto getFullPost(long simplePostId, long userId) {
+	public UpdatePostDto getUpdateFullPost(long simplePostId, long userId) {
 		isLeaderValidation(simplePostId, userId);
 		SimplePost findPost = simplePostService.findPostById(simplePostId);
 		return UpdatePostDto.of(findPost);
