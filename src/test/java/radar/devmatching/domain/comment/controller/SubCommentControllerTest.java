@@ -25,7 +25,6 @@ import radar.devmatching.common.exception.error.ErrorMessage;
 import radar.devmatching.domain.comment.service.CommentService;
 import radar.devmatching.domain.comment.service.dto.UpdateCommentDto;
 import radar.devmatching.domain.comment.service.dto.request.CreateCommentRequest;
-import radar.devmatching.domain.user.entity.User;
 import radar.devmatching.util.ControllerTestSetUp;
 
 @WebMvcTest(SubCommentController.class)
@@ -107,8 +106,7 @@ public class SubCommentControllerTest extends ControllerTestSetUp {
 					.with(SecurityMockMvcRequestPostProcessors.csrf())
 					.params(params);
 
-				given(commentService.createSubComment(eq(mainCommentId), any(User.class),
-					any(CreateCommentRequest.class)))
+				given(commentService.createSubComment(eq(mainCommentId), anyLong(), any(CreateCommentRequest.class)))
 					.willReturn(simplePostId);
 
 				//when
@@ -135,7 +133,7 @@ public class SubCommentControllerTest extends ControllerTestSetUp {
 					.params(params);
 
 				willThrow(new EntityNotFoundException(ErrorMessage.MAIN_COMMENT_NOT_FOUND)).given(commentService)
-					.createSubComment(anyLong(), any(), any());
+					.createSubComment(anyLong(), anyLong(), any());
 
 				//when
 				ResultActions result = mockMvc.perform(request);
@@ -286,7 +284,7 @@ public class SubCommentControllerTest extends ControllerTestSetUp {
 					.with(SecurityMockMvcRequestPostProcessors.csrf())
 					.params(params);
 
-				given(commentService.updateSubComment(eq(subCommentId), any(UpdateCommentDto.class), any(User.class)))
+				given(commentService.updateSubComment(eq(subCommentId), any(UpdateCommentDto.class), anyLong()))
 					.willReturn(simplePostId);
 
 				//when
@@ -313,7 +311,7 @@ public class SubCommentControllerTest extends ControllerTestSetUp {
 					.params(params);
 
 				willThrow(new EntityNotFoundException(ErrorMessage.SUB_COMMENT_NOT_FOUND)).given(commentService)
-					.updateSubComment(anyLong(), any(), any());
+					.updateSubComment(anyLong(), any(), anyLong());
 
 				//when
 				ResultActions result = mockMvc.perform(request);
@@ -407,7 +405,7 @@ public class SubCommentControllerTest extends ControllerTestSetUp {
 				//given
 				Long simplePostId = 1L;
 				Long subCommentId = 2L;
-				given(commentService.deleteSubComment(eq(subCommentId), any(User.class)))
+				given(commentService.deleteSubComment(eq(subCommentId), anyLong()))
 					.willReturn(simplePostId);
 
 				//when
@@ -426,7 +424,7 @@ public class SubCommentControllerTest extends ControllerTestSetUp {
 			void notExistByCorrespondedEntity() throws Exception {
 				//given
 				willThrow(new EntityNotFoundException(ErrorMessage.SUB_COMMENT_NOT_FOUND)).given(commentService)
-					.deleteSubComment(anyLong(), any());
+					.deleteSubComment(anyLong(), anyLong());
 
 				//when
 				ResultActions result = mockMvc.perform(get(BASIC_URL + "/subComments/1/delete"));

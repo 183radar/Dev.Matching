@@ -5,12 +5,11 @@ import java.util.List;
 import radar.devmatching.domain.comment.service.dto.UpdateCommentDto;
 import radar.devmatching.domain.comment.service.dto.request.CreateCommentRequest;
 import radar.devmatching.domain.comment.service.dto.response.MainCommentResponse;
-import radar.devmatching.domain.user.entity.User;
 
 public interface CommentService {
-	void createMainComment(long simplePostId, User loginUser, CreateCommentRequest createCommentRequest);
+	void createMainComment(long simplePostId, long loginUserId, CreateCommentRequest createCommentRequest);
 
-	long createSubComment(long mainCommentId, User loginUser, CreateCommentRequest createCommentRequest);
+	long createSubComment(long mainCommentId, long loginUserId, CreateCommentRequest createCommentRequest);
 
 	List<MainCommentResponse> getAllComments(long fullPostId);
 
@@ -20,11 +19,11 @@ public interface CommentService {
 
 	UpdateCommentDto getSubCommentOnly(long subCommentId);
 
-	long updateMainComment(long mainCommentId, UpdateCommentDto updateCommentDto, User loginUser);
+	long updateMainComment(long mainCommentId, UpdateCommentDto updateCommentDto, long loginUserId);
 
-	long updateSubComment(long subCommentId, UpdateCommentDto updateCommentDto, User loginUser);
+	long updateSubComment(long subCommentId, UpdateCommentDto updateCommentDto, long loginUserId);
 
-	Long deleteMainComment(long mainCommentId, User loginUser);
+	Long deleteMainComment(long mainCommentId, long loginUserId);
 
-	Long deleteSubComment(long subCommentId, User loginUser);
+	Long deleteSubComment(long subCommentId, long loginUserId);
 }

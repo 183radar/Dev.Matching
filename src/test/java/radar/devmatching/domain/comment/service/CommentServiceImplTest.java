@@ -35,6 +35,7 @@ import radar.devmatching.domain.post.simple.entity.SimplePost;
 import radar.devmatching.domain.post.simple.exception.SimplePostNotFoundException;
 import radar.devmatching.domain.post.simple.service.SimplePostService;
 import radar.devmatching.domain.user.entity.User;
+import radar.devmatching.domain.user.repository.UserRepository;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("CommentService 클래스의")
@@ -42,6 +43,8 @@ class CommentServiceImplTest {
 
 	// private final static User loginUser = createUser();
 
+	@Mock
+	UserRepository userRepository;
 	@Mock
 	SimplePostService simplePostService;
 	@Mock
@@ -80,7 +83,8 @@ class CommentServiceImplTest {
 
 	@BeforeEach
 	void setUp() {
-		this.commentService = new CommentServiceImpl(simplePostService, mainCommentRepository, subCommentRepository);
+		this.commentService = new CommentServiceImpl(userRepository, simplePostService, mainCommentRepository,
+			subCommentRepository);
 	}
 
 	private MainComment createMainComment(FullPost fullPost, User user) {
@@ -121,7 +125,7 @@ class CommentServiceImplTest {
 
 			//when
 			//then
-			assertThatThrownBy(() -> commentService.createMainComment(1L, any(User.class), null))
+			assertThatThrownBy(() -> commentService.createMainComment(1L, anyLong(), null))
 				.isInstanceOf(SimplePostNotFoundException.class);
 			verify(mainCommentRepository, never()).save(any(MainComment.class));
 		}
@@ -130,16 +134,19 @@ class CommentServiceImplTest {
 		@DisplayName("정상 흐름일 경우 MainComment를 저장한다")
 		void correctThanSaveMainComment() throws Exception {
 			//given
-			User loginUser = createUser(1L);
+			User loginUser = User.builder().build();
+			ReflectionTestUtils.setField(loginUser, "id", 1L);
 			CreateCommentRequest createCommentRequest = CreateCommentRequest.builder()
 				.content("내용")
 				.commentType(CreateCommentRequest.CommentType.MAIN)
 				.build();
-			SimplePost simplePost = createSimplePost(loginUser, Matching.builder().build(), FullPost.builder().build());
-			given(simplePostService.findById(simplePost.getId())).willReturn(simplePost);
+			SimplePost simplePost = createSimplePost(createUser(2L), Matching.builder().build(),
+				FullPost.builder().build());
+			given(userRepository.getReferenceById(anyLong())).willReturn(loginUser);
+			given(simplePostService.findById(anyLong())).willReturn(simplePost);
 
 			//when
-			commentService.createMainComment(simplePost.getId(), loginUser, createCommentRequest);
+			commentService.createMainComment(simplePost.getId(), loginUser.getId(), createCommentRequest);
 
 			//then
 			verify(simplePostService).findById(simplePost.getId());
@@ -157,7 +164,7 @@ class CommentServiceImplTest {
 			//given
 			//when
 			//then
-			assertThatThrownBy(() -> commentService.createSubComment(1L, any(User.class), null))
+			assertThatThrownBy(() -> commentService.createSubComment(1L, anyLong(), null))
 				.isInstanceOf(EntityNotFoundException.class)
 				.hasMessage(ErrorMessage.MAIN_COMMENT_NOT_FOUND.getMessage());
 			verify(subCommentRepository, never()).save(any(SubComment.class));
@@ -167,22 +174,25 @@ class CommentServiceImplTest {
 		@DisplayName("정상 흐름일 경우 SubComment 엔티티를 저장한다")
 		void correct() throws Exception {
 			//given
-			User loginUser = createUser(1L);
+			User loginUser = User.builder().build();
+			ReflectionTestUtils.setField(loginUser, "id", 1L);
 			FullPost fullPost = FullPost.builder().content("내용").build();
-			SimplePost simplePost = createSimplePost(loginUser, Matching.builder().build(), fullPost);
+			SimplePost simplePost = createSimplePost(createUser(2L), Matching.builder().build(), fullPost);
 			MainComment mainComment = createMainComment(fullPost, loginUser);
 			SubComment subComment = createSubComment(mainComment, loginUser);
 			CreateCommentRequest createCommentRequest = CreateCommentRequest.builder()
 				.content("내용")
 				.commentType(CreateCommentRequest.CommentType.SUB)
 				.build();
+			given(userRepository.getReferenceById(anyLong())).willReturn(loginUser);
 			given(mainCommentRepository.findMainCommentById(mainComment.getId())).willReturn(Optional.of(mainComment));
 			given(subCommentRepository.save(any(SubComment.class))).willReturn(subComment);
 			given(subCommentRepository.findBySimplePostIdAsSubCommentId(subComment.getId())).willReturn(
 				simplePost.getId());
 
 			//when
-			long simplePostId = commentService.createSubComment(mainComment.getId(), loginUser, createCommentRequest);
+			long simplePostId = commentService.createSubComment(mainComment.getId(), loginUser.getId(),
+				createCommentRequest);
 
 			//then
 			assertThat(simplePostId).isEqualTo(simplePost.getId());
@@ -295,7 +305,7 @@ class CommentServiceImplTest {
 			//given
 			//when
 			//then
-			assertThatThrownBy(() -> commentService.getSubCommentOnly(anyLong()))
+			assertThatThrownBy(() -> commentService.getSubCommentOnly(1L))
 				.isInstanceOf(EntityNotFoundException.class)
 				.hasMessage(ErrorMessage.SUB_COMMENT_NOT_FOUND.getMessage());
 		}
@@ -326,7 +336,7 @@ class CommentServiceImplTest {
 				.willReturn(simplePost.getId());
 
 			//when
-			long result = commentService.updateMainComment(anyLong(), dto, loginUser);
+			long result = commentService.updateMainComment(mainComment.getId(), dto, loginUser.getId());
 
 			//then
 			verify(mainCommentRepository).findMainCommentById(anyLong());
@@ -349,7 +359,7 @@ class CommentServiceImplTest {
 
 			//when
 			//then
-			assertThatThrownBy(() -> commentService.updateMainComment(mainComment.getId(), dto, loginUser))
+			assertThatThrownBy(() -> commentService.updateMainComment(mainComment.getId(), dto, loginUser.getId()))
 				.isInstanceOf(EntityNotFoundException.class)
 				.hasMessage(ErrorMessage.SIMPLE_POST_NOT_FOUND.getMessage());
 			assertThat(mainComment.getComment().getContent()).isEqualTo(updateContent);//엔티티는 업데이트 되나 실제 DB엔 반영 X
@@ -366,7 +376,7 @@ class CommentServiceImplTest {
 				//when
 
 				//then
-				assertThatThrownBy(() -> commentService.updateMainComment(anyLong(), null, null))
+				assertThatThrownBy(() -> commentService.updateMainComment(anyLong(), null, 1L))
 					.isInstanceOf(EntityNotFoundException.class)
 					.hasMessage(ErrorMessage.MAIN_COMMENT_NOT_FOUND.getMessage());
 				verify(mainCommentRepository, never()).findBySimplePostIdAsMainCommentId(anyLong());
@@ -383,7 +393,7 @@ class CommentServiceImplTest {
 
 				//when
 				//then
-				assertThatThrownBy(() -> commentService.updateMainComment(anyLong(), null, loginUser))
+				assertThatThrownBy(() -> commentService.updateMainComment(mainComment.getId(), null, loginUser.getId()))
 					.isInstanceOf(InvalidAccessException.class)
 					.hasMessage(ErrorMessage.NOT_COMMENT_OWNER.getMessage());
 				verify(mainCommentRepository, never()).findBySimplePostIdAsMainCommentId(anyLong());
@@ -417,7 +427,7 @@ class CommentServiceImplTest {
 				.willReturn(simplePost.getId());
 
 			//when
-			long result = commentService.updateSubComment(anyLong(), dto, loginUser);
+			long result = commentService.updateSubComment(subComment.getId(), dto, loginUser.getId());
 
 			//then
 			verify(subCommentRepository).findSubCommentById(anyLong());
@@ -441,7 +451,7 @@ class CommentServiceImplTest {
 
 			//when
 			//then
-			assertThatThrownBy(() -> commentService.updateSubComment(subComment.getId(), dto, loginUser))
+			assertThatThrownBy(() -> commentService.updateSubComment(subComment.getId(), dto, loginUser.getId()))
 				.isInstanceOf(EntityNotFoundException.class)
 				.hasMessage(ErrorMessage.SIMPLE_POST_NOT_FOUND.getMessage());
 			assertThat(subComment.getComment().getContent()).isEqualTo(updateContent);//엔티티는 업데이트 되나 실제 DB엔 반영 X
@@ -457,7 +467,7 @@ class CommentServiceImplTest {
 				//given
 				//when
 				//then
-				assertThatThrownBy(() -> commentService.updateSubComment(anyLong(), null, null))
+				assertThatThrownBy(() -> commentService.updateSubComment(1L, null, 2L))
 					.isInstanceOf(EntityNotFoundException.class)
 					.hasMessage(ErrorMessage.SUB_COMMENT_NOT_FOUND.getMessage());
 				verify(subCommentRepository, never()).findBySimplePostIdAsSubCommentId(anyLong());
@@ -475,7 +485,7 @@ class CommentServiceImplTest {
 
 				//when
 				//then
-				assertThatThrownBy(() -> commentService.updateSubComment(anyLong(), null, loginUser))
+				assertThatThrownBy(() -> commentService.updateSubComment(subComment.getId(), null, loginUser.getId()))
 					.isInstanceOf(InvalidAccessException.class)
 					.hasMessage(ErrorMessage.NOT_COMMENT_OWNER.getMessage());
 				verify(subCommentRepository, never()).findBySimplePostIdAsSubCommentId(anyLong());
@@ -496,7 +506,7 @@ class CommentServiceImplTest {
 			given(mainCommentRepository.findMainCommentById(anyLong())).willReturn(Optional.of(mainComment));
 
 			//when
-			commentService.deleteMainComment(anyLong(), commentOwner);
+			commentService.deleteMainComment(anyLong(), commentOwner.getId());
 
 			//then
 			verify(mainCommentRepository).findMainCommentById(anyLong());
@@ -513,7 +523,7 @@ class CommentServiceImplTest {
 				//given
 				//when
 				//then
-				assertThatThrownBy(() -> commentService.deleteMainComment(1L, any(User.class)))
+				assertThatThrownBy(() -> commentService.deleteMainComment(1L, anyLong()))
 					.isInstanceOf(EntityNotFoundException.class)
 					.hasMessage(ErrorMessage.MAIN_COMMENT_NOT_FOUND.getMessage());
 				verify(mainCommentRepository, never()).delete(any(MainComment.class));
@@ -530,7 +540,7 @@ class CommentServiceImplTest {
 
 				//when
 				//then
-				assertThatThrownBy(() -> commentService.deleteMainComment(anyLong(), loginUser))
+				assertThatThrownBy(() -> commentService.deleteMainComment(anyLong(), loginUser.getId()))
 					.isInstanceOf(InvalidAccessException.class)
 					.hasMessage(ErrorMessage.NOT_COMMENT_OWNER.getMessage());
 				verify(mainCommentRepository, never()).delete(any(MainComment.class));
@@ -552,7 +562,7 @@ class CommentServiceImplTest {
 			given(subCommentRepository.findSubCommentById(anyLong())).willReturn(Optional.of(subComment));
 
 			//when
-			commentService.deleteSubComment(anyLong(), commentOwner);
+			commentService.deleteSubComment(anyLong(), commentOwner.getId());
 
 			//then
 			verify(subCommentRepository).findSubCommentById(anyLong());
@@ -569,7 +579,7 @@ class CommentServiceImplTest {
 				//given
 				//when
 				//then
-				assertThatThrownBy(() -> commentService.deleteSubComment(1L, any(User.class)))
+				assertThatThrownBy(() -> commentService.deleteSubComment(1L, 2L))
 					.isInstanceOf(EntityNotFoundException.class)
 					.hasMessage(ErrorMessage.SUB_COMMENT_NOT_FOUND.getMessage());
 				verify(subCommentRepository, never()).delete(any(SubComment.class));
@@ -587,7 +597,7 @@ class CommentServiceImplTest {
 
 				//when
 				//then
-				assertThatThrownBy(() -> commentService.deleteSubComment(anyLong(), loginUser))
+				assertThatThrownBy(() -> commentService.deleteSubComment(subComment.getId(), loginUser.getId()))
 					.isInstanceOf(InvalidAccessException.class)
 					.hasMessage(ErrorMessage.NOT_COMMENT_OWNER.getMessage());
 				verify(subCommentRepository, never()).delete(any(SubComment.class));

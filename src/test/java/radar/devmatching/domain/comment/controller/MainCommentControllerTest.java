@@ -27,7 +27,6 @@ import radar.devmatching.domain.comment.service.dto.UpdateCommentDto;
 import radar.devmatching.domain.comment.service.dto.request.CreateCommentRequest;
 import radar.devmatching.domain.post.simple.exception.SimplePostNotFoundException;
 import radar.devmatching.domain.post.simple.service.SimplePostService;
-import radar.devmatching.domain.user.entity.User;
 import radar.devmatching.util.ControllerTestSetUp;
 
 @WebMvcTest(MainCommentController.class)
@@ -130,7 +129,7 @@ public class MainCommentControllerTest extends ControllerTestSetUp {
 					.params(params);
 
 				willThrow(new SimplePostNotFoundException()).given(commentService)
-					.createMainComment(anyLong(), any(), any());
+					.createMainComment(anyLong(), anyLong(), any());
 
 				//when
 				ResultActions result = mockMvc.perform(request);
@@ -281,7 +280,7 @@ public class MainCommentControllerTest extends ControllerTestSetUp {
 					.with(SecurityMockMvcRequestPostProcessors.csrf())
 					.params(params);
 
-				given(commentService.updateMainComment(eq(mainCommentId), any(UpdateCommentDto.class), any(User.class)))
+				given(commentService.updateMainComment(eq(mainCommentId), any(UpdateCommentDto.class), anyLong()))
 					.willReturn(simplePostId);
 
 				//when
@@ -308,7 +307,7 @@ public class MainCommentControllerTest extends ControllerTestSetUp {
 					.params(params);
 
 				willThrow(new EntityNotFoundException(ErrorMessage.MAIN_COMMENT_NOT_FOUND)).given(commentService)
-					.updateMainComment(anyLong(), any(), any());
+					.updateMainComment(anyLong(), any(), anyLong());
 
 				//when
 				ResultActions result = mockMvc.perform(request);
@@ -402,7 +401,7 @@ public class MainCommentControllerTest extends ControllerTestSetUp {
 				//given
 				Long simplePostId = 1L;
 				Long mainCommentId = 2L;
-				given(commentService.deleteMainComment(eq(mainCommentId), any(User.class)))
+				given(commentService.deleteMainComment(eq(mainCommentId), anyLong()))
 					.willReturn(simplePostId);
 
 				//when
@@ -421,7 +420,7 @@ public class MainCommentControllerTest extends ControllerTestSetUp {
 			void notExistByCorrespondedEntity() throws Exception {
 				//given
 				willThrow(new EntityNotFoundException(ErrorMessage.MAIN_COMMENT_NOT_FOUND)).given(commentService)
-					.deleteMainComment(anyLong(), any());
+					.deleteMainComment(anyLong(), anyLong());
 
 				//when
 				ResultActions result = mockMvc.perform(get(BASIC_URL + "/mainComments/1/delete"));

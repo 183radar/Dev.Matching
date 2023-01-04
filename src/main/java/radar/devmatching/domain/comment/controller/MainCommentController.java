@@ -12,12 +12,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import lombok.RequiredArgsConstructor;
+import radar.devmatching.common.security.jwt.JwtTokenInfo;
 import radar.devmatching.common.security.resolver.AuthUser;
 import radar.devmatching.domain.comment.service.CommentService;
 import radar.devmatching.domain.comment.service.dto.UpdateCommentDto;
 import radar.devmatching.domain.comment.service.dto.request.CreateCommentRequest;
 import radar.devmatching.domain.post.simple.service.SimplePostService;
-import radar.devmatching.domain.user.entity.User;
 
 @Controller
 @RequiredArgsConstructor
@@ -36,14 +36,14 @@ public class MainCommentController {
 	}
 
 	@PostMapping("posts/{simplePostId}/createMainComment")
-	public String createMainComment(@AuthUser User authUser, @PathVariable long simplePostId,
+	public String createMainComment(@AuthUser JwtTokenInfo jwtTokenInfo, @PathVariable long simplePostId,
 		@Valid @ModelAttribute CreateCommentRequest createCommentRequest, BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
 			createCommentRequest.setEntityId(simplePostId);
 			createCommentRequest.setCommentType(CreateCommentRequest.CommentType.MAIN);
 			return "comment/createComment";
 		}
-		commentService.createMainComment(simplePostId, authUser, createCommentRequest);
+		commentService.createMainComment(simplePostId, jwtTokenInfo.getUserId(), createCommentRequest);
 		return "redirect:/api/posts/" + simplePostId;
 	}
 
@@ -55,20 +55,20 @@ public class MainCommentController {
 	}
 
 	@PostMapping("mainComments/{mainCommentId}/edit")
-	public String updateMainComment(@AuthUser User authUser, @PathVariable long mainCommentId,
+	public String updateMainComment(@AuthUser JwtTokenInfo jwtTokenInfo, @PathVariable long mainCommentId,
 		@Valid @ModelAttribute UpdateCommentDto updateCommentDto, BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
 			updateCommentDto.setEntityId(mainCommentId);
 			updateCommentDto.setCommentType(UpdateCommentDto.CommentType.MAIN);
 			return "comment/updateComment";
 		}
-		long simplePostId = commentService.updateMainComment(mainCommentId, updateCommentDto, authUser);
+		long simplePostId = commentService.updateMainComment(mainCommentId, updateCommentDto, jwtTokenInfo.getUserId());
 		return "redirect:/api/posts/" + simplePostId;
 	}
 
 	@GetMapping("mainComments/{mainCommentId}/delete")
-	public String deleteMainComment(@AuthUser User authUser, @PathVariable long mainCommentId) {
-		Long simplePostId = commentService.deleteMainComment(mainCommentId, authUser);
+	public String deleteMainComment(@AuthUser JwtTokenInfo jwtTokenInfo, @PathVariable long mainCommentId) {
+		Long simplePostId = commentService.deleteMainComment(mainCommentId, jwtTokenInfo.getUserId());
 		return "redirect:/api/posts/" + simplePostId;
 	}
 

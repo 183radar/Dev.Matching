@@ -21,30 +21,34 @@ import radar.devmatching.domain.comment.service.dto.response.MainCommentResponse
 import radar.devmatching.domain.post.simple.entity.SimplePost;
 import radar.devmatching.domain.post.simple.service.SimplePostService;
 import radar.devmatching.domain.user.entity.User;
+import radar.devmatching.domain.user.repository.UserRepository;
 
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class CommentServiceImpl implements CommentService {
 
+	private final UserRepository userRepository;
 	private final SimplePostService simplePostService;
 	private final MainCommentRepository mainCommentRepository;
 	private final SubCommentRepository subCommentRepository;
 
 	@Override
 	@Transactional
-	public void createMainComment(long simplePostId, User loginUser, CreateCommentRequest createCommentRequest) {
+	public void createMainComment(long simplePostId, long loginUserId, CreateCommentRequest createCommentRequest) {
+		User referenceLoginUser = userRepository.getReferenceById(loginUserId);
 		SimplePost simplePost = simplePostService.findById(simplePostId);
-		mainCommentRepository.save(createCommentRequest.toMainCommentEntity(simplePost, loginUser));
+		mainCommentRepository.save(createCommentRequest.toMainCommentEntity(simplePost, referenceLoginUser));
 	}
 
 	@Override
 	@Transactional
-	public long createSubComment(long mainCommentId, User loginUser, CreateCommentRequest createCommentRequest) {
+	public long createSubComment(long mainCommentId, long loginUserId, CreateCommentRequest createCommentRequest) {
+		User referenceLoginUser = userRepository.getReferenceById(loginUserId);
 		MainComment mainComment = mainCommentRepository.findMainCommentById(mainCommentId)
 			.orElseThrow(() -> new EntityNotFoundException(ErrorMessage.MAIN_COMMENT_NOT_FOUND));
 		SubComment subComment = subCommentRepository.save(
-			createCommentRequest.toSubCommentEntity(mainComment, loginUser));
+			createCommentRequest.toSubCommentEntity(mainComment, referenceLoginUser));
 		return subCommentRepository.findBySimplePostIdAsSubCommentId(subComment.getId());
 	}
 
@@ -79,8 +83,8 @@ public class CommentServiceImpl implements CommentService {
 
 	@Override
 	@Transactional
-	public long updateMainComment(long mainCommentId, UpdateCommentDto updateCommentDto, User loginUser) {
-		MainComment mainComment = validationMainCommentOwner(mainCommentId, loginUser);
+	public long updateMainComment(long mainCommentId, UpdateCommentDto updateCommentDto, long loginUserId) {
+		MainComment mainComment = validationMainCommentOwner(mainCommentId, loginUserId);
 		mainComment.update(updateCommentDto.getContent());
 		Long simplePostId = mainCommentRepository.findBySimplePostIdAsMainCommentId(mainCommentId);
 		if (Objects.isNull(simplePostId)) {
@@ -91,8 +95,8 @@ public class CommentServiceImpl implements CommentService {
 
 	@Override
 	@Transactional
-	public long updateSubComment(long subCommentId, UpdateCommentDto updateCommentDto, User loginUser) {
-		SubComment subComment = validationSubCommentOwner(subCommentId, loginUser);
+	public long updateSubComment(long subCommentId, UpdateCommentDto updateCommentDto, long loginUserId) {
+		SubComment subComment = validationSubCommentOwner(subCommentId, loginUserId);
 		subComment.update(updateCommentDto.getContent());
 		Long simplePostId = subCommentRepository.findBySimplePostIdAsSubCommentId(subCommentId);
 		if (Objects.isNull(simplePostId)) {
@@ -103,8 +107,8 @@ public class CommentServiceImpl implements CommentService {
 
 	@Override
 	@Transactional
-	public Long deleteMainComment(long mainCommentId, User authUser) {
-		MainComment mainComment = validationMainCommentOwner(mainCommentId, authUser);
+	public Long deleteMainComment(long mainCommentId, long loginUserId) {
+		MainComment mainComment = validationMainCommentOwner(mainCommentId, loginUserId);
 		Long simplePostId = mainCommentRepository.findBySimplePostIdAsMainCommentId(mainCommentId);
 		if (Objects.isNull(simplePostId)) {
 			throw new EntityNotFoundException(ErrorMessage.SIMPLE_POST_NOT_FOUND);
@@ -115,8 +119,8 @@ public class CommentServiceImpl implements CommentService {
 
 	@Override
 	@Transactional
-	public Long deleteSubComment(long subCommentId, User loginUser) {
-		SubComment subComment = validationSubCommentOwner(subCommentId, loginUser);
+	public Long deleteSubComment(long subCommentId, long loginUserId) {
+		SubComment subComment = validationSubCommentOwner(subCommentId, loginUserId);
 		Long simplePostId = subCommentRepository.findBySimplePostIdAsSubCommentId(subCommentId);
 		if (Objects.isNull(simplePostId)) {
 			throw new EntityNotFoundException(ErrorMessage.SIMPLE_POST_NOT_FOUND);
@@ -125,19 +129,19 @@ public class CommentServiceImpl implements CommentService {
 		return simplePostId;
 	}
 
-	private MainComment validationMainCommentOwner(long mainCommentId, User loginUser) {
+	private MainComment validationMainCommentOwner(long mainCommentId, long loginUserId) {
 		MainComment mainComment = mainCommentRepository.findMainCommentById(mainCommentId)
 			.orElseThrow(() -> new EntityNotFoundException(ErrorMessage.MAIN_COMMENT_NOT_FOUND));
-		if (!Objects.equals(mainComment.getComment().getUser().getId(), loginUser.getId())) {
+		if (!Objects.equals(mainComment.getComment().getUser().getId(), loginUserId)) {
 			throw new InvalidAccessException(ErrorMessage.NOT_COMMENT_OWNER);
 		}
 		return mainComment;
 	}
 
-	private SubComment validationSubCommentOwner(long subCommentId, User loginUser) {
+	private SubComment validationSubCommentOwner(long subCommentId, long loginUserId) {
 		SubComment subComment = subCommentRepository.findSubCommentById(subCommentId)
 			.orElseThrow(() -> new EntityNotFoundException(ErrorMessage.SUB_COMMENT_NOT_FOUND));
-		if (!Objects.equals(subComment.getComment().getUser().getId(), loginUser.getId())) {
+		if (!Objects.equals(subComment.getComment().getUser().getId(), loginUserId)) {
 			throw new InvalidAccessException(ErrorMessage.NOT_COMMENT_OWNER);
 		}
 		return subComment;
