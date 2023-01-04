@@ -53,10 +53,10 @@ public class SimplePostServiceImpl implements SimplePostService {
 
 	@Override
 	@Transactional
-	public long createPost(CreatePostRequest createPostRequest, User user) {
-		user = userService.getUserEntity(user.getId());
-		Matching matching = matchingLeaderService.createMatching(user);
-		SimplePost savedPost = simplePostRepository.save(createPostRequest.toEntity(user, matching));
+	public long createPost(CreatePostRequest createPostRequest, long loginUserId) {
+		User loginUser = userService.getUserEntity(loginUserId);
+		Matching matching = matchingLeaderService.createMatching(loginUser);
+		SimplePost savedPost = simplePostRepository.save(createPostRequest.toEntity(loginUser, matching));
 		return savedPost.getId();
 	}
 
@@ -76,14 +76,14 @@ public class SimplePostServiceImpl implements SimplePostService {
 	}
 
 	@Override
-	public List<SimplePostResponse> getMyPosts(long userId) {
-		List<SimplePost> myPosts = simplePostRepository.findMyPostsByLeaderIdOrderByCreateDateDesc(userId);
+	public List<SimplePostResponse> getMyPosts(long loginUserId) {
+		List<SimplePost> myPosts = simplePostRepository.findMyPostsByLeaderIdOrderByCreateDateDesc(loginUserId);
 		return myPosts.stream().map(SimplePostResponse::of).collect(Collectors.toList());
 	}
 
 	@Override
-	public List<SimplePostResponse> getApplicationPosts(long userId) {
-		List<SimplePost> applicationPosts = simplePostRepository.findApplicationPosts(userId);
+	public List<SimplePostResponse> getApplicationPosts(long loginUserId) {
+		List<SimplePost> applicationPosts = simplePostRepository.findApplicationPosts(loginUserId);
 		return applicationPosts.stream().map(SimplePostResponse::of).collect(Collectors.toList());
 	}
 

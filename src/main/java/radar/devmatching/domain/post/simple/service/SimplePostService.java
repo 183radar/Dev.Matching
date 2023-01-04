@@ -6,15 +6,14 @@ import radar.devmatching.domain.post.simple.entity.SimplePost;
 import radar.devmatching.domain.post.simple.service.dto.MainPostDto;
 import radar.devmatching.domain.post.simple.service.dto.request.CreatePostRequest;
 import radar.devmatching.domain.post.simple.service.dto.response.SimplePostResponse;
-import radar.devmatching.domain.user.entity.User;
 
 public interface SimplePostService {
 
-	long createPost(CreatePostRequest createPostDto, User user);
+	long createPost(CreatePostRequest createPostDto, long loginUserId);
 
-	List<SimplePostResponse> getMyPosts(long userId);
+	List<SimplePostResponse> getMyPosts(long loginUserId);
 
-	List<SimplePostResponse> getApplicationPosts(long userId);
+	List<SimplePostResponse> getApplicationPosts(long loginUserId);
 
 	SimplePost findById(long simplePostId);
 
