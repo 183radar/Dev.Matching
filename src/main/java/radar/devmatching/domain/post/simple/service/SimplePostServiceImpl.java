@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import radar.devmatching.common.exception.InvalidParamException;
 import radar.devmatching.common.exception.error.ErrorMessage;
 import radar.devmatching.domain.matchings.matching.entity.Matching;
@@ -22,6 +23,7 @@ import radar.devmatching.domain.post.simple.service.dto.response.SimplePostRespo
 import radar.devmatching.domain.user.entity.User;
 import radar.devmatching.domain.user.service.UserService;
 
+@Slf4j
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -57,6 +59,7 @@ public class SimplePostServiceImpl implements SimplePostService {
 		User loginUser = userService.getUserEntity(loginUserId);
 		Matching matching = matchingLeaderService.createMatching(loginUser);
 		SimplePost savedPost = simplePostRepository.save(createPostRequest.toEntity(loginUser, matching));
+		log.info("Create Post: {}", createPostRequest);
 		return savedPost.getId();
 	}
 
@@ -69,6 +72,8 @@ public class SimplePostServiceImpl implements SimplePostService {
 
 	@Override
 	public MainPostDto searchSimplePost(long loginUserId, String postCategory, MainPostDto mainPostDto) {
+		log.info("PostCategory:{} Region:{} SearchCondition:{}", postCategory, mainPostDto.getRegion(),
+			mainPostDto.getSearchCondition());
 		User loginUser = userService.getUserEntity(loginUserId);
 		List<SimplePost> simplePosts = simplePostRepository.findRecruitingPostBySearchCondition(postCategory,
 			mainPostDto);

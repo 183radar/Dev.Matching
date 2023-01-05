@@ -9,6 +9,7 @@ import org.hibernate.validator.constraints.Range;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
+import radar.devmatching.common.util.ExcludeJacocoGenerated;
 import radar.devmatching.domain.matchings.matching.entity.Matching;
 import radar.devmatching.domain.post.full.entity.FullPost;
 import radar.devmatching.domain.post.simple.entity.PostCategory;
@@ -83,5 +84,17 @@ public class CreatePostRequest {
 
 	public String getContent() {
 		return content;
+	}
+
+	@ExcludeJacocoGenerated
+	@Override
+	public String toString() {
+		return "CreatePostRequest{" +
+			"title='" + title + '\'' +
+			", category=" + category.getName() +
+			", region=" + region.getName() +
+			", userNum=" + userNum +
+			", content='" + content + '\'' +
+			'}';
 	}
 }

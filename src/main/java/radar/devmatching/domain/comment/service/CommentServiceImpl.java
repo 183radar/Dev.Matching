@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import radar.devmatching.common.exception.EntityNotFoundException;
 import radar.devmatching.common.exception.InvalidAccessException;
 import radar.devmatching.common.exception.error.ErrorMessage;
@@ -23,6 +24,7 @@ import radar.devmatching.domain.post.simple.service.SimplePostService;
 import radar.devmatching.domain.user.entity.User;
 import radar.devmatching.domain.user.repository.UserRepository;
 
+@Slf4j
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -39,6 +41,7 @@ public class CommentServiceImpl implements CommentService {
 		User referenceLoginUser = userRepository.getReferenceById(loginUserId);
 		SimplePost simplePost = simplePostService.findById(simplePostId);
 		mainCommentRepository.save(createCommentRequest.toMainCommentEntity(simplePost, referenceLoginUser));
+		log.info("Create MainComment: {}", createCommentRequest);
 	}
 
 	@Override
@@ -49,6 +52,7 @@ public class CommentServiceImpl implements CommentService {
 			.orElseThrow(() -> new EntityNotFoundException(ErrorMessage.MAIN_COMMENT_NOT_FOUND));
 		SubComment subComment = subCommentRepository.save(
 			createCommentRequest.toSubCommentEntity(mainComment, referenceLoginUser));
+		log.info("Create SubComment: {}", createCommentRequest);
 		return subCommentRepository.findBySimplePostIdAsSubCommentId(subComment.getId());
 	}
 
@@ -90,6 +94,7 @@ public class CommentServiceImpl implements CommentService {
 		if (Objects.isNull(simplePostId)) {
 			throw new EntityNotFoundException(ErrorMessage.SIMPLE_POST_NOT_FOUND);
 		}
+		log.info("Update MainComment: {}", updateCommentDto);
 		return simplePostId;
 	}
 
@@ -102,6 +107,7 @@ public class CommentServiceImpl implements CommentService {
 		if (Objects.isNull(simplePostId)) {
 			throw new EntityNotFoundException(ErrorMessage.SIMPLE_POST_NOT_FOUND);
 		}
+		log.info("Update SubComment: {}", updateCommentDto);
 		return simplePostId;
 	}
 
@@ -114,6 +120,7 @@ public class CommentServiceImpl implements CommentService {
 			throw new EntityNotFoundException(ErrorMessage.SIMPLE_POST_NOT_FOUND);
 		}
 		mainCommentRepository.delete(mainComment);
+		log.info("Delete MainComment ID: {}", mainCommentId);
 		return simplePostId;
 	}
 
@@ -126,6 +133,7 @@ public class CommentServiceImpl implements CommentService {
 			throw new EntityNotFoundException(ErrorMessage.SIMPLE_POST_NOT_FOUND);
 		}
 		subCommentRepository.delete(subComment);
+		log.info("Delete SubComment ID: {}", subCommentId);
 		return simplePostId;
 	}
 

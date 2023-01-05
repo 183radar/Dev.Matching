@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import radar.devmatching.common.exception.InvalidAccessException;
 import radar.devmatching.common.exception.error.ErrorMessage;
 import radar.devmatching.domain.comment.service.CommentService;
@@ -20,6 +21,7 @@ import radar.devmatching.domain.post.simple.service.SimplePostService;
 import radar.devmatching.domain.user.entity.User;
 import radar.devmatching.domain.user.service.UserService;
 
+@Slf4j
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -74,6 +76,7 @@ public class FullPostServiceImpl implements FullPostService {
 		SimplePost findPost = simplePostService.findPostById(simplePostId);
 		findPost.update(updatePostDto.getTitle(), updatePostDto.getCategory(), updatePostDto.getRegion(),
 			updatePostDto.getUserNum(), updatePostDto.getContent());
+		log.info("Update Post: {}", updatePostDto);
 	}
 
 	@Override
@@ -81,6 +84,7 @@ public class FullPostServiceImpl implements FullPostService {
 	public void deletePost(long simplePostId, long userId) {
 		isLeaderValidation(simplePostId, userId);
 		simplePostService.deleteById(simplePostId);
+		log.info("Delete Post ID: {}", simplePostId);
 	}
 
 	@Override
@@ -89,6 +93,7 @@ public class FullPostServiceImpl implements FullPostService {
 		isLeaderValidation(simplePostId, userId);
 		SimplePost findPost = simplePostService.findPostById(simplePostId);
 		findPost.closePost();
+		log.info("Close Post: {}", findPost.getTitle());
 	}
 
 	private void isLeaderValidation(long simplePostId, long userId) {
