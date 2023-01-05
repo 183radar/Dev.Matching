@@ -31,7 +31,7 @@ public class AuthServiceImpl implements AuthService {
 
 		User findUser;
 		try {
-			findUser = userService.getUserEntityByUsername(username);
+			findUser = userService.findByUsername(username);
 		} catch (EntityNotFoundException e) {
 			log.warn("username not found : username = {}", username);
 			throw new UsernamePasswordNotMatchException(ErrorMessage.AUTHENTICATION_FAIL);
