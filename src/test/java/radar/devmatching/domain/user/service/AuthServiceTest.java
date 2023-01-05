@@ -85,7 +85,7 @@ public class AuthServiceTest {
 		void signInWithoutException() {
 			//given
 			User user = createUser();
-			given(userService.getUserEntityByUsername(eq(user.getUsername()))).willReturn(user);
+			given(userService.findByUsername(eq(user.getUsername()))).willReturn(user);
 			given(passwordEncoder.matches(any(), any())).willReturn(true);
 			//when
 			SignInResponse signInResponse = authService.signIn(user.getUsername(), user.getPassword());
@@ -103,7 +103,7 @@ public class AuthServiceTest {
 		void UserNotFound() {
 			//given
 			User user = createUser();
-			given(userService.getUserEntityByUsername(user.getUsername())).willThrow(EntityNotFoundException.class);
+			given(userService.findByUsername(user.getUsername())).willThrow(EntityNotFoundException.class);
 			//when
 			//then
 			assertThatThrownBy(() -> authService.signIn(user.getUsername(), user.getPassword()))
@@ -115,7 +115,7 @@ public class AuthServiceTest {
 		void requestPasswordNotMatchUserPassword() {
 			//given
 			User user = createUser();
-			given(userService.getUserEntityByUsername(eq(user.getUsername()))).willReturn(user);
+			given(userService.findByUsername(eq(user.getUsername()))).willReturn(user);
 			given(passwordEncoder.matches(any(), any())).willReturn(false);
 			//when
 			//then
