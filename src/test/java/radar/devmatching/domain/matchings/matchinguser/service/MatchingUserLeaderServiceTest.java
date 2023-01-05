@@ -52,7 +52,7 @@ class MatchingUserLeaderServiceTest {
 
 	@Test
 	@DisplayName("createMatchingUserLeader 메서드는 user 엔티티와 matching 엔티티 입력 받으면 leader 상태를 담은 matchingUser 엔티티를 생성한다.")
-	public void createMatchingUserLeaderMethod() {
+	void createMatchingUserLeaderMethod() {
 		//given
 		User user = createUser();
 		Matching matching = Matching.builder().build();

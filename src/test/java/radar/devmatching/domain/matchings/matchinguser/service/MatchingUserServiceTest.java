@@ -118,7 +118,7 @@ class MatchingUserServiceTest {
 
 		@Test
 		@DisplayName("정상적으로 matchingUser 엔티티가 저장된다.")
-		public void saveMatchingUserWithoutException() {
+		void saveMatchingUserWithoutException() {
 			//given
 			User user = createUser();
 			Matching matching = createMatching();
@@ -132,7 +132,7 @@ class MatchingUserServiceTest {
 
 		@Test
 		@DisplayName("해당 User가 이미 저장되어 있으면 예외를 던진다.")
-		public void throwAlreadyJoinMatchingUserException() {
+		void throwAlreadyJoinMatchingUserException() {
 			//given
 			User user = createUser();
 			Matching matching = createMatching();
