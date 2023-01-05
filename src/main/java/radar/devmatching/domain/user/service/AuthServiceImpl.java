@@ -10,11 +10,11 @@ import radar.devmatching.common.exception.EntityNotFoundException;
 import radar.devmatching.common.exception.UsernamePasswordNotMatchException;
 import radar.devmatching.common.exception.error.ErrorMessage;
 import radar.devmatching.common.security.JwtProperties;
-import radar.devmatching.common.security.jwt.JwtToken;
+import radar.devmatching.common.security.jwt.JwtTokenCookieInfo;
 import radar.devmatching.common.security.jwt.JwtTokenProvider;
+import radar.devmatching.domain.user.entity.User;
 import radar.devmatching.domain.user.service.dto.response.SignInResponse;
 import radar.devmatching.domain.user.service.dto.response.SignOutResponse;
-import radar.devmatching.domain.user.service.dto.response.UserResponse;
 
 @Slf4j
 @Service
@@ -28,9 +28,10 @@ public class AuthServiceImpl implements AuthService {
 
 	@Override
 	public SignInResponse signIn(String username, String password) {
-		UserResponse findUser;
+
+		User findUser;
 		try {
-			findUser = userService.getUserByUsername(username);
+			findUser = userService.getUserEntityByUsername(username);
 		} catch (EntityNotFoundException e) {
 			log.warn("username not found : username = {}", username);
 			throw new UsernamePasswordNotMatchException(ErrorMessage.AUTHENTICATION_FAIL);
@@ -44,12 +45,12 @@ public class AuthServiceImpl implements AuthService {
 		String refreshToken = jwtTokenProvider.createRefreshToken(username, findUser.getUserRole());
 
 		return SignInResponse.builder()
-			.accessToken(JwtToken.builder()
+			.accessToken(JwtTokenCookieInfo.builder()
 				.header(JwtProperties.ACCESS_TOKEN_HEADER)
 				.token(accessToken)
 				.expireTime(jwtTokenProvider.getExpireTime())
 				.build())
-			.refreshToken(JwtToken.builder()
+			.refreshToken(JwtTokenCookieInfo.builder()
 				.header(JwtProperties.REFRESH_TOKEN_HEADER)
 				.token(refreshToken)
 				.expireTime(jwtTokenProvider.getExpireTime())
@@ -58,7 +59,7 @@ public class AuthServiceImpl implements AuthService {
 	}
 
 	@Override
-	public SignOutResponse singOut() {
+	public SignOutResponse signOut() {
 		return SignOutResponse.builder()
 			.accessTokenHeader(JwtProperties.ACCESS_TOKEN_HEADER)
 			.refreshTokenHeader(JwtProperties.REFRESH_TOKEN_HEADER)
