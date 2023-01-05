@@ -45,21 +45,21 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public UserResponse getUser(Long userId) {
-		User user = getUserEntity(userId);
+		User user = findById(userId);
 		log.info("get user info={}", user);
 		return UserResponse.of(user);
 	}
 
 	@Override
 	public SimpleUserResponse getSimpleUser(Long userId) {
-		User user = getUserEntity(userId);
+		User user = findById(userId);
 		log.info("get simple user info={}", user);
 		return SimpleUserResponse.of(user);
 	}
 
 	@Override
 	public UserResponse getUserByUsername(String username) {
-		User user = getUserEntityByUsername(username);
+		User user = findByUsername(username);
 		log.info("signIn user={}", user);
 		return UserResponse.of(user);
 	}
@@ -71,7 +71,7 @@ public class UserServiceImpl implements UserService {
 	@Transactional
 	public UserResponse updateUser(UpdateUserRequest request, Long userId) {
 
-		User user = getUserEntity(userId);
+		User user = findById(userId);
 
 		user.update(request.getSchoolName(), request.getGithubUrl(), request.getIntroduce());
 
@@ -121,12 +121,12 @@ public class UserServiceImpl implements UserService {
 		log.info("checkDuplicateNickName request info={}", request);
 	}
 
-	public User getUserEntity(Long userId) {
+	public User findById(Long userId) {
 		return userRepository.findById(userId)
 			.orElseThrow(() -> new EntityNotFoundException(ErrorMessage.USER_NOT_FOUND));
 	}
 
-	public User getUserEntityByUsername(String username) {
+	public User findByUsername(String username) {
 		return userRepository.findByUsername(username)
 			.orElseThrow(() -> new EntityNotFoundException(ErrorMessage.USER_NOT_FOUND));
 	}

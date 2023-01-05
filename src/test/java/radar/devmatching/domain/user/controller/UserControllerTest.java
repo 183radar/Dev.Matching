@@ -41,7 +41,7 @@ public class UserControllerTest extends ControllerTestSetUp {
 
 	private User authUserSetUp(Long userId) {
 		User user = createUser(userId);
-		given(userService.getUserEntityByUsername(anyString())).willReturn(user);
+		given(userService.findByUsername(anyString())).willReturn(user);
 		return user;
 	}
 

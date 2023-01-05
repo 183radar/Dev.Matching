@@ -306,17 +306,17 @@ public class UserServiceTest {
 	}
 
 	@Nested
-	@DisplayName("getUserEntity 메서드에서")
-	class GetUserEntityMethod {
+	@DisplayName("findById 메서드에서")
+	class FindByIdMethod {
 
 		@Test
 		@DisplayName("userId에 해당하는 엔티티가 존재한다")
-		void getUserEntity() {
+		void findById() {
 			//given
 			User user = createUser();
 			given(userRepository.findById(user.getId())).willReturn(Optional.of(user));
 			//when
-			User getUserEntity = userService.getUserEntity(user.getId());
+			User getUserEntity = userService.findById(user.getId());
 			//then
 			assertThat(getUserEntity).isEqualTo(user);
 		}
@@ -329,24 +329,24 @@ public class UserServiceTest {
 			given(userRepository.findById(user.getId())).willReturn(Optional.empty());
 			//when
 			//then
-			assertThatThrownBy(() -> userService.getUserEntity(user.getId()))
+			assertThatThrownBy(() -> userService.findById(user.getId()))
 				.isInstanceOf(EntityNotFoundException.class);
 		}
 
 	}
 
 	@Nested
-	@DisplayName("getUserEntityByUsername 메서드에서")
-	class GetUserEntityByUsernameMethod {
+	@DisplayName("findByUsername 메서드에서")
+	class findByUsernameMethod {
 
 		@Test
 		@DisplayName("username에 해당하는 엔티티가 존재한다")
-		void getUserEntityByUsername() {
+		void findByUsername() {
 			//given
 			User user = createUser();
 			given(userRepository.findByUsername(user.getUsername())).willReturn(Optional.of(user));
 			//when
-			User getUserEntityByUsername = userService.getUserEntityByUsername(user.getUsername());
+			User getUserEntityByUsername = userService.findByUsername(user.getUsername());
 			//then
 			assertThat(getUserEntityByUsername).isEqualTo(user);
 		}
@@ -359,7 +359,7 @@ public class UserServiceTest {
 			given(userRepository.findByUsername(user.getUsername())).willReturn(Optional.empty());
 			//when
 			//then
-			assertThatThrownBy(() -> userService.getUserEntityByUsername(user.getUsername()))
+			assertThatThrownBy(() -> userService.findByUsername(user.getUsername()))
 				.isInstanceOf(EntityNotFoundException.class);
 		}
 

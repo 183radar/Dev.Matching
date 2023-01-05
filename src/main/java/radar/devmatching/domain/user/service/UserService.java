@@ -24,7 +24,7 @@ public interface UserService {
 
 	void checkDuplicateNickName(CreateUserRequest request);
 
-	User getUserEntity(Long userId);
+	User findById(Long userId);
 
-	User getUserEntityByUsername(String username);
+	User findByUsername(String username);
 }
