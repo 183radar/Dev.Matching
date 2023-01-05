@@ -5,6 +5,7 @@ import javax.validation.constraints.NotBlank;
 import org.hibernate.validator.constraints.Length;
 
 import lombok.Builder;
+import radar.devmatching.common.util.ExcludeJacocoGenerated;
 import radar.devmatching.domain.comment.entity.Comment;
 import radar.devmatching.domain.comment.entity.MainComment;
 import radar.devmatching.domain.comment.entity.SubComment;
@@ -13,12 +14,10 @@ import radar.devmatching.domain.user.entity.User;
 
 public class CreateCommentRequest {
 
-	private Long entityId;
-
 	@NotBlank
 	@Length(max = 10000)
 	private final String content;
-
+	private Long entityId;
 	private CommentType commentType;
 
 	@Builder
@@ -73,6 +72,15 @@ public class CreateCommentRequest {
 
 	public void setCommentType(CommentType commentType) {
 		this.commentType = commentType;
+	}
+
+	@ExcludeJacocoGenerated
+	@Override
+	public String toString() {
+		return "CreateCommentRequest{" +
+			"entityId=" + entityId +
+			", content='" + content +
+			'}';
 	}
 
 	public enum CommentType {

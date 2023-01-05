@@ -25,17 +25,21 @@ public class PresentPostResponse {
 
 	private Integer applyCount;
 
+	private boolean isAppliedLoginUser;
+
 	private String content;
 
 	private List<MainCommentResponse> mainCommentResponses;
 
 	public static PresentPostResponse of(SimplePost simplePost, User loginUser, int applyCount,
+		boolean isAppliedLoginUser,
 		List<MainCommentResponse> mainCommentResponse) {
 		return PresentPostResponse.builder()
 			.simplePostResponse(SimplePostResponse.of(simplePost))
 			.loginUser(SimpleUserResponse.of(loginUser))
 			.postLeader(SimpleUserResponse.of(simplePost.getLeader()))
 			.applyCount(applyCount)
+			.isAppliedLoginUser(isAppliedLoginUser)
 			.content(simplePost.getFullPost().getContent())
 			.mainCommentResponses(mainCommentResponse)
 			.build();
@@ -55,6 +59,10 @@ public class PresentPostResponse {
 
 	public Integer getApplyCount() {
 		return applyCount;
+	}
+
+	public boolean isAppliedLoginUser() {
+		return isAppliedLoginUser;
 	}
 
 	public String getContent() {

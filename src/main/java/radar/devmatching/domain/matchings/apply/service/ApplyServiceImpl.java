@@ -17,7 +17,7 @@ import radar.devmatching.domain.matchings.apply.exception.AlreadyApplyException;
 import radar.devmatching.domain.matchings.apply.repository.ApplyRepository;
 import radar.devmatching.domain.matchings.apply.service.dto.response.ApplyResponse;
 import radar.devmatching.domain.post.simple.entity.SimplePost;
-import radar.devmatching.domain.post.simple.repository.SimplePostRepository;
+import radar.devmatching.domain.post.simple.service.SimplePostService;
 import radar.devmatching.domain.user.entity.User;
 import radar.devmatching.domain.user.repository.UserRepository;
 
@@ -29,13 +29,13 @@ public class ApplyServiceImpl implements ApplyService {
 
 	private final UserRepository userRepository;
 	private final ApplyRepository applyRepository;
-	private final SimplePostRepository simplePostRepository;
+	private final SimplePostService simplePostService;
 
 	@Override
 	@Transactional
 	public Apply createApply(Long simplePostId, User authUser) {
 		authUser = userRepository.findById(authUser.getId()).get();
-		SimplePost simplePost = getSimplePost(simplePostId);
+		SimplePost simplePost = simplePostService.findById(simplePostId);
 
 		// TODO : Querydsl 로 이름 간략하게 바꾸기
 		applyRepository.findByApplySimplePostIdAndApplyUserId(simplePostId, authUser.getId())
@@ -69,11 +69,6 @@ public class ApplyServiceImpl implements ApplyService {
 	public Apply getApply(Long applyId) {
 		return applyRepository.findById(applyId)
 			.orElseThrow(() -> new EntityNotFoundException(ErrorMessage.APPLY_NOT_FOUND));
-	}
-
-	private SimplePost getSimplePost(Long simplePostId) {
-		return simplePostRepository.findById(simplePostId)
-			.orElseThrow(() -> new EntityNotFoundException(ErrorMessage.SIMPLE_POST_NOT_FOUND));
 	}
 
 }

@@ -14,13 +14,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
 import lombok.RequiredArgsConstructor;
+import radar.devmatching.common.security.jwt.JwtTokenInfo;
 import radar.devmatching.common.security.resolver.AuthUser;
 import radar.devmatching.domain.post.simple.entity.PostCategory;
 import radar.devmatching.domain.post.simple.entity.Region;
 import radar.devmatching.domain.post.simple.service.SimplePostService;
 import radar.devmatching.domain.post.simple.service.dto.request.CreatePostRequest;
 import radar.devmatching.domain.post.simple.service.dto.response.SimplePostResponse;
-import radar.devmatching.domain.user.entity.User;
 
 @Controller
 @RequiredArgsConstructor
@@ -47,25 +47,26 @@ public class SimplePostController {
 	}
 
 	@PostMapping("/new")
-	public String createPost(@AuthUser User authUser, @Valid @ModelAttribute CreatePostRequest createPostRequest,
+	public String createPost(@AuthUser JwtTokenInfo jwtTokenInfo,
+		@Valid @ModelAttribute CreatePostRequest createPostRequest,
 		BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
 			return "post/createPost";
 		}
-		long simplePostId = simplePostService.createPost(createPostRequest, authUser);
+		long simplePostId = simplePostService.createPost(createPostRequest, jwtTokenInfo.getUserId());
 		return "redirect:/api/posts/" + simplePostId;
 	}
 
 	@GetMapping("/my")
-	public String getMyPosts(@AuthUser User authUser, Model model) {
-		List<SimplePostResponse> myPosts = simplePostService.getMyPosts(authUser.getId());
+	public String getMyPosts(@AuthUser JwtTokenInfo jwtTokenInfo, Model model) {
+		List<SimplePostResponse> myPosts = simplePostService.getMyPosts(jwtTokenInfo.getUserId());
 		model.addAttribute("myPosts", myPosts);
 		return "post/myPosts";
 	}
 
 	@GetMapping("/applicationPosts")
-	public String getApplicationPosts(@AuthUser User authUser, Model model) {
-		List<SimplePostResponse> applicationPosts = simplePostService.getApplicationPosts(authUser.getId());
+	public String getApplicationPosts(@AuthUser JwtTokenInfo jwtTokenInfo, Model model) {
+		List<SimplePostResponse> applicationPosts = simplePostService.getApplicationPosts(jwtTokenInfo.getUserId());
 		model.addAttribute("applicationPosts", applicationPosts);
 		return "post/applicationPosts";
 	}

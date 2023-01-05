@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -22,6 +21,7 @@ import radar.devmatching.domain.comment.entity.MainComment;
 import radar.devmatching.domain.comment.entity.SubComment;
 import radar.devmatching.domain.comment.service.CommentService;
 import radar.devmatching.domain.comment.service.dto.response.MainCommentResponse;
+import radar.devmatching.domain.matchings.apply.repository.ApplyRepository;
 import radar.devmatching.domain.matchings.apply.service.ApplyService;
 import radar.devmatching.domain.matchings.matching.entity.Matching;
 import radar.devmatching.domain.post.full.entity.FullPost;
@@ -32,9 +32,10 @@ import radar.devmatching.domain.post.simple.entity.PostState;
 import radar.devmatching.domain.post.simple.entity.Region;
 import radar.devmatching.domain.post.simple.entity.SimplePost;
 import radar.devmatching.domain.post.simple.exception.SimplePostNotFoundException;
-import radar.devmatching.domain.post.simple.repository.SimplePostRepository;
+import radar.devmatching.domain.post.simple.service.SimplePostService;
 import radar.devmatching.domain.post.simple.service.dto.response.SimplePostResponse;
 import radar.devmatching.domain.user.entity.User;
+import radar.devmatching.domain.user.service.UserService;
 import radar.devmatching.domain.user.service.dto.response.SimpleUserResponse;
 
 @ExtendWith(MockitoExtension.class)
@@ -42,8 +43,13 @@ import radar.devmatching.domain.user.service.dto.response.SimpleUserResponse;
 class FullPostServiceImplTest {
 
 	private static final FullPost fullPost = createFullPost();
+
 	@Mock
-	private SimplePostRepository simplePostRepository;
+	private UserService userService;
+	@Mock
+	private SimplePostService simplePostService;
+	@Mock
+	private ApplyRepository applyRepository;
 	@Mock
 	private ApplyService applyService;
 	@Mock
@@ -87,7 +93,8 @@ class FullPostServiceImplTest {
 
 	@BeforeEach
 	void setup() {
-		this.fullPostService = new FullPostServiceImpl(simplePostRepository, applyService, commentService);
+		this.fullPostService = new FullPostServiceImpl(userService, simplePostService, applyRepository, applyService,
+			commentService);
 	}
 
 	@Nested
@@ -109,15 +116,16 @@ class FullPostServiceImplTest {
 				.build();
 			int applyCount = 2;
 			List<MainCommentResponse> mainCommentResponses = List.of(MainCommentResponse.of(mainComment));
-			given(simplePostRepository.findPostById(anyLong())).willReturn(Optional.of(simplePost));
+			given(userService.getUserEntity(anyLong())).willReturn(loginUser);
+			given(simplePostService.findPostById(anyLong())).willReturn(simplePost);
 			given(applyService.getAcceptedApplyCount(anyLong())).willReturn(applyCount);
 			given(commentService.getAllComments(anyLong())).willReturn(mainCommentResponses);
 
 			//when
-			PresentPostResponse presentPostResponse = fullPostService.getPostWithComment(anyLong(), loginUser);
+			PresentPostResponse presentPostResponse = fullPostService.getPostWithComment(anyLong(), loginUser.getId());
 
 			//then
-			verify(simplePostRepository).findPostById(anyLong());
+			verify(simplePostService).findPostById(anyLong());
 			verify(applyService).getAcceptedApplyCount(anyLong());
 			verify(commentService).getAllComments(anyLong());
 
@@ -141,10 +149,12 @@ class FullPostServiceImplTest {
 			User loginUser = createUser();
 			SimplePost simplePost = createSimplePost(loginUser, Matching.builder().build(), fullPost);
 			Long clickCount = simplePost.getClickCount();
+			willThrow(new SimplePostNotFoundException()).given(simplePostService)
+				.findPostById(anyLong());
 
 			//when
 			//then
-			assertThatThrownBy(() -> fullPostService.getPostWithComment(anyLong(), loginUser))
+			assertThatThrownBy(() -> fullPostService.getPostWithComment(anyLong(), loginUser.getId()))
 				.isInstanceOf(SimplePostNotFoundException.class);
 			assertThat(clickCount).isEqualTo(simplePost.getClickCount());
 			verify(applyService, never()).getAcceptedApplyCount(anyLong());
@@ -153,8 +163,8 @@ class FullPostServiceImplTest {
 	}
 
 	@Nested
-	@DisplayName("getFullPost 메서드는")
-	class GetFullPostMethod {
+	@DisplayName("getUpdateFullPost 메서드는")
+	class GetUpdateFullPostMethod {
 
 		@Nested
 		@DisplayName("simplePostId에 해당하는 게시글이")
@@ -165,15 +175,16 @@ class FullPostServiceImplTest {
 			void correct() throws Exception {
 				//given
 				SimplePost simplePost = createSimplePost(createUser(), Matching.builder().build(), fullPost);
-				given(simplePostRepository.findById(anyLong())).willReturn(Optional.of(simplePost));
-				given(simplePostRepository.findPostById(anyLong())).willReturn(Optional.of(simplePost));
+				given(simplePostService.findById(anyLong())).willReturn(simplePost);
+				given(simplePostService.findPostById(anyLong())).willReturn(simplePost);
 
 				//when
-				UpdatePostDto updatePostDto = fullPostService.getFullPost(anyLong(), simplePost.getLeader().getId());
+				UpdatePostDto updatePostDto = fullPostService.getUpdateFullPost(anyLong(),
+					simplePost.getLeader().getId());
 
 				//then
-				verify(simplePostRepository).findById(anyLong());
-				verify(simplePostRepository).findPostById(anyLong());
+				verify(simplePostService).findById(anyLong());
+				verify(simplePostService).findPostById(anyLong());
 				assertThat(updatePostDto).usingRecursiveComparison().isEqualTo(UpdatePostDto.of(simplePost));
 			}
 
@@ -182,27 +193,30 @@ class FullPostServiceImplTest {
 			void notLeader() throws Exception {
 				//given
 				SimplePost simplePost = createSimplePost(createUser(), Matching.builder().build(), fullPost);
-				given(simplePostRepository.findById(anyLong())).willReturn(Optional.of(simplePost));
+				given(simplePostService.findById(anyLong())).willReturn(simplePost);
 
 				//when
 				//then
-				assertThatThrownBy(() -> fullPostService.getFullPost(anyLong(), 12321L))
+				assertThatThrownBy(() -> fullPostService.getUpdateFullPost(anyLong(), 12321L))
 					.isInstanceOf(InvalidAccessException.class)
 					.hasMessage(ErrorMessage.NOT_LEADER.getMessage());
-				verify(simplePostRepository).findById(anyLong());
-				verify(simplePostRepository, never()).findPostById(anyLong());
+				verify(simplePostService).findById(anyLong());
+				verify(simplePostService, never()).findPostById(anyLong());
 			}
 
 			@Test
 			@DisplayName("없을 경우 예외를 반환한다.")
 			void notExistSimplePost() throws Exception {
 				//given
+				willThrow(new SimplePostNotFoundException()).given(simplePostService)
+					.findById(anyLong());
+
 				//when
 				//then
-				assertThatThrownBy(() -> fullPostService.getFullPost(1L, 1L))
+				assertThatThrownBy(() -> fullPostService.getUpdateFullPost(1L, 1L))
 					.isInstanceOf(SimplePostNotFoundException.class);
-				verify(simplePostRepository).findById(anyLong());
-				verify(simplePostRepository, never()).findPostById(anyLong());
+				verify(simplePostService).findById(anyLong());
+				verify(simplePostService, never()).findPostById(anyLong());
 			}
 		}
 	}
@@ -230,15 +244,15 @@ class FullPostServiceImplTest {
 					.matching(Matching.builder().build())
 					.build();
 				UpdatePostDto updatePostDto = UpdatePostDto.of(updateSimplePost);
-				given(simplePostRepository.findById(anyLong())).willReturn(Optional.of(simplePost));
-				given(simplePostRepository.findPostById(anyLong())).willReturn(Optional.of(simplePost));
+				given(simplePostService.findById(anyLong())).willReturn(simplePost);
+				given(simplePostService.findPostById(anyLong())).willReturn(simplePost);
 
 				//when
 				fullPostService.updatePost(anyLong(), simplePost.getLeader().getId(), updatePostDto);
 
 				//then
-				verify(simplePostRepository).findById(anyLong());
-				verify(simplePostRepository).findPostById(anyLong());
+				verify(simplePostService).findById(anyLong());
+				verify(simplePostService).findPostById(anyLong());
 
 				assertThat(simplePost.getTitle()).isEqualTo(updatePostDto.getTitle());
 				assertThat(simplePost.getCategory()).isEqualTo(updatePostDto.getCategory());
@@ -252,27 +266,30 @@ class FullPostServiceImplTest {
 			void notLeader() throws Exception {
 				//given
 				SimplePost simplePost = createSimplePost(createUser(), Matching.builder().build(), fullPost);
-				given(simplePostRepository.findById(anyLong())).willReturn(Optional.of(simplePost));
+				given(simplePostService.findById(anyLong())).willReturn(simplePost);
 
 				//when
 				//then
 				assertThatThrownBy(() -> fullPostService.updatePost(anyLong(), 12321L, null))
 					.isInstanceOf(InvalidAccessException.class)
 					.hasMessage(ErrorMessage.NOT_LEADER.getMessage());
-				verify(simplePostRepository).findById(anyLong());
-				verify(simplePostRepository, never()).findPostById(anyLong());
+				verify(simplePostService).findById(anyLong());
+				verify(simplePostService, never()).findPostById(anyLong());
 			}
 
 			@Test
 			@DisplayName("없을 경우 예외를 반환한다.")
 			void notExistSimplePost() throws Exception {
 				//given
+				willThrow(new SimplePostNotFoundException()).given(simplePostService)
+					.findById(anyLong());
+
 				//when
 				//then
 				assertThatThrownBy(() -> fullPostService.updatePost(0, 0, any(UpdatePostDto.class)))
 					.isInstanceOf(SimplePostNotFoundException.class);
-				verify(simplePostRepository).findById(anyLong());
-				verify(simplePostRepository, never()).findPostById(anyLong());
+				verify(simplePostService).findById(anyLong());
+				verify(simplePostService, never()).findPostById(anyLong());
 			}
 		}
 	}
@@ -290,14 +307,14 @@ class FullPostServiceImplTest {
 			void correct() throws Exception {
 				//given
 				SimplePost simplePost = createSimplePost(createUser(), Matching.builder().build(), fullPost);
-				given(simplePostRepository.findById(simplePost.getId())).willReturn(Optional.of(simplePost));
+				given(simplePostService.findById(simplePost.getId())).willReturn(simplePost);
 
 				//when
 				fullPostService.deletePost(simplePost.getId(), simplePost.getLeader().getId());
 
 				//then
-				verify(simplePostRepository).findById(simplePost.getId());
-				verify(simplePostRepository).deleteById(simplePost.getId());
+				verify(simplePostService).findById(simplePost.getId());
+				verify(simplePostService).deleteById(simplePost.getId());
 			}
 
 			@Test
@@ -305,27 +322,30 @@ class FullPostServiceImplTest {
 			void notLeader() throws Exception {
 				//given
 				SimplePost simplePost = createSimplePost(createUser(), Matching.builder().build(), fullPost);
-				given(simplePostRepository.findById(anyLong())).willReturn(Optional.of(simplePost));
+				given(simplePostService.findById(anyLong())).willReturn(simplePost);
 
 				//when
 				//then
 				assertThatThrownBy(() -> fullPostService.deletePost(anyLong(), 12321L))
 					.isInstanceOf(InvalidAccessException.class)
 					.hasMessage(ErrorMessage.NOT_LEADER.getMessage());
-				verify(simplePostRepository).findById(anyLong());
-				verify(simplePostRepository, never()).deleteById(anyLong());
+				verify(simplePostService).findById(anyLong());
+				verify(simplePostService, never()).deleteById(anyLong());
 			}
 
 			@Test
 			@DisplayName("없을 경우 예외를 반환한다.")
 			void notExistSimplePost() throws Exception {
 				//given
+				willThrow(new SimplePostNotFoundException()).given(simplePostService)
+					.findById(anyLong());
+
 				//when
 				//then
 				assertThatThrownBy(() -> fullPostService.deletePost(0, 0))
 					.isInstanceOf(SimplePostNotFoundException.class);
-				verify(simplePostRepository).findById(anyLong());
-				verify(simplePostRepository, never()).deleteById(anyLong());
+				verify(simplePostService).findById(anyLong());
+				verify(simplePostService, never()).deleteById(anyLong());
 			}
 		}
 	}
@@ -343,15 +363,15 @@ class FullPostServiceImplTest {
 			void correct() throws Exception {
 				//given
 				SimplePost simplePost = createSimplePost(createUser(), Matching.builder().build(), fullPost);
-				given(simplePostRepository.findById(simplePost.getId())).willReturn(Optional.of(simplePost));
-				given(simplePostRepository.findPostById(simplePost.getId())).willReturn(Optional.of(simplePost));
+				given(simplePostService.findById(simplePost.getId())).willReturn(simplePost);
+				given(simplePostService.findPostById(simplePost.getId())).willReturn(simplePost);
 
 				//when
 				fullPostService.closePost(simplePost.getId(), simplePost.getLeader().getId());
 
 				//then
-				verify(simplePostRepository).findById(simplePost.getId());
-				verify(simplePostRepository).findPostById(simplePost.getId());
+				verify(simplePostService).findById(simplePost.getId());
+				verify(simplePostService).findPostById(simplePost.getId());
 				assertThat(simplePost.getPostState()).isEqualTo(PostState.END);
 			}
 
@@ -360,27 +380,30 @@ class FullPostServiceImplTest {
 			void notLeader() throws Exception {
 				//given
 				SimplePost simplePost = createSimplePost(createUser(), Matching.builder().build(), fullPost);
-				given(simplePostRepository.findById(anyLong())).willReturn(Optional.of(simplePost));
+				given(simplePostService.findById(anyLong())).willReturn(simplePost);
 
 				//when
 				//then
 				assertThatThrownBy(() -> fullPostService.closePost(anyLong(), 12321L))
 					.isInstanceOf(InvalidAccessException.class)
 					.hasMessage(ErrorMessage.NOT_LEADER.getMessage());
-				verify(simplePostRepository).findById(anyLong());
-				verify(simplePostRepository, never()).findPostById(anyLong());
+				verify(simplePostService).findById(anyLong());
+				verify(simplePostService, never()).findPostById(anyLong());
 			}
 
 			@Test
 			@DisplayName("없을 경우 예외를 반환한다.")
 			void notExistSimplePost() throws Exception {
 				//given
+				willThrow(new SimplePostNotFoundException()).given(simplePostService)
+					.findById(anyLong());
+
 				//when
 				//then
 				assertThatThrownBy(() -> fullPostService.closePost(0, 0))
 					.isInstanceOf(SimplePostNotFoundException.class);
-				verify(simplePostRepository).findById(anyLong());
-				verify(simplePostRepository, never()).findPostById(anyLong());
+				verify(simplePostService).findById(anyLong());
+				verify(simplePostService, never()).findPostById(anyLong());
 			}
 		}
 	}

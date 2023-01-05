@@ -1,6 +1,9 @@
 package radar.devmatching.util;
 
+import static org.mockito.ArgumentMatchers.*;
+
 import org.junit.jupiter.api.BeforeEach;
+import org.mockito.BDDMockito;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
@@ -16,6 +19,7 @@ import radar.devmatching.domain.post.simple.entity.PostCategory;
 import radar.devmatching.domain.post.simple.entity.Region;
 import radar.devmatching.domain.post.simple.entity.SimplePost;
 import radar.devmatching.domain.user.entity.User;
+import radar.devmatching.domain.user.service.UserService;
 
 @Import({ControllerTestConfig.class})
 @MockBean(JpaMetamodelMappingContext.class)
@@ -23,6 +27,9 @@ import radar.devmatching.domain.user.entity.User;
 public abstract class ControllerTestSetUp {
 
 	protected MockMvc mockMvc;
+
+	@MockBean
+	UserService userService;
 
 	protected static User createUser(long userId) {
 		User user = User.builder()
@@ -53,6 +60,11 @@ public abstract class ControllerTestSetUp {
 
 	@BeforeEach
 	void setUp(WebApplicationContext context) {
+		User customUser = User.builder().build();
+		ReflectionTestUtils.setField(customUser, "id", 1L);
+		BDDMockito.given(userService.getUserEntityByUsername(eq("CustomUserName")))
+			.willReturn(customUser);
+
 		this.mockMvc = MockMvcBuilders.webAppContextSetup(context)
 			.apply(SecurityMockMvcConfigurers.springSecurity())
 			.build();
