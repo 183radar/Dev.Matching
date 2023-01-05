@@ -41,6 +41,20 @@ public class UserResponse {
 			.build();
 	}
 
+	@Override
+	public String toString() {
+		return "UserResponse{" +
+			"id=" + id +
+			", username='" + username + '\'' +
+			", password='" + password + '\'' +
+			", nickName='" + nickName + '\'' +
+			", schoolName='" + schoolName + '\'' +
+			", githubUrl='" + githubUrl + '\'' +
+			", introduce='" + introduce + '\'' +
+			", userRole=" + userRole +
+			'}';
+	}
+
 	public Long getId() {
 		return id;
 	}

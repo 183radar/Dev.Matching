@@ -9,6 +9,7 @@ public enum ErrorMessage {
 	//User
 	DUPLICATE_USERNAME("duplicate username", HttpStatus.CONFLICT),
 	DUPLICATE_NICKNAME("duplicate nickName", HttpStatus.CONFLICT),
+	NOT_EXIST_DUPLICATE_PERMISSION("not exist duplicate permission", HttpStatus.BAD_REQUEST),
 	USER_NOT_FOUND("not exist user", HttpStatus.BAD_REQUEST),
 	EMPTY_USERNAME("empty username", HttpStatus.BAD_REQUEST),
 	EMPTY_NICKNAME("empty nickName", HttpStatus.BAD_REQUEST),

@@ -12,7 +12,7 @@ public interface UserService {
 
 	UserResponse getUser(Long userId);
 
-	SimpleUserResponse getSimpleUser(User authUser);
+	SimpleUserResponse getSimpleUser(Long userId);
 
 	UserResponse getUserByUsername(String username);
 

@@ -31,9 +31,8 @@ public class UserServiceImpl implements UserService {
 	@Transactional
 	public UserResponse createUser(CreateUserRequest request) {
 
-		// TODO : 예외 설정하기
 		if (!request.getNickNameCheck() || !request.getUsernameCheck()) {
-			throw new RuntimeException();
+			throw new DuplicateException(ErrorMessage.NOT_EXIST_DUPLICATE_PERMISSION);
 		}
 
 		User signUpUser = CreateUserRequest.toEntity(request, passwordEncoder);
@@ -52,9 +51,10 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public SimpleUserResponse getSimpleUser(User authUser) {
-		log.info("get simple user info={}", authUser);
-		return SimpleUserResponse.of(authUser);
+	public SimpleUserResponse getSimpleUser(Long userId) {
+		User user = getUserEntity(userId);
+		log.info("get simple user info={}", user);
+		return SimpleUserResponse.of(user);
 	}
 
 	@Override
@@ -82,7 +82,6 @@ public class UserServiceImpl implements UserService {
 	@Override
 	@Transactional
 	public void deleteUser(Long userId) {
-
 		log.info("delete user={}", userId);
 		userRepository.deleteById(userId);
 	}

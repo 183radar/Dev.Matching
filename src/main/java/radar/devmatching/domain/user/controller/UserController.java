@@ -20,7 +20,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import radar.devmatching.common.security.jwt.JwtTokenInfo;
 import radar.devmatching.common.security.resolver.AuthUser;
-import radar.devmatching.domain.user.entity.User;
 import radar.devmatching.domain.user.service.UserService;
 import radar.devmatching.domain.user.service.dto.request.CreateUserRequest;
 import radar.devmatching.domain.user.service.dto.request.UpdateUserRequest;
@@ -101,11 +100,11 @@ public class UserController {
 	}
 
 	@GetMapping("/{userId}")
-	public String getSimpleUser(@PathVariable Long userId, @AuthUser User user, Model model) {
-		if (Objects.equals(userId, user.getId())) {
+	public String getSimpleUser(@PathVariable Long userId, @AuthUser JwtTokenInfo jwtTokenInfo, Model model) {
+		if (Objects.equals(userId, jwtTokenInfo.getUserId())) {
 			return "redirect:/api/users";
 		}
-		model.addAttribute("simpleUserInfo", userService.getSimpleUser(user));
+		model.addAttribute("simpleUserInfo", userService.getSimpleUser(userId));
 		return "user/simpleUserInfo";
 	}
 
