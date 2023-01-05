@@ -22,7 +22,6 @@ import org.springframework.util.MultiValueMap;
 import radar.devmatching.domain.post.simple.service.SimplePostService;
 import radar.devmatching.domain.post.simple.service.dto.request.CreatePostRequest;
 import radar.devmatching.domain.post.simple.service.dto.response.SimplePostResponse;
-import radar.devmatching.domain.user.entity.User;
 import radar.devmatching.util.ControllerTestSetUp;
 
 @WebMvcTest(SimplePostController.class)
@@ -58,7 +57,7 @@ class SimplePostControllerTest extends ControllerTestSetUp {
 		void createPostMethod() throws Exception {
 			//given
 			Long simplePostId = 1L;
-			given(simplePostService.createPost(any(CreatePostRequest.class), any(User.class)))
+			given(simplePostService.createPost(any(CreatePostRequest.class), anyLong()))
 				.willReturn(simplePostId);
 
 			//when
@@ -75,7 +74,7 @@ class SimplePostControllerTest extends ControllerTestSetUp {
 			ResultActions result = mockMvc.perform(request);
 
 			//then
-			verify(simplePostService, only()).createPost(any(CreatePostRequest.class), any(User.class));
+			verify(simplePostService, only()).createPost(any(CreatePostRequest.class), anyLong());
 
 			result.andExpect(status().isFound())
 				.andExpect(handler().handlerType(SimplePostController.class))
@@ -106,7 +105,7 @@ class SimplePostControllerTest extends ControllerTestSetUp {
 				ResultActions result = mockMvc.perform(request);
 
 				//then
-				verify(simplePostService, never()).createPost(any(CreatePostRequest.class), any(User.class));
+				verify(simplePostService, never()).createPost(any(CreatePostRequest.class), anyLong());
 
 				result.andExpect(status().isOk())
 					.andExpect(handler().handlerType(SimplePostController.class))
@@ -139,7 +138,7 @@ class SimplePostControllerTest extends ControllerTestSetUp {
 				ResultActions result = mockMvc.perform(request);
 
 				//then
-				verify(simplePostService, never()).createPost(any(CreatePostRequest.class), any(User.class));
+				verify(simplePostService, never()).createPost(any(CreatePostRequest.class), anyLong());
 
 				result.andExpect(status().isOk())
 					.andExpect(handler().handlerType(SimplePostController.class))
@@ -184,7 +183,7 @@ class SimplePostControllerTest extends ControllerTestSetUp {
 				ResultActions result2 = mockMvc.perform(request2);
 
 				//then
-				verify(simplePostService, never()).createPost(any(CreatePostRequest.class), any(User.class));
+				verify(simplePostService, never()).createPost(any(CreatePostRequest.class), anyLong());
 
 				result1.andExpect(status().isOk())
 					.andExpect(handler().handlerType(SimplePostController.class))

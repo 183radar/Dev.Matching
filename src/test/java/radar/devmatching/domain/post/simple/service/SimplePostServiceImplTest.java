@@ -30,7 +30,7 @@ import radar.devmatching.domain.post.simple.service.dto.MainPostDto;
 import radar.devmatching.domain.post.simple.service.dto.request.CreatePostRequest;
 import radar.devmatching.domain.post.simple.service.dto.response.SimplePostResponse;
 import radar.devmatching.domain.user.entity.User;
-import radar.devmatching.domain.user.repository.UserRepository;
+import radar.devmatching.domain.user.service.UserService;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("SimplePostService 클래스의")
@@ -40,7 +40,7 @@ class SimplePostServiceImplTest {
 	private final static Matching matching = Matching.builder().build();
 
 	@Mock
-	UserRepository userRepository;
+	UserService userService;
 	@Mock
 	SimplePostRepository simplePostRepository;
 	@Mock
@@ -63,7 +63,7 @@ class SimplePostServiceImplTest {
 
 	@BeforeEach
 	void setup() {
-		this.simplePostService = new SimplePostServiceImpl(userRepository, simplePostRepository, matchingLeaderService);
+		this.simplePostService = new SimplePostServiceImpl(userService, simplePostRepository, matchingLeaderService);
 	}
 
 	private SimplePost createSimplePost(User user, Matching matching) {
@@ -117,8 +117,8 @@ class SimplePostServiceImplTest {
 	}
 
 	@Nested
-	@DisplayName("getSimplePostOnly 메서드는")
-	class getSimplePostOnlyMethodIs {
+	@DisplayName("findById 메서드는")
+	class FindByIdMethod {
 
 		@Test
 		@DisplayName("db에 존재하지 않는 simplePostId를 넘기면 에러를 낸다.")
@@ -126,7 +126,7 @@ class SimplePostServiceImplTest {
 			//given
 			//when
 			//then
-			assertThatThrownBy(() -> simplePostService.getSimplePostOnly(anyLong()))
+			assertThatThrownBy(() -> simplePostService.findById(anyLong()))
 				.isInstanceOf(SimplePostNotFoundException.class);
 		}
 
@@ -138,7 +138,36 @@ class SimplePostServiceImplTest {
 			given(simplePostRepository.findById(anyLong())).willReturn(Optional.of(simplePost));
 
 			//when
-			SimplePost findSimplePost = simplePostService.getSimplePostOnly(anyLong());
+			SimplePost findSimplePost = simplePostService.findById(anyLong());
+
+			//then
+			assertThat(findSimplePost).isEqualTo(simplePost);
+		}
+	}
+
+	@Nested
+	@DisplayName("findPostById 메서드는")
+	class FindPostById {
+
+		@Test
+		@DisplayName("db에 존재하지 않는 simplePostId를 넘기면 에러를 낸다.")
+		void ifNotExistIdThanThrowException() throws Exception {
+			//given
+			//when
+			//then
+			assertThatThrownBy(() -> simplePostService.findPostById(anyLong()))
+				.isInstanceOf(SimplePostNotFoundException.class);
+		}
+
+		@Test
+		@DisplayName("db에 존재하는 simplePostId를 넘기면 simplePost만 가져온다.")
+		void ifExistIdThanGetSimplePost() throws Exception {
+			//given
+			SimplePost simplePost = createSimplePost(loginUser, matching);
+			given(simplePostRepository.findPostById(anyLong())).willReturn(Optional.of(simplePost));
+
+			//when
+			SimplePost findSimplePost = simplePostService.findPostById(anyLong());
 
 			//then
 			assertThat(findSimplePost).isEqualTo(simplePost);
@@ -159,7 +188,7 @@ class SimplePostServiceImplTest {
 				//given
 				//when
 				//then
-				assertThatThrownBy(() -> simplePostService.getMainPostDto(loginUser, "noMatch"))
+				assertThatThrownBy(() -> simplePostService.getMainPostDto(loginUser.getId(), "noMatch"))
 					.isInstanceOf(InvalidParamException.class)
 					.hasMessage(ErrorMessage.INVALID_POST_CATEGORY.getMessage());
 			}
@@ -169,11 +198,12 @@ class SimplePostServiceImplTest {
 			void isAllThanSearchAll() throws Exception {
 				//given
 				SimplePost simplePost = createSimplePost(loginUser, matching);
+				given(userService.getUserEntity(anyLong())).willReturn(loginUser);
 				given(simplePostRepository.findByPostStateOrderByCreateDateDesc(PostState.RECRUITING))
 					.willReturn(List.of(simplePost));
 
 				//when
-				MainPostDto findMainPostDto = simplePostService.getMainPostDto(loginUser, "ALL");
+				MainPostDto findMainPostDto = simplePostService.getMainPostDto(loginUser.getId(), "ALL");
 
 				//then
 				assertThat(findMainPostDto.getSimplePostResponses().get(0))
@@ -185,11 +215,12 @@ class SimplePostServiceImplTest {
 			void correctCase() throws Exception {
 				//given
 				SimplePost simplePost = createSimplePost(loginUser, matching);
+				given(userService.getUserEntity(anyLong())).willReturn(loginUser);
 				given(simplePostRepository.findByCategoryAndPostStateOrderByCreateDateDesc(
 					PostCategory.PROJECT, PostState.RECRUITING)).willReturn(List.of(simplePost));
 
 				//when
-				MainPostDto findMainPostDto = simplePostService.getMainPostDto(loginUser, "PROJECT");
+				MainPostDto findMainPostDto = simplePostService.getMainPostDto(loginUser.getId(), "PROJECT");
 
 				//then
 				assertThat(findMainPostDto.getSimplePostResponses().get(0).getCategory()).isEqualTo(
@@ -208,11 +239,12 @@ class SimplePostServiceImplTest {
 			//given
 			SimplePost simplePost = createSimplePost(loginUser, matching);
 			MainPostDto mainPostDto = MainPostDto.builder().region(Region.BUSAN).build();
+			given(userService.getUserEntity(anyLong())).willReturn(loginUser);
 			given(simplePostRepository.findRecruitingPostBySearchCondition("ALL", mainPostDto))
 				.willReturn(List.of(simplePost));
 
 			//when
-			MainPostDto findMainPostDto = simplePostService.searchSimplePost(loginUser, "ALL", mainPostDto);
+			MainPostDto findMainPostDto = simplePostService.searchSimplePost(loginUser.getId(), "ALL", mainPostDto);
 
 			//then
 			assertThat(findMainPostDto.getNickname()).isEqualTo(loginUser.getNickName());
@@ -237,12 +269,12 @@ class SimplePostServiceImplTest {
 				SimplePost simplePost = createSimplePost(loginUser, matching);
 				ReflectionTestUtils.setField(simplePost, "id", 1L);
 				CreatePostRequest postRequest = createPostRequest();
-				given(userRepository.findById(anyLong())).willReturn(Optional.of(loginUser));
+				given(userService.getUserEntity(anyLong())).willReturn(loginUser);
 				given(matchingLeaderService.createMatching(loginUser)).willReturn(matching);
 				given(simplePostRepository.save(any(SimplePost.class))).willReturn(simplePost);
 
 				//when
-				long result = simplePostService.createPost(postRequest, loginUser);
+				long result = simplePostService.createPost(postRequest, loginUser.getId());
 
 				//then
 				assertThat(result).isEqualTo(simplePost.getId());

@@ -58,4 +58,5 @@ public class MainPostDto {
 	public List<SimplePostResponse> getSimplePostResponses() {
 		return simplePostResponses;
 	}
+
 }

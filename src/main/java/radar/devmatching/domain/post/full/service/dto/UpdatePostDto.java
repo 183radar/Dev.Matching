@@ -9,6 +9,7 @@ import org.hibernate.validator.constraints.Range;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
+import radar.devmatching.common.util.ExcludeJacocoGenerated;
 import radar.devmatching.domain.post.simple.entity.PostCategory;
 import radar.devmatching.domain.post.simple.entity.Region;
 import radar.devmatching.domain.post.simple.entity.SimplePost;
@@ -80,5 +81,18 @@ public class UpdatePostDto {
 
 	public String getContent() {
 		return content;
+	}
+
+	@ExcludeJacocoGenerated
+	@Override
+	public String toString() {
+		return "UpdatePostDto{" +
+			"simplePostId=" + simplePostId +
+			", title='" + title + '\'' +
+			", category=" + category.getName() +
+			", region=" + region +
+			", userNum=" + userNum +
+			", content='" + content + '\'' +
+			'}';
 	}
 }

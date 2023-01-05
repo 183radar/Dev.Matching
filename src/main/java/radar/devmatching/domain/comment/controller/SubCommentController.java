@@ -12,11 +12,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import lombok.RequiredArgsConstructor;
+import radar.devmatching.common.security.jwt.JwtTokenInfo;
 import radar.devmatching.common.security.resolver.AuthUser;
 import radar.devmatching.domain.comment.service.CommentService;
 import radar.devmatching.domain.comment.service.dto.UpdateCommentDto;
 import radar.devmatching.domain.comment.service.dto.request.CreateCommentRequest;
-import radar.devmatching.domain.user.entity.User;
 
 @Controller
 @RequiredArgsConstructor
@@ -34,14 +34,15 @@ public class SubCommentController {
 	}
 
 	@PostMapping("mainComments/{mainCommentId}/createSubComment")
-	public String createSubComment(@AuthUser User authUser, @PathVariable long mainCommentId,
+	public String createSubComment(@AuthUser JwtTokenInfo jwtTokenInfo, @PathVariable long mainCommentId,
 		@Valid @ModelAttribute CreateCommentRequest createCommentRequest, BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
 			createCommentRequest.setEntityId(mainCommentId);
 			createCommentRequest.setCommentType(CreateCommentRequest.CommentType.SUB);
 			return "comment/createComment";
 		}
-		long simplePostId = commentService.createSubComment(mainCommentId, authUser, createCommentRequest);
+		long simplePostId = commentService.createSubComment(mainCommentId, jwtTokenInfo.getUserId(),
+			createCommentRequest);
 		return "redirect:/api/posts/" + simplePostId;
 	}
 
@@ -53,20 +54,20 @@ public class SubCommentController {
 	}
 
 	@PostMapping("subComments/{subCommentId}/edit")
-	public String updateSubComment(@AuthUser User authUser, @PathVariable long subCommentId,
+	public String updateSubComment(@AuthUser JwtTokenInfo jwtTokenInfo, @PathVariable long subCommentId,
 		@Valid @ModelAttribute UpdateCommentDto updateCommentDto, BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
 			updateCommentDto.setEntityId(subCommentId);
 			updateCommentDto.setCommentType(UpdateCommentDto.CommentType.SUB);
 			return "comment/updateComment";
 		}
-		long simplePostId = commentService.updateSubComment(subCommentId, updateCommentDto, authUser);
+		long simplePostId = commentService.updateSubComment(subCommentId, updateCommentDto, jwtTokenInfo.getUserId());
 		return "redirect:/api/posts/" + simplePostId;
 	}
 
 	@GetMapping("subComments/{subCommentId}/delete")
-	public String deleteSubComment(@AuthUser User authUser, @PathVariable long subCommentId) {
-		Long simplePostId = commentService.deleteSubComment(subCommentId, authUser);
+	public String deleteSubComment(@AuthUser JwtTokenInfo jwtTokenInfo, @PathVariable long subCommentId) {
+		Long simplePostId = commentService.deleteSubComment(subCommentId, jwtTokenInfo.getUserId());
 		return "redirect:/api/posts/" + simplePostId;
 	}
 

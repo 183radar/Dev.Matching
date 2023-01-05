@@ -141,7 +141,7 @@ class ApplyLeaderServiceTest {
 			Matching matching = Matching.builder().build();
 			SimplePost simplePost = createSimplePost(user, FullPost.builder().content("test").build(), matching);
 			Apply apply = Apply.builder().applyUser(user).applySimplePost(simplePost).build();
-			given(simplePostService.getSimplePostOnly(TEST_SIMPLE_POST_ID)).willReturn(simplePost);
+			given(simplePostService.findById(TEST_SIMPLE_POST_ID)).willReturn(simplePost);
 			given(applyService.getApply(TEST_APPLY_ID)).willReturn(apply);
 
 			//when
@@ -164,7 +164,7 @@ class ApplyLeaderServiceTest {
 			Matching matching = Matching.builder().build();
 			SimplePost simplePost = createSimplePost(user, FullPost.builder().content("test").build(), matching);
 			Apply apply = Apply.builder().applyUser(user).applySimplePost(simplePost).build();
-			given(simplePostService.getSimplePostOnly(TEST_SIMPLE_POST_ID)).willReturn(simplePost);
+			given(simplePostService.findById(TEST_SIMPLE_POST_ID)).willReturn(simplePost);
 			given(applyService.getApply(TEST_APPLY_ID)).willReturn(apply);
 			//when
 			applyLeaderService.denyApply(user, TEST_APPLY_ID, TEST_SIMPLE_POST_ID);
@@ -195,7 +195,7 @@ class ApplyLeaderServiceTest {
 				User userEX = createUserEX();
 				Matching matching = Matching.builder().build();
 				SimplePost simplePost = createSimplePost(userEX, FullPost.builder().content("test").build(), matching);
-				given(simplePostService.getSimplePostOnly(TEST_SIMPLE_POST_ID)).willReturn(simplePost);
+				given(simplePostService.findById(TEST_SIMPLE_POST_ID)).willReturn(simplePost);
 				//when
 				//then
 				assertThatThrownBy(() -> applyLeaderService.acceptApply(user, TEST_APPLY_ID, TEST_SIMPLE_POST_ID))
@@ -214,7 +214,7 @@ class ApplyLeaderServiceTest {
 				SimplePost simplePostEX = createSimplePostEX(user, FullPost.builder().content("test").build(),
 					matching);
 				Apply applyEX = Apply.builder().applyUser(user).applySimplePost(simplePostEX).build();
-				given(simplePostService.getSimplePostOnly(TEST_SIMPLE_POST_ID)).willReturn(simplePost);
+				given(simplePostService.findById(TEST_SIMPLE_POST_ID)).willReturn(simplePost);
 				given(applyService.getApply(TEST_APPLY_ID)).willReturn(applyEX);
 				//when
 				//then

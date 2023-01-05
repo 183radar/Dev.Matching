@@ -18,7 +18,6 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 
 import radar.devmatching.domain.post.simple.service.SimplePostService;
 import radar.devmatching.domain.post.simple.service.dto.MainPostDto;
-import radar.devmatching.domain.user.entity.User;
 import radar.devmatching.util.ControllerTestSetUp;
 
 @WebMvcTest(MainPostController.class)
@@ -38,7 +37,7 @@ class MainPostControllerTest extends ControllerTestSetUp {
 		void noPostCategoryParamThanSelectAll() throws Exception {
 			//given
 			MainPostDto mainPostDto = MainPostDto.builder().build();
-			given(simplePostService.getMainPostDto(any(User.class), eq(categoryDefaultValue)))
+			given(simplePostService.getMainPostDto(anyLong(), eq(categoryDefaultValue)))
 				.willReturn(mainPostDto);
 
 			//when
@@ -46,7 +45,7 @@ class MainPostControllerTest extends ControllerTestSetUp {
 			ResultActions result = mockMvc.perform(request);
 
 			//then
-			verify(simplePostService, only()).getMainPostDto(any(User.class), eq(categoryDefaultValue));
+			verify(simplePostService, only()).getMainPostDto(anyLong(), eq(categoryDefaultValue));
 			result.andExpect(status().isOk())
 				.andExpect(handler().handlerType(MainPostController.class))
 				.andExpect(handler().methodName("getMainPage"))
@@ -67,7 +66,7 @@ class MainPostControllerTest extends ControllerTestSetUp {
 			void searchConditionLengthOver() throws Exception {
 				//given
 				MainPostDto mainPostDto = MainPostDto.builder().build();
-				given(simplePostService.searchSimplePost(any(User.class), anyString(), any(MainPostDto.class)))
+				given(simplePostService.searchSimplePost(anyLong(), anyString(), any(MainPostDto.class)))
 					.willReturn(mainPostDto);
 
 				//when
@@ -80,7 +79,7 @@ class MainPostControllerTest extends ControllerTestSetUp {
 				ResultActions result = mockMvc.perform(request);
 
 				//then
-				verify(simplePostService, never()).searchSimplePost(any(User.class), anyString(),
+				verify(simplePostService, never()).searchSimplePost(anyLong(), anyString(),
 					any(MainPostDto.class));
 
 				result.andExpect(status().isOk())
@@ -96,7 +95,7 @@ class MainPostControllerTest extends ControllerTestSetUp {
 			void correct() throws Exception {
 				//given
 				MainPostDto mainPostDto = MainPostDto.builder().build();
-				given(simplePostService.searchSimplePost(any(User.class), anyString(), any(MainPostDto.class)))
+				given(simplePostService.searchSimplePost(anyLong(), anyString(), any(MainPostDto.class)))
 					.willReturn(mainPostDto);
 
 				//when
@@ -107,7 +106,7 @@ class MainPostControllerTest extends ControllerTestSetUp {
 				ResultActions result = mockMvc.perform(request);
 
 				//then
-				verify(simplePostService, only()).searchSimplePost(any(User.class), anyString(),
+				verify(simplePostService, only()).searchSimplePost(anyLong(), anyString(),
 					any(MainPostDto.class));
 
 				result.andExpect(status().isOk())

@@ -51,8 +51,10 @@ class FullPostControllerTest extends ControllerTestSetUp {
 				User loginUser = createUser(2L);
 				SimplePost simplePost = createSimplePost(loginUser, Matching.builder().build(),
 					FullPost.builder().build(), simplePostId);
-				given(fullPostService.getPostWithComment(anyLong(), any(User.class)))
-					.willReturn(PresentPostResponse.of(simplePost, loginUser, 2, new ArrayList<>()));
+				PresentPostResponse presentPostResponse = PresentPostResponse.of(simplePost, loginUser,
+					2, true, new ArrayList<>());
+				given(fullPostService.getPostWithComment(anyLong(), anyLong()))
+					.willReturn(presentPostResponse);
 
 				//when
 				ResultActions result = mockMvc.perform(get(BASIC_URL + "/" + simplePostId));
@@ -61,7 +63,7 @@ class FullPostControllerTest extends ControllerTestSetUp {
 				result.andExpect(status().isOk())
 					.andExpect(handler().handlerType(FullPostController.class))
 					.andExpect(handler().methodName("getFullPost"))
-					.andExpect(model().attributeExists("presentPostResponse"))
+					.andExpect(model().attribute("presentPostResponse", presentPostResponse))
 					.andExpect(view().name("post/post"));
 			}
 
@@ -69,7 +71,7 @@ class FullPostControllerTest extends ControllerTestSetUp {
 			@DisplayName("해당되는 엔티티가 없을 경우 404가 전달된다")
 			void notExistByCorrespondedEntity() throws Exception {
 				//given
-				given(fullPostService.getPostWithComment(anyLong(), any(User.class)))
+				given(fullPostService.getPostWithComment(anyLong(), anyLong()))
 					.willThrow(new SimplePostNotFoundException());
 
 				//when
@@ -98,7 +100,7 @@ class FullPostControllerTest extends ControllerTestSetUp {
 				Long simplePostId = 1L;
 				SimplePost simplePost = createSimplePost(createUser(2L), Matching.builder().build(),
 					FullPost.builder().build(), simplePostId);
-				given(fullPostService.getFullPost(anyLong(), anyLong()))
+				given(fullPostService.getUpdateFullPost(anyLong(), anyLong()))
 					.willReturn(UpdatePostDto.of(simplePost));
 
 				//when
@@ -116,7 +118,7 @@ class FullPostControllerTest extends ControllerTestSetUp {
 			@DisplayName("해당되는 엔티티가 없을 경우 404가 전달된다")
 			void notExistByCorrespondedEntity() throws Exception {
 				//given
-				given(fullPostService.getFullPost(anyLong(), anyLong()))
+				given(fullPostService.getUpdateFullPost(anyLong(), anyLong()))
 					.willThrow(new SimplePostNotFoundException());
 
 				//when

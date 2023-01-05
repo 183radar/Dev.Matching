@@ -63,7 +63,7 @@
         </button>
     </div>
     <div th:if="!*{#strings.equals(postLeader.userId, loginUser.userId)}">
-        <button class="btn btn-secondary"
+        <button class="btn btn-secondary" th:if="!*{isAppliedLoginUser}"
                 th:onclick="|location.href='@{/api/posts/{id}/apply(id=*{simplePostResponse.simplePostId})}'|">
             신청
         </button>

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import radar.devmatching.common.exception.InvalidParamException;
 import radar.devmatching.common.exception.error.ErrorMessage;
 import radar.devmatching.domain.matchings.matching.entity.Matching;
@@ -20,53 +21,74 @@ import radar.devmatching.domain.post.simple.service.dto.MainPostDto;
 import radar.devmatching.domain.post.simple.service.dto.request.CreatePostRequest;
 import radar.devmatching.domain.post.simple.service.dto.response.SimplePostResponse;
 import radar.devmatching.domain.user.entity.User;
-import radar.devmatching.domain.user.repository.UserRepository;
+import radar.devmatching.domain.user.service.UserService;
 
+@Slf4j
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class SimplePostServiceImpl implements SimplePostService {
 
-	private final UserRepository userRepository;
+	private final UserService userService;
 	private final SimplePostRepository simplePostRepository;
 	private final MatchingLeaderService matchingLeaderService;
 
-	@Override
-	@Transactional
-	public long createPost(CreatePostRequest createPostRequest, User user) {
-		user = userRepository.findById(user.getId()).get();
-		Matching matching = matchingLeaderService.createMatching(user);
-		SimplePost savedPost = simplePostRepository.save(createPostRequest.toEntity(user, matching));
-		return savedPost.getId();
-	}
+	/**
+	 * 단순 조회에 예외 처리를 한 곳에서 처리하기 위해 만든 메서드
+	 * 나중에 순환참조같은 문제 발생할 것 같으면 서비스 계층 세분화해서 나누어도 좋을 듯
+	 */
 
 	@Override
-	public SimplePost getSimplePostOnly(long simplePostId) {
+	public SimplePost findById(long simplePostId) {
 		return simplePostRepository.findById(simplePostId).orElseThrow(SimplePostNotFoundException::new);
 	}
 
 	@Override
-	public MainPostDto getMainPostDto(User loginUser, String postCategoryParam) {
+	public SimplePost findPostById(long simplePostId) {
+		return simplePostRepository.findPostById(simplePostId).orElseThrow(SimplePostNotFoundException::new);
+	}
+
+	@Override
+	public void deleteById(long simplePostId) {
+		simplePostRepository.deleteById(simplePostId);
+	}
+
+	@Override
+	@Transactional
+	public long createPost(CreatePostRequest createPostRequest, long loginUserId) {
+		User loginUser = userService.getUserEntity(loginUserId);
+		Matching matching = matchingLeaderService.createMatching(loginUser);
+		SimplePost savedPost = simplePostRepository.save(createPostRequest.toEntity(loginUser, matching));
+		log.info("Create Post: {}", createPostRequest);
+		return savedPost.getId();
+	}
+
+	@Override
+	public MainPostDto getMainPostDto(long loginUserId, String postCategoryParam) {
+		User loginUser = userService.getUserEntity(loginUserId);
 		List<SimplePost> simplePosts = getSimplePostsWhichCategoryEq(postCategoryParam);
 		return MainPostDto.of(loginUser.getNickName(), null, simplePosts);
 	}
 
 	@Override
-	public MainPostDto searchSimplePost(User loginUser, String postCategory, MainPostDto mainPostDto) {
+	public MainPostDto searchSimplePost(long loginUserId, String postCategory, MainPostDto mainPostDto) {
+		log.info("PostCategory:{} Region:{} SearchCondition:{}", postCategory, mainPostDto.getRegion(),
+			mainPostDto.getSearchCondition());
+		User loginUser = userService.getUserEntity(loginUserId);
 		List<SimplePost> simplePosts = simplePostRepository.findRecruitingPostBySearchCondition(postCategory,
 			mainPostDto);
 		return MainPostDto.of(loginUser.getNickName(), mainPostDto.getRegion(), simplePosts);
 	}
 
 	@Override
-	public List<SimplePostResponse> getMyPosts(long userId) {
-		List<SimplePost> myPosts = simplePostRepository.findMyPostsByLeaderIdOrderByCreateDateDesc(userId);
+	public List<SimplePostResponse> getMyPosts(long loginUserId) {
+		List<SimplePost> myPosts = simplePostRepository.findMyPostsByLeaderIdOrderByCreateDateDesc(loginUserId);
 		return myPosts.stream().map(SimplePostResponse::of).collect(Collectors.toList());
 	}
 
 	@Override
-	public List<SimplePostResponse> getApplicationPosts(long userId) {
-		List<SimplePost> applicationPosts = simplePostRepository.findApplicationPosts(userId);
+	public List<SimplePostResponse> getApplicationPosts(long loginUserId) {
+		List<SimplePost> applicationPosts = simplePostRepository.findApplicationPosts(loginUserId);
 		return applicationPosts.stream().map(SimplePostResponse::of).collect(Collectors.toList());
 	}
 

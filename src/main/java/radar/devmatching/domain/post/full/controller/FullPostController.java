@@ -13,13 +13,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
 import lombok.RequiredArgsConstructor;
+import radar.devmatching.common.security.jwt.JwtTokenInfo;
 import radar.devmatching.common.security.resolver.AuthUser;
 import radar.devmatching.domain.post.full.service.FullPostService;
 import radar.devmatching.domain.post.full.service.dto.UpdatePostDto;
 import radar.devmatching.domain.post.full.service.dto.response.PresentPostResponse;
 import radar.devmatching.domain.post.simple.entity.PostCategory;
 import radar.devmatching.domain.post.simple.entity.Region;
-import radar.devmatching.domain.user.entity.User;
 
 @Controller
 @RequiredArgsConstructor
@@ -40,38 +40,39 @@ public class FullPostController {
 	}
 
 	@GetMapping("/{simplePostId}")
-	public String getFullPost(@AuthUser User authUser, @PathVariable long simplePostId, Model model) {
-		PresentPostResponse presentPostResponse = fullPostService.getPostWithComment(simplePostId, authUser);
+	public String getFullPost(@AuthUser JwtTokenInfo jwtTokenInfo, @PathVariable long simplePostId, Model model) {
+		PresentPostResponse presentPostResponse = fullPostService.getPostWithComment(simplePostId,
+			jwtTokenInfo.getUserId());
 		model.addAttribute("presentPostResponse", presentPostResponse);
 		return "post/post";
 	}
 
 	@GetMapping("/{simplePostId}/edit")
-	public String getUpdatePost(@AuthUser User authUser, @PathVariable long simplePostId, Model model) {
-		UpdatePostDto findPost = fullPostService.getFullPost(simplePostId, authUser.getId());
+	public String getUpdatePost(@AuthUser JwtTokenInfo jwtTokenInfo, @PathVariable long simplePostId, Model model) {
+		UpdatePostDto findPost = fullPostService.getUpdateFullPost(simplePostId, jwtTokenInfo.getUserId());
 		model.addAttribute("updatePostDto", findPost);
 		return "post/editPost";
 	}
 
 	@PostMapping("/{simplePostId}/edit")
-	public String updatePost(@AuthUser User authUser, @PathVariable long simplePostId,
+	public String updatePost(@AuthUser JwtTokenInfo jwtTokenInfo, @PathVariable long simplePostId,
 		@Valid @ModelAttribute UpdatePostDto updatePostDto, BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
 			return "post/editPost";
 		}
-		fullPostService.updatePost(simplePostId, authUser.getId(), updatePostDto);
+		fullPostService.updatePost(simplePostId, jwtTokenInfo.getUserId(), updatePostDto);
 		return "redirect:/api/posts/" + simplePostId;
 	}
 
 	@GetMapping("/{simplePostId}/delete")
-	public String deletePost(@AuthUser User authUser, @PathVariable long simplePostId) {
-		fullPostService.deletePost(simplePostId, authUser.getId());
+	public String deletePost(@AuthUser JwtTokenInfo jwtTokenInfo, @PathVariable long simplePostId) {
+		fullPostService.deletePost(simplePostId, jwtTokenInfo.getUserId());
 		return "redirect:/api/posts/my";
 	}
 
 	@GetMapping("/{simplePostId}/end")
-	public String closePost(@AuthUser User authUser, @PathVariable long simplePostId) {
-		fullPostService.closePost(simplePostId, authUser.getId());
+	public String closePost(@AuthUser JwtTokenInfo jwtTokenInfo, @PathVariable long simplePostId) {
+		fullPostService.closePost(simplePostId, jwtTokenInfo.getUserId());
 		return "redirect:/api/posts/" + simplePostId;
 	}
 

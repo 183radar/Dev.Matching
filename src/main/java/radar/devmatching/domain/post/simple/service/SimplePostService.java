@@ -6,19 +6,22 @@ import radar.devmatching.domain.post.simple.entity.SimplePost;
 import radar.devmatching.domain.post.simple.service.dto.MainPostDto;
 import radar.devmatching.domain.post.simple.service.dto.request.CreatePostRequest;
 import radar.devmatching.domain.post.simple.service.dto.response.SimplePostResponse;
-import radar.devmatching.domain.user.entity.User;
 
 public interface SimplePostService {
 
-	long createPost(CreatePostRequest createPostDto, User user);
+	long createPost(CreatePostRequest createPostDto, long loginUserId);
 
-	List<SimplePostResponse> getMyPosts(long userId);
+	List<SimplePostResponse> getMyPosts(long loginUserId);
 
-	List<SimplePostResponse> getApplicationPosts(long userId);
+	List<SimplePostResponse> getApplicationPosts(long loginUserId);
 
-	SimplePost getSimplePostOnly(long simplePostId);
+	SimplePost findById(long simplePostId);
 
-	MainPostDto getMainPostDto(User loginUser, String postCategory);
+	SimplePost findPostById(long simplePostId);
 
-	MainPostDto searchSimplePost(User loginUser, String postCategory, MainPostDto mainPostDto);
+	void deleteById(long simplePostId);
+
+	MainPostDto getMainPostDto(long loginUserId, String postCategory);
+
+	MainPostDto searchSimplePost(long loginUserId, String postCategory, MainPostDto mainPostDto);
 }

@@ -12,11 +12,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
 import lombok.RequiredArgsConstructor;
+import radar.devmatching.common.security.jwt.JwtTokenInfo;
 import radar.devmatching.common.security.resolver.AuthUser;
 import radar.devmatching.domain.post.simple.entity.Region;
 import radar.devmatching.domain.post.simple.service.SimplePostService;
 import radar.devmatching.domain.post.simple.service.dto.MainPostDto;
-import radar.devmatching.domain.user.entity.User;
 
 @Controller
 @RequiredArgsConstructor
@@ -32,21 +32,21 @@ public class MainPostController {
 	}
 
 	@GetMapping("/")
-	public String getMainPage(@AuthUser User authUser, Model model,
+	public String getMainPage(@AuthUser JwtTokenInfo jwtTokenInfo, Model model,
 		@RequestParam(value = "postCategory", defaultValue = categoryDefaultValue) String postCategory) {
-		MainPostDto mainPostDto = simplePostService.getMainPostDto(authUser, postCategory);
+		MainPostDto mainPostDto = simplePostService.getMainPostDto(jwtTokenInfo.getUserId(), postCategory);
 		model.addAttribute("mainPostDto", mainPostDto);
 		return "main";
 	}
 
 	@PostMapping("/")
-	public String searchMainPage(@AuthUser User authUser, @Valid @ModelAttribute MainPostDto mainPostDto,
+	public String searchMainPage(@AuthUser JwtTokenInfo jwtTokenInfo, @Valid @ModelAttribute MainPostDto mainPostDto,
 		BindingResult bindingResult, Model model,
 		@RequestParam(value = "postCategory", defaultValue = categoryDefaultValue) String postCategory) {
 		if (bindingResult.hasErrors()) {
 			return "main";
 		}
-		mainPostDto = simplePostService.searchSimplePost(authUser, postCategory, mainPostDto);
+		mainPostDto = simplePostService.searchSimplePost(jwtTokenInfo.getUserId(), postCategory, mainPostDto);
 		model.addAttribute("mainPostDto", mainPostDto);
 		return "main";
 	}
