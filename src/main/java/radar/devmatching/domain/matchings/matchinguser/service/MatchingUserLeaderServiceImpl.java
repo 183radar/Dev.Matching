@@ -19,6 +19,7 @@ public class MatchingUserLeaderServiceImpl implements MatchingUserLeaderService 
 
 	private final MatchingUserRepository matchingUserRepository;
 
+	@Override
 	@Transactional
 	public MatchingUser createMatchingUserLeader(User leader, Matching matching) {
 		// 검증이 들어갔다는걸 전재로함

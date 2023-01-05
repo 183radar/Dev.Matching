@@ -34,6 +34,17 @@ public class MatchingUserResponse {
 			.build();
 	}
 
+	@Override
+	public String toString() {
+		return "MatchingUserResponse{" +
+			"matchingId=" + matchingId +
+			", matchingUserRole=" + matchingUserRole +
+			", matchingTitle='" + matchingTitle + '\'' +
+			", userCount=" + userCount +
+			", postState=" + postState +
+			'}';
+	}
+
 	public Long getMatchingId() {
 		return matchingId;
 	}

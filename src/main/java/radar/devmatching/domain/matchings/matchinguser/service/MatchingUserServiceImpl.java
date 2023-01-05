@@ -37,6 +37,7 @@ public class MatchingUserServiceImpl implements MatchingUserService {
 		return matchingUser;
 	}
 
+	@Override
 	public List<MatchingUserResponse> getMatchingUserList(Long userId) {
 		return matchingUserRepository.findMatchingUserList(userId).stream()
 			.map(MatchingUserResponse::of)
