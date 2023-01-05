@@ -87,7 +87,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	/**
-	 * 회원 가입시에만 사용
+	 * TODO : username 길이 제한하기
 	 */
 	@Override
 	public void checkDuplicateUsername(CreateUserRequest request) {
@@ -105,6 +105,7 @@ public class UserServiceImpl implements UserService {
 		log.info("checkDuplicateUsername request info={}", request);
 	}
 
+	// TODO : nickName 길이 제한 추가하기
 	@Override
 	public void checkDuplicateNickName(CreateUserRequest request) {
 		String nickName = request.getNickName();

@@ -32,34 +32,34 @@ import radar.devmatching.domain.user.service.dto.response.UserResponse;
 @SessionAttributes("createUserRequest")
 public class UserController {
 
+	private static final String CREAT_USER_REQUEST = "createUserRequest";
+	private static final String USER_INFO = "userInfo";
+	private static final String SIMPLE_USER_INFO = "simpleUserInfo";
+
 	private final UserService userService;
 
 	@GetMapping(value = "/signUp")
 	public String signUp(Model model) {
-		model.addAttribute("createUserRequest", CreateUserRequest.of());
+		model.addAttribute(CREAT_USER_REQUEST, CreateUserRequest.of());
 		return "redirect:/api/users/signUp/page";
 	}
 
 	@GetMapping(value = "/signUp/page")
-	public String signUpPage(@ModelAttribute("createUserRequest") CreateUserRequest request, Model model) {
-		model.addAttribute("createUserRequest", request);
+	public String signUpPage(@ModelAttribute(CREAT_USER_REQUEST) CreateUserRequest request, Model model) {
+		model.addAttribute(CREAT_USER_REQUEST, request);
 		return "user/signUp";
 	}
 
-	/**
-	 * TODO : 아이디, 닉네임 중복확인후 다른 아이디, 닉네임 요청하면 예외 던지기
-	 */
 	@PostMapping(value = "/signUp/page")
-	public String signUpRequest(@Valid @ModelAttribute("creatUserRequest") CreateUserRequest request,
+	public String signUpRequest(@Valid @ModelAttribute(CREAT_USER_REQUEST) CreateUserRequest request,
 		BindingResult bindingResult, Model model, SessionStatus sessionStatus) {
 		if (bindingResult.hasErrors()) {
-			return "/user/signUp";
+			model.addAttribute(CREAT_USER_REQUEST, request);
+			return "user/signUp";
 		}
-		UserResponse user = userService.createUser(request);
+		userService.createUser(request);
 
 		sessionStatus.setComplete();
-
-		model.addAttribute("createUser", user);
 		return "redirect:/api/users/signIn";
 	}
 
@@ -67,13 +67,14 @@ public class UserController {
 	 * 요쳥 username 중복확인
 	 * 중복 안되면 : 사용가능한 아이디입니다.
 	 * 중복 되면 : 사용중인 아이디 입니다.
+	 * TODO : 메시지 통일하기
 	 */
 	@PostMapping("/duplicate/username")
-	public String checkDuplicateUsername(@ModelAttribute("creatUserRequest") CreateUserRequest request, Model model,
+	public String checkDuplicateUsername(@ModelAttribute(CREAT_USER_REQUEST) CreateUserRequest request, Model model,
 		RedirectAttributes redirectAttributes) {
 		userService.checkDuplicateUsername(request);
 		redirectAttributes.addFlashAttribute("msg", request.getUsername() + ": 사용가능한 아이디 입니다.");
-		model.addAttribute("createUserRequest", request);
+		model.addAttribute(CREAT_USER_REQUEST, request);
 		return "redirect:/api/users/signUp/page";
 	}
 
@@ -81,21 +82,21 @@ public class UserController {
 	 * 요청 nickName 중복확인
 	 * 중복 안되면 : 사용가능한 이름입니다.
 	 * 중복 되면 : 사용중인 이름입니다.
+	 * TODO : 메시지 통일하기
 	 */
 	@PostMapping("/duplicate/nickName")
-	public String checkDuplicateNickName(@ModelAttribute("creatUserRequest") CreateUserRequest request, Model model,
+	public String checkDuplicateNickName(@ModelAttribute(CREAT_USER_REQUEST) CreateUserRequest request, Model model,
 		RedirectAttributes redirectAttributes) {
 		userService.checkDuplicateNickName(request);
 		redirectAttributes.addFlashAttribute("msg", request.getNickName() + ": 사용가능한 이름 입니다.");
-		model.addAttribute("createUserRequest", request);
+		model.addAttribute(CREAT_USER_REQUEST, request);
 		return "redirect:/api/users/signUp/page";
 	}
 
-	// TODO : 다른 사람이 접근할경우에는 다른 뷰를 사용
 	@GetMapping
 	public String getUser(@AuthUser JwtTokenInfo tokenInfo, Model model) {
 		UserResponse user = userService.getUser(tokenInfo.getUserId());
-		model.addAttribute("userInfo", user);
+		model.addAttribute(USER_INFO, user);
 		return "user/userInfo";
 	}
 
@@ -104,14 +105,14 @@ public class UserController {
 		if (Objects.equals(userId, jwtTokenInfo.getUserId())) {
 			return "redirect:/api/users";
 		}
-		model.addAttribute("simpleUserInfo", userService.getSimpleUser(userId));
+		model.addAttribute(SIMPLE_USER_INFO, userService.getSimpleUser(userId));
 		return "user/simpleUserInfo";
 	}
 
 	@GetMapping("/update")
 	public String updateUser(@AuthUser JwtTokenInfo tokenInfo, Model model) {
 		UserResponse user = userService.getUser(tokenInfo.getUserId());
-		model.addAttribute("userInfo", user);
+		model.addAttribute(USER_INFO, user);
 		return "user/userUpdate";
 	}
 
@@ -125,7 +126,7 @@ public class UserController {
 			return "redirect:/api/users/update";
 		}
 		userService.updateUser(request, tokenInfo.getUserId());
-		return "redirect:/api/users/";
+		return "redirect:/api/users";
 	}
 
 	/**
@@ -138,5 +139,5 @@ public class UserController {
 		return "redirect:/api/users/signIn";
 	}
 
-	// TODO : 비밀번호 변경, 닉네임 변경 페이지 만들기.
+	// TODO : 비밀번호 변경, 닉네임 변경 페이지 만들기. 비밀번호 찾기,
 }
