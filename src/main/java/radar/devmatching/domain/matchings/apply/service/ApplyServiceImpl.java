@@ -19,7 +19,7 @@ import radar.devmatching.domain.matchings.apply.service.dto.response.ApplyRespon
 import radar.devmatching.domain.post.simple.entity.SimplePost;
 import radar.devmatching.domain.post.simple.service.SimplePostService;
 import radar.devmatching.domain.user.entity.User;
-import radar.devmatching.domain.user.repository.UserRepository;
+import radar.devmatching.domain.user.service.UserService;
 
 @Slf4j
 @Service
@@ -27,36 +27,37 @@ import radar.devmatching.domain.user.repository.UserRepository;
 @RequiredArgsConstructor
 public class ApplyServiceImpl implements ApplyService {
 
-	private final UserRepository userRepository;
 	private final ApplyRepository applyRepository;
 	private final SimplePostService simplePostService;
+	private final UserService userService;
 
 	@Override
 	@Transactional
-	public Apply createApply(Long simplePostId, User authUser) {
-		authUser = userRepository.findById(authUser.getId()).get();
+	public Apply createApply(Long simplePostId, Long userId) {
+		User user = userService.findById(userId);
 		SimplePost simplePost = simplePostService.findById(simplePostId);
 
 		// TODO : Querydsl 로 이름 간략하게 바꾸기
-		applyRepository.findByApplySimplePostIdAndApplyUserId(simplePostId, authUser.getId())
+		applyRepository.findByApplySimplePostIdAndApplyUserId(simplePostId, userId)
 			.ifPresent(apply -> {
 				throw new AlreadyApplyException(ErrorMessage.ALREADY_APPLY);
 			});
 
-		Apply apply = Apply.builder().applyUser(authUser).applySimplePost(simplePost).build();
+		Apply apply = Apply.builder().applyUser(user).applySimplePost(simplePost).build();
 
 		applyRepository.save(apply);
 		return apply;
 	}
 
 	@Override
-	public List<ApplyResponse> getAllApplyList(User authUser) {
+	public List<ApplyResponse> getAllApplyList(Long userId) {
 
-		return applyRepository.findAppliesByUserId(authUser.getId()).stream()
+		return applyRepository.findAppliesByUserId(userId).stream()
 			.map(ApplyResponse::of)
 			.collect(Collectors.toList());
 	}
 
+	// TODO : 리펙터링하기
 	@Override
 	public int getAcceptedApplyCount(Long simplePostId) {
 		long count = applyRepository.findAllByApplySimplePostId(simplePostId).stream()
@@ -66,7 +67,7 @@ public class ApplyServiceImpl implements ApplyService {
 	}
 
 	@Override
-	public Apply getApply(Long applyId) {
+	public Apply findById(Long applyId) {
 		return applyRepository.findById(applyId)
 			.orElseThrow(() -> new EntityNotFoundException(ErrorMessage.APPLY_NOT_FOUND));
 	}

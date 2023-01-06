@@ -34,8 +34,8 @@ public class ApplyLeaderServiceImpl implements ApplyLeaderService {
 
 	@Override
 	@Transactional
-	public void acceptApply(User authUser, Long applyId, Long simplePostId) {
-		Apply apply = validatePermission(authUser, applyId, simplePostId);
+	public void acceptApply(Long userId, Long applyId, Long simplePostId) {
+		Apply apply = validatePermission(userId, applyId, simplePostId);
 
 		if (!Objects.equals(apply.getApplyState(), ApplyState.ACCEPTED)) {
 			apply.acceptApply();
@@ -49,12 +49,11 @@ public class ApplyLeaderServiceImpl implements ApplyLeaderService {
 
 	@Override
 	@Transactional
-	public void denyApply(User authUser, Long applyId, Long simplePostId) {
-		Apply apply = validatePermission(authUser, applyId, simplePostId);
+	public void denyApply(Long userId, Long applyId, Long simplePostId) {
+		Apply apply = validatePermission(userId, applyId, simplePostId);
 
 		if (Objects.equals(apply.getApplyState(), ApplyState.ACCEPTED)) {
 			Long matchingId = apply.getApplySimplePost().getMatching().getId();
-			Long userId = authUser.getId();
 
 			matchingUserService.deleteMatchingUser(matchingId, userId);
 		}
@@ -63,8 +62,8 @@ public class ApplyLeaderServiceImpl implements ApplyLeaderService {
 	}
 
 	@Override
-	public List<ApplyLeaderResponse> getAllApplyList(User authUser, Long simplePostId) {
-		validatePermission(authUser, null, simplePostId);
+	public List<ApplyLeaderResponse> getAllApplyList(Long userId, Long simplePostId) {
+		validatePermission(userId, null, simplePostId);
 
 		return applyRepository.findAllByApplySimplePostId(simplePostId).stream()
 			.map(ApplyLeaderResponse::of)
@@ -74,20 +73,17 @@ public class ApplyLeaderServiceImpl implements ApplyLeaderService {
 	/**
 	 * simplePost에 접근하는 사용자가 리더인지 확인
 	 * applyId가 null이 아니라면 apply가 simplePost에 있는지 확인
-	 * @param authUser
-	 * @param applyId
-	 * @param simplePostId
 	 */
-	private Apply validatePermission(User authUser, Long applyId, Long simplePostId) {
+	private Apply validatePermission(Long userId, Long applyId, Long simplePostId) {
 		SimplePost simplePost = simplePostService.findById(simplePostId);
 
 		User leader = simplePost.getLeader();
-		if (!Objects.equals(leader.getId(), authUser.getId())) {
+		if (!Objects.equals(leader.getId(), userId)) {
 			throw new InvalidAccessException(ErrorMessage.INVALID_ACCESS);
 		}
 
 		if (Objects.nonNull(applyId)) {
-			Apply apply = applyService.getApply(applyId);
+			Apply apply = applyService.findById(applyId);
 
 			if (!Objects.equals(apply.getApplySimplePost().getId(), simplePostId)) {
 				throw new InvalidAccessException(ErrorMessage.INVALID_ACCESS);
