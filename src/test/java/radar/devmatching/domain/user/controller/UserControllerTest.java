@@ -10,7 +10,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.ResultActions;
@@ -19,7 +18,6 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 import radar.devmatching.domain.user.entity.User;
-import radar.devmatching.domain.user.service.UserService;
 import radar.devmatching.domain.user.service.dto.request.CreateUserRequest;
 import radar.devmatching.domain.user.service.dto.response.SimpleUserResponse;
 import radar.devmatching.domain.user.service.dto.response.UserResponse;
@@ -35,9 +33,6 @@ public class UserControllerTest extends ControllerTestSetUp {
 	static final String USER_INFO = "userInfo";
 	static final Long USER_ID = 1L;
 	static final Long USER_ID2 = 2L;
-
-	@MockBean
-	UserService userService;
 
 	private User authUserSetUp(Long userId) {
 		User user = createUser(userId);

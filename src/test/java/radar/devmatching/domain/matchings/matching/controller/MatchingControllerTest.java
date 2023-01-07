@@ -18,8 +18,8 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 import radar.devmatching.domain.matchings.matching.service.MatchingService;
-import radar.devmatching.domain.matchings.matching.service.dto.MatchingInfo;
 import radar.devmatching.domain.matchings.matching.service.dto.MatchingUpdate;
+import radar.devmatching.domain.matchings.matching.service.dto.response.MatchingInfoResponse;
 import radar.devmatching.domain.matchings.matchinguser.entity.MatchingUserRole;
 import radar.devmatching.domain.post.simple.entity.PostState;
 import radar.devmatching.util.ControllerTestSetUp;
@@ -40,7 +40,7 @@ class MatchingControllerTest extends ControllerTestSetUp {
 	@DisplayName("getMatchingPage 메서드는 matching 정보를 모델에 담아 보여준다.")
 	void getMatchingPage() throws Exception {
 		//given
-		MatchingInfo matchingInfo = MatchingInfo.builder()
+		MatchingInfoResponse matchingInfoResponse = MatchingInfoResponse.builder()
 			.matchingTitle("test")
 			.matchingInfo("test")
 			.matchingUserRole(MatchingUserRole.LEADER)
@@ -48,7 +48,7 @@ class MatchingControllerTest extends ControllerTestSetUp {
 			.userCount(0)
 			.postState(PostState.RECRUITING)
 			.build();
-		given(matchingService.getMatchingInfo(any(), anyLong())).willReturn(matchingInfo);
+		given(matchingService.getMatchingInfo(any(), anyLong())).willReturn(matchingInfoResponse);
 		MockHttpServletRequestBuilder request = get(BASIC_URL_MATCHING_ID);
 		//when
 		ResultActions result = mockMvc.perform(request);

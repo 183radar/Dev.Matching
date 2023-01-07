@@ -12,8 +12,8 @@ import lombok.RequiredArgsConstructor;
 import radar.devmatching.common.security.jwt.JwtTokenInfo;
 import radar.devmatching.common.security.resolver.AuthUser;
 import radar.devmatching.domain.matchings.matching.service.MatchingService;
-import radar.devmatching.domain.matchings.matching.service.dto.MatchingInfo;
 import radar.devmatching.domain.matchings.matching.service.dto.MatchingUpdate;
+import radar.devmatching.domain.matchings.matching.service.dto.response.MatchingInfoResponse;
 
 @Controller
 @RequestMapping("/api/matching")
@@ -25,7 +25,7 @@ public class MatchingController {
 	@GetMapping("/{matchingId}")
 	public String getMatchingPage(@PathVariable("matchingId") Long matchingId, @AuthUser JwtTokenInfo tokenInfo,
 		Model model) {
-		MatchingInfo matching = matchingService.getMatchingInfo(matchingId, tokenInfo.getUserId());
+		MatchingInfoResponse matching = matchingService.getMatchingInfo(matchingId, tokenInfo.getUserId());
 		model.addAttribute("matching", matching);
 		return "matching/matching/matchingInfo";
 	}

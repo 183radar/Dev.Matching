@@ -12,8 +12,8 @@ import radar.devmatching.common.exception.InvalidAccessException;
 import radar.devmatching.common.exception.error.ErrorMessage;
 import radar.devmatching.domain.matchings.matching.entity.Matching;
 import radar.devmatching.domain.matchings.matching.repository.MatchingRepository;
-import radar.devmatching.domain.matchings.matching.service.dto.MatchingInfo;
 import radar.devmatching.domain.matchings.matching.service.dto.MatchingUpdate;
+import radar.devmatching.domain.matchings.matching.service.dto.response.MatchingInfoResponse;
 import radar.devmatching.domain.matchings.matchinguser.entity.MatchingUser;
 import radar.devmatching.domain.matchings.matchinguser.service.MatchingUserService;
 import radar.devmatching.domain.user.entity.User;
@@ -33,14 +33,14 @@ public class MatchingServiceImpl implements MatchingService {
 	private final UserService userService;
 
 	@Override
-	public MatchingInfo getMatchingInfo(Long matchingId, Long userId) {
+	public MatchingInfoResponse getMatchingInfo(Long matchingId, Long userId) {
 		MatchingUser matchingUser = matchingUserService.findByMatchingIdAndUserId(matchingId, userId);
 
 		Matching matching = matchingUser.getMatching();
 
 		User user = userService.findById(userId);
 		log.info("access matching info={}", matching);
-		return MatchingInfo.of(matchingUser);
+		return MatchingInfoResponse.of(matchingUser);
 	}
 
 	@Override

@@ -1,4 +1,4 @@
-package radar.devmatching.domain.matchings.matching.service.dto;
+package radar.devmatching.domain.matchings.matching.service.dto.response;
 
 import java.util.List;
 
@@ -8,7 +8,7 @@ import radar.devmatching.domain.matchings.matchinguser.entity.MatchingUser;
 import radar.devmatching.domain.matchings.matchinguser.entity.MatchingUserRole;
 import radar.devmatching.domain.post.simple.entity.PostState;
 
-public class MatchingInfo {
+public class MatchingInfoResponse {
 
 	private final String matchingTitle;
 	private final MatchingUserRole matchingUserRole;
@@ -18,7 +18,8 @@ public class MatchingInfo {
 	private final List<MatchingUser> matchingUserList;
 
 	@Builder
-	public MatchingInfo(String matchingTitle, MatchingUserRole matchingUserRole, int userCount, PostState postState,
+	public MatchingInfoResponse(String matchingTitle, MatchingUserRole matchingUserRole, int userCount,
+		PostState postState,
 		String matchingInfo, List<MatchingUser> matchingUserList) {
 		this.matchingTitle = matchingTitle;
 		this.matchingUserRole = matchingUserRole;
@@ -29,10 +30,10 @@ public class MatchingInfo {
 	}
 
 	// TODO : 리팩터링
-	public static MatchingInfo of(MatchingUser matchingUser) {
+	public static MatchingInfoResponse of(MatchingUser matchingUser) {
 		Matching matching = matchingUser.getMatching();
 
-		return MatchingInfo.builder()
+		return MatchingInfoResponse.builder()
 			.matchingTitle(matching.getMatchingTitle())
 			.matchingUserRole(matchingUser.getMatchingUserRole())
 			.userCount(matching.getMatchingUsers().size())

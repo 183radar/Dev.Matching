@@ -18,8 +18,8 @@ import radar.devmatching.common.exception.EntityNotFoundException;
 import radar.devmatching.common.exception.InvalidAccessException;
 import radar.devmatching.domain.matchings.matching.entity.Matching;
 import radar.devmatching.domain.matchings.matching.repository.MatchingRepository;
-import radar.devmatching.domain.matchings.matching.service.dto.MatchingInfo;
 import radar.devmatching.domain.matchings.matching.service.dto.MatchingUpdate;
+import radar.devmatching.domain.matchings.matching.service.dto.response.MatchingInfoResponse;
 import radar.devmatching.domain.matchings.matchinguser.entity.MatchingUser;
 import radar.devmatching.domain.matchings.matchinguser.entity.MatchingUserRole;
 import radar.devmatching.domain.matchings.matchinguser.service.MatchingUserService;
@@ -101,9 +101,9 @@ public class MatchingServiceTest {
 		given(matchingUserService.findByMatchingIdAndUserId(matching.getId(), user.getId())).willReturn(matchingUser);
 		given(userService.findById(user.getId())).willReturn(user);
 		//when
-		MatchingInfo matchingInfo = matchingService.getMatchingInfo(matching.getId(), user.getId());
+		MatchingInfoResponse matchingInfoResponse = matchingService.getMatchingInfo(matching.getId(), user.getId());
 		//then
-		assertThat(matchingInfo).usingRecursiveComparison().isEqualTo(MatchingInfo.of(matchingUser));
+		assertThat(matchingInfoResponse).usingRecursiveComparison().isEqualTo(MatchingInfoResponse.of(matchingUser));
 	}
 
 	@Test
