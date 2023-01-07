@@ -109,8 +109,8 @@ class MatchingUserRepositoryTest {
 	}
 
 	@Test
-	@DisplayName("fin")
-	void findMatchingUserByMatchingIdAndUserId() {
+	@DisplayName("findByMatchingIdAndUserId 메서드는 matchingId와 userId를 포함하는 MatchingUser를 반환한다.")
+	void findByMatchingIdAndUserId() {
 		//given
 		User user = createUser();
 		userRepository.save(user);
@@ -121,7 +121,7 @@ class MatchingUserRepositoryTest {
 		matchingUserRepository.save(matchingUser);
 
 		//when
-		MatchingUser findMatchingUser = matchingUserRepository.findMatchingUserByMatchingIdAndUserId(
+		MatchingUser findMatchingUser = matchingUserRepository.findByMatchingIdAndUserId(
 			matching.getId(), user.getId()).get();
 		//then
 		assertThat(findMatchingUser).usingRecursiveComparison().isEqualTo(matchingUser);

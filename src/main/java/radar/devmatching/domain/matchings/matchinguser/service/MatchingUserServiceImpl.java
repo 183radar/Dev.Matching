@@ -52,7 +52,7 @@ public class MatchingUserServiceImpl implements MatchingUserService {
 	}
 
 	public MatchingUser findByMatchingIdAndUserId(Long matchingId, Long userId) {
-		return matchingUserRepository.findMatchingUserByMatchingIdAndUserId(matchingId, userId)
+		return matchingUserRepository.findByMatchingIdAndUserId(matchingId, userId)
 			.orElseThrow(() -> new EntityNotFoundException(ErrorMessage.MATCHING_USER_NOT_FOUND));
 	}
 
