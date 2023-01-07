@@ -1,6 +1,7 @@
 package radar.devmatching.domain.user.service.dto.response;
 
 import lombok.Builder;
+import radar.devmatching.common.util.ExcludeJacocoGenerated;
 import radar.devmatching.domain.user.entity.User;
 import radar.devmatching.domain.user.entity.UserRole;
 
@@ -42,6 +43,7 @@ public class UserResponse {
 	}
 
 	@Override
+	@ExcludeJacocoGenerated
 	public String toString() {
 		return "UserResponse{" +
 			"id=" + id +

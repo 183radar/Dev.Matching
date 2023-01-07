@@ -1,6 +1,7 @@
 package radar.devmatching.common.security.jwt;
 
 import lombok.Builder;
+import radar.devmatching.common.util.ExcludeJacocoGenerated;
 
 public class JwtTokenCookieInfo {
 	private final String header;
@@ -15,6 +16,7 @@ public class JwtTokenCookieInfo {
 	}
 
 	@Override
+	@ExcludeJacocoGenerated
 	public String toString() {
 		return "JwtTokenCookieInfo{" +
 			"header='" + header + '\'' +
