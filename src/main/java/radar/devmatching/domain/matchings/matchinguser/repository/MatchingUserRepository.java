@@ -18,6 +18,5 @@ public interface MatchingUserRepository extends JpaRepository<MatchingUser, Long
 	@Query("select m from MatchingUser m where m.user.id = :userId order by m.createDate desc")
 	List<MatchingUser> findMatchingUserList(@Param("userId") Long userId);
 
-	@Query("select mu from MatchingUser mu where mu.matching.id = :matchingId and mu.user.id = :userId")
-	Optional<MatchingUser> findMatchingUser(@Param("matchingId") Long matchingId, @Param("userId") Long userId);
+	Optional<MatchingUser> findMatchingUserByMatchingIdAndUserId(Long matchingId, Long userId);
 }

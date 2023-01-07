@@ -108,4 +108,23 @@ class MatchingUserRepositoryTest {
 		assertThat(list.get(0)).usingRecursiveComparison().isEqualTo(matchingUser);
 	}
 
+	@Test
+	@DisplayName("fin")
+	void findMatchingUserByMatchingIdAndUserId() {
+		//given
+		User user = createUser();
+		userRepository.save(user);
+		Matching matching = Matching.builder().build();
+		SimplePost simplePost = createSimplePost(user, FullPost.builder().content("test").build(), matching);
+		simplePostRepository.save(simplePost);
+		MatchingUser matchingUser = MatchingUser.builder().user(user).matching(matching).build();
+		matchingUserRepository.save(matchingUser);
+
+		//when
+		MatchingUser findMatchingUser = matchingUserRepository.findMatchingUserByMatchingIdAndUserId(
+			matching.getId(), user.getId()).get();
+		//then
+		assertThat(findMatchingUser).usingRecursiveComparison().isEqualTo(matchingUser);
+	}
+
 }
