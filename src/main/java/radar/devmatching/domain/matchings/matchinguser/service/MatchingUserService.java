@@ -14,4 +14,6 @@ public interface MatchingUserService {
 	List<MatchingUserResponse> getMatchingUserList(Long userId);
 
 	void deleteMatchingUser(Long userId, Long matchingId);
+
+	MatchingUser findByMatchingIdAndUserId(Long matchingId, Long userId);
 }
