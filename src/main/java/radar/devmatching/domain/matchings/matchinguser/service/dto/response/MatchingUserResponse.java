@@ -1,6 +1,7 @@
 package radar.devmatching.domain.matchings.matchinguser.service.dto.response;
 
 import lombok.Builder;
+import radar.devmatching.common.util.ExcludeJacocoGenerated;
 import radar.devmatching.domain.matchings.matchinguser.entity.MatchingUser;
 import radar.devmatching.domain.matchings.matchinguser.entity.MatchingUserRole;
 import radar.devmatching.domain.post.simple.entity.PostState;
@@ -32,6 +33,18 @@ public class MatchingUserResponse {
 			.userCount(matchingUser.getMatching().getMatchingUsers().size())
 			.postState(matchingUser.getMatching().getSimplePost().getPostState())
 			.build();
+	}
+
+	@Override
+	@ExcludeJacocoGenerated
+	public String toString() {
+		return "MatchingUserResponse{" +
+			"matchingId=" + matchingId +
+			", matchingUserRole=" + matchingUserRole +
+			", matchingTitle='" + matchingTitle + '\'' +
+			", userCount=" + userCount +
+			", postState=" + postState +
+			'}';
 	}
 
 	public Long getMatchingId() {

@@ -198,7 +198,7 @@ class SimplePostServiceImplTest {
 			void isAllThanSearchAll() throws Exception {
 				//given
 				SimplePost simplePost = createSimplePost(loginUser, matching);
-				given(userService.getUserEntity(anyLong())).willReturn(loginUser);
+				given(userService.findById(anyLong())).willReturn(loginUser);
 				given(simplePostRepository.findByPostStateOrderByCreateDateDesc(PostState.RECRUITING))
 					.willReturn(List.of(simplePost));
 
@@ -215,7 +215,7 @@ class SimplePostServiceImplTest {
 			void correctCase() throws Exception {
 				//given
 				SimplePost simplePost = createSimplePost(loginUser, matching);
-				given(userService.getUserEntity(anyLong())).willReturn(loginUser);
+				given(userService.findById(anyLong())).willReturn(loginUser);
 				given(simplePostRepository.findByCategoryAndPostStateOrderByCreateDateDesc(
 					PostCategory.PROJECT, PostState.RECRUITING)).willReturn(List.of(simplePost));
 
@@ -239,7 +239,7 @@ class SimplePostServiceImplTest {
 			//given
 			SimplePost simplePost = createSimplePost(loginUser, matching);
 			MainPostDto mainPostDto = MainPostDto.builder().region(Region.BUSAN).build();
-			given(userService.getUserEntity(anyLong())).willReturn(loginUser);
+			given(userService.findById(anyLong())).willReturn(loginUser);
 			given(simplePostRepository.findRecruitingPostBySearchCondition("ALL", mainPostDto))
 				.willReturn(List.of(simplePost));
 
@@ -269,7 +269,7 @@ class SimplePostServiceImplTest {
 				SimplePost simplePost = createSimplePost(loginUser, matching);
 				ReflectionTestUtils.setField(simplePost, "id", 1L);
 				CreatePostRequest postRequest = createPostRequest();
-				given(userService.getUserEntity(anyLong())).willReturn(loginUser);
+				given(userService.findById(anyLong())).willReturn(loginUser);
 				given(matchingLeaderService.createMatching(loginUser)).willReturn(matching);
 				given(simplePostRepository.save(any(SimplePost.class))).willReturn(simplePost);
 

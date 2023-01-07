@@ -1,6 +1,7 @@
 package radar.devmatching.domain.user.service.dto.response;
 
 import lombok.Builder;
+import radar.devmatching.common.util.ExcludeJacocoGenerated;
 import radar.devmatching.domain.user.entity.User;
 import radar.devmatching.domain.user.entity.UserRole;
 
@@ -39,6 +40,21 @@ public class UserResponse {
 			.introduce(user.getIntroduce())
 			.userRole(user.getUserRole())
 			.build();
+	}
+
+	@Override
+	@ExcludeJacocoGenerated
+	public String toString() {
+		return "UserResponse{" +
+			"id=" + id +
+			", username='" + username + '\'' +
+			", password='" + password + '\'' +
+			", nickName='" + nickName + '\'' +
+			", schoolName='" + schoolName + '\'' +
+			", githubUrl='" + githubUrl + '\'' +
+			", introduce='" + introduce + '\'' +
+			", userRole=" + userRole +
+			'}';
 	}
 
 	public Long getId() {

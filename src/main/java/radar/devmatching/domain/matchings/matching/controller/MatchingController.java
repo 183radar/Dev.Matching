@@ -9,11 +9,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import lombok.RequiredArgsConstructor;
+import radar.devmatching.common.security.jwt.JwtTokenInfo;
 import radar.devmatching.common.security.resolver.AuthUser;
 import radar.devmatching.domain.matchings.matching.service.MatchingService;
 import radar.devmatching.domain.matchings.matching.service.dto.MatchingUpdate;
-import radar.devmatching.domain.matchings.matching.service.dto.response.MatchingResponse;
-import radar.devmatching.domain.user.entity.User;
+import radar.devmatching.domain.matchings.matching.service.dto.response.MatchingInfoResponse;
 
 @Controller
 @RequestMapping("/api/matching")
@@ -23,8 +23,9 @@ public class MatchingController {
 	private final MatchingService matchingService;
 
 	@GetMapping("/{matchingId}")
-	public String getMatchingPage(@PathVariable("matchingId") Long matchingId, @AuthUser User user, Model model) {
-		MatchingResponse matching = matchingService.getMatchingInfo(matchingId, user);
+	public String getMatchingPage(@PathVariable("matchingId") Long matchingId, @AuthUser JwtTokenInfo tokenInfo,
+		Model model) {
+		MatchingInfoResponse matching = matchingService.getMatchingInfo(matchingId, tokenInfo.getUserId());
 		model.addAttribute("matching", matching);
 		return "matching/matching/matchingInfo";
 	}
@@ -33,14 +34,14 @@ public class MatchingController {
 	 * TODO : 접근 사용자 검증 들어가야함
 	 */
 	@GetMapping("/{matchingId}/update")
-	public String updateMatchingPage(@PathVariable Long matchingId, @AuthUser User user, Model model) {
+	public String updateMatchingPage(@PathVariable Long matchingId, @AuthUser JwtTokenInfo tokenInfo, Model model) {
 		MatchingUpdate matchingUpdate = matchingService.getMatchingUpdateData(matchingId);
 		model.addAttribute("matchingUpdate", matchingUpdate);
 		return "matching/matching/matchingUpdate";
 	}
 
 	@PostMapping("/{matchingId}/update")
-	public String updateMatching(@PathVariable Long matchingId, @AuthUser User user,
+	public String updateMatching(@PathVariable Long matchingId, @AuthUser JwtTokenInfo tokenInfo,
 		@ModelAttribute("matchingUpdate") MatchingUpdate matchingUpdate) {
 		matchingService.updateMatching(matchingId, matchingUpdate);
 		return "redirect:/api/matching/" + matchingId;

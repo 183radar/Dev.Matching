@@ -12,7 +12,7 @@ public interface UserService {
 
 	UserResponse getUser(Long userId);
 
-	SimpleUserResponse getSimpleUser(User authUser);
+	SimpleUserResponse getSimpleUser(Long userId);
 
 	UserResponse getUserByUsername(String username);
 
@@ -24,7 +24,7 @@ public interface UserService {
 
 	void checkDuplicateNickName(CreateUserRequest request);
 
-	User getUserEntity(Long userId);
+	User findById(Long userId);
 
-	User getUserEntityByUsername(String username);
+	User findByUsername(String username);
 }

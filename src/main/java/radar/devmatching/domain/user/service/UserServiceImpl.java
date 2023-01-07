@@ -31,9 +31,8 @@ public class UserServiceImpl implements UserService {
 	@Transactional
 	public UserResponse createUser(CreateUserRequest request) {
 
-		// TODO : 예외 설정하기
 		if (!request.getNickNameCheck() || !request.getUsernameCheck()) {
-			throw new RuntimeException();
+			throw new DuplicateException(ErrorMessage.NOT_EXIST_DUPLICATE_PERMISSION);
 		}
 
 		User signUpUser = CreateUserRequest.toEntity(request, passwordEncoder);
@@ -46,20 +45,21 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public UserResponse getUser(Long userId) {
-		User user = getUserEntity(userId);
+		User user = findById(userId);
 		log.info("get user info={}", user);
 		return UserResponse.of(user);
 	}
 
 	@Override
-	public SimpleUserResponse getSimpleUser(User authUser) {
-		log.info("get simple user info={}", authUser);
-		return SimpleUserResponse.of(authUser);
+	public SimpleUserResponse getSimpleUser(Long userId) {
+		User user = findById(userId);
+		log.info("get simple user info={}", user);
+		return SimpleUserResponse.of(user);
 	}
 
 	@Override
 	public UserResponse getUserByUsername(String username) {
-		User user = getUserEntityByUsername(username);
+		User user = findByUsername(username);
 		log.info("signIn user={}", user);
 		return UserResponse.of(user);
 	}
@@ -71,7 +71,7 @@ public class UserServiceImpl implements UserService {
 	@Transactional
 	public UserResponse updateUser(UpdateUserRequest request, Long userId) {
 
-		User user = getUserEntity(userId);
+		User user = findById(userId);
 
 		user.update(request.getSchoolName(), request.getGithubUrl(), request.getIntroduce());
 
@@ -82,13 +82,12 @@ public class UserServiceImpl implements UserService {
 	@Override
 	@Transactional
 	public void deleteUser(Long userId) {
-
 		log.info("delete user={}", userId);
 		userRepository.deleteById(userId);
 	}
 
 	/**
-	 * 회원 가입시에만 사용
+	 * TODO : username 길이 제한하기
 	 */
 	@Override
 	public void checkDuplicateUsername(CreateUserRequest request) {
@@ -106,6 +105,7 @@ public class UserServiceImpl implements UserService {
 		log.info("checkDuplicateUsername request info={}", request);
 	}
 
+	// TODO : nickName 길이 제한 추가하기
 	@Override
 	public void checkDuplicateNickName(CreateUserRequest request) {
 		String nickName = request.getNickName();
@@ -121,12 +121,12 @@ public class UserServiceImpl implements UserService {
 		log.info("checkDuplicateNickName request info={}", request);
 	}
 
-	public User getUserEntity(Long userId) {
+	public User findById(Long userId) {
 		return userRepository.findById(userId)
 			.orElseThrow(() -> new EntityNotFoundException(ErrorMessage.USER_NOT_FOUND));
 	}
 
-	public User getUserEntityByUsername(String username) {
+	public User findByUsername(String username) {
 		return userRepository.findByUsername(username)
 			.orElseThrow(() -> new EntityNotFoundException(ErrorMessage.USER_NOT_FOUND));
 	}

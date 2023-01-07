@@ -56,7 +56,7 @@ public class SimplePostServiceImpl implements SimplePostService {
 	@Override
 	@Transactional
 	public long createPost(CreatePostRequest createPostRequest, long loginUserId) {
-		User loginUser = userService.getUserEntity(loginUserId);
+		User loginUser = userService.findById(loginUserId);
 		Matching matching = matchingLeaderService.createMatching(loginUser);
 		SimplePost savedPost = simplePostRepository.save(createPostRequest.toEntity(loginUser, matching));
 		log.info("Create Post: {}", createPostRequest);
@@ -65,7 +65,7 @@ public class SimplePostServiceImpl implements SimplePostService {
 
 	@Override
 	public MainPostDto getMainPostDto(long loginUserId, String postCategoryParam) {
-		User loginUser = userService.getUserEntity(loginUserId);
+		User loginUser = userService.findById(loginUserId);
 		List<SimplePost> simplePosts = getSimplePostsWhichCategoryEq(postCategoryParam);
 		return MainPostDto.of(loginUser.getNickName(), null, simplePosts);
 	}
@@ -74,7 +74,7 @@ public class SimplePostServiceImpl implements SimplePostService {
 	public MainPostDto searchSimplePost(long loginUserId, String postCategory, MainPostDto mainPostDto) {
 		log.info("PostCategory:{} Region:{} SearchCondition:{}", postCategory, mainPostDto.getRegion(),
 			mainPostDto.getSearchCondition());
-		User loginUser = userService.getUserEntity(loginUserId);
+		User loginUser = userService.findById(loginUserId);
 		List<SimplePost> simplePosts = simplePostRepository.findRecruitingPostBySearchCondition(postCategory,
 			mainPostDto);
 		return MainPostDto.of(loginUser.getNickName(), mainPostDto.getRegion(), simplePosts);

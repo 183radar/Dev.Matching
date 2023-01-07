@@ -3,7 +3,8 @@ package radar.devmatching.domain.matchings.apply.service;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
-import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -12,11 +13,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import radar.devmatching.common.exception.InvalidAccessException;
 import radar.devmatching.domain.matchings.apply.entity.Apply;
 import radar.devmatching.domain.matchings.apply.entity.ApplyState;
 import radar.devmatching.domain.matchings.apply.repository.ApplyRepository;
+import radar.devmatching.domain.matchings.apply.service.dto.response.ApplyLeaderResponse;
 import radar.devmatching.domain.matchings.matching.entity.Matching;
 import radar.devmatching.domain.matchings.matchinguser.service.MatchingUserService;
 import radar.devmatching.domain.post.full.entity.FullPost;
@@ -81,52 +84,40 @@ class ApplyLeaderServiceTest {
 			simplePostService);
 	}
 
-	private User createUser() throws IllegalAccessException, NoSuchFieldException {
+	private User createUser(Long userId) {
 		User user = basicUser();
 
-		Class<User> userClass = User.class;
-		Field userId = userClass.getDeclaredField("id");
-		userId.setAccessible(true);
-		userId.set(user, TEST_USER_ID);
+		ReflectionTestUtils.setField(user, "id", userId);
 
 		return user;
 	}
 
-	private User createUserEX() throws IllegalAccessException, NoSuchFieldException {
-		User user = basicUser();
-
-		Class<User> userClass = User.class;
-		Field userId = userClass.getDeclaredField("id");
-		userId.setAccessible(true);
-		userId.set(user, TEST_USER_ID_EX);
-
-		return user;
-	}
-
-	private SimplePost createSimplePost(User user, FullPost fullPost, Matching matching) throws
-		NoSuchFieldException,
-		IllegalAccessException {
+	private SimplePost createSimplePost(User user, FullPost fullPost, Matching matching, Long simplePostId) {
 		SimplePost simplePost = basicSimplePost(user, fullPost, matching);
 
-		Class<SimplePost> simplePostClass = SimplePost.class;
-		Field simplePostId = simplePostClass.getDeclaredField("id");
-		simplePostId.setAccessible(true);
-		simplePostId.set(simplePost, TEST_SIMPLE_POST_ID);
+		ReflectionTestUtils.setField(simplePost, "id", simplePostId);
 
 		return simplePost;
 	}
 
-	private SimplePost createSimplePostEX(User user, FullPost fullPost, Matching matching) throws
-		NoSuchFieldException,
-		IllegalAccessException {
-		SimplePost simplePost = basicSimplePost(user, fullPost, matching);
-
-		Class<SimplePost> simplePostClass = SimplePost.class;
-		Field simplePostId = simplePostClass.getDeclaredField("id");
-		simplePostId.setAccessible(true);
-		simplePostId.set(simplePost, TEST_SIMPLE_POST_ID_EX);
-
-		return simplePost;
+	@Test
+	@DisplayName("getAllApplyList 메서드에서 findAllByApplySimplePostId로 가져온 리스트를 ApplyLeaderResponse로 변환해서 반환한다.")
+	void getAllApplyListMethod() {
+		//given
+		User user = createUser(TEST_USER_ID);
+		Matching matching = Matching.builder().build();
+		SimplePost simplePost = createSimplePost(user, FullPost.builder().content("test").build(), matching,
+			TEST_SIMPLE_POST_ID);
+		Apply apply = Apply.builder().applyUser(user).applySimplePost(simplePost).build();
+		List<Apply> list = new ArrayList<>();
+		list.add(apply);
+		given(applyRepository.findAllByApplySimplePostId(TEST_SIMPLE_POST_ID)).willReturn(list);
+		given(simplePostService.findById(TEST_SIMPLE_POST_ID)).willReturn(simplePost);
+		//when
+		List<ApplyLeaderResponse> applyList = applyLeaderService.getAllApplyList(TEST_USER_ID, TEST_SIMPLE_POST_ID);
+		//then
+		assertThat(applyList.size()).isEqualTo(1);
+		assertThat(applyList.get(0)).usingRecursiveComparison().isEqualTo(ApplyLeaderResponse.of(apply));
 	}
 
 	@Nested
@@ -135,17 +126,18 @@ class ApplyLeaderServiceTest {
 
 		@Test
 		@DisplayName("예외를 던지지 않고 정상적으로 Apply 상태를 ACCEPTED 로 변경한다.")
-		void accept_Apply_Without_Exception() throws NoSuchFieldException, IllegalAccessException {
+		void accept_Apply_Without_Exception() {
 			//given
-			User user = createUser();
+			User user = createUser(TEST_USER_ID);
 			Matching matching = Matching.builder().build();
-			SimplePost simplePost = createSimplePost(user, FullPost.builder().content("test").build(), matching);
+			SimplePost simplePost = createSimplePost(user, FullPost.builder().content("test").build(), matching,
+				TEST_SIMPLE_POST_ID);
 			Apply apply = Apply.builder().applyUser(user).applySimplePost(simplePost).build();
 			given(simplePostService.findById(TEST_SIMPLE_POST_ID)).willReturn(simplePost);
-			given(applyService.getApply(TEST_APPLY_ID)).willReturn(apply);
+			given(applyService.findById(TEST_APPLY_ID)).willReturn(apply);
 
 			//when
-			applyLeaderService.acceptApply(user, TEST_APPLY_ID, TEST_SIMPLE_POST_ID);
+			applyLeaderService.acceptApply(TEST_USER_ID, TEST_APPLY_ID, TEST_SIMPLE_POST_ID);
 			//then
 			assertThat(apply.getApplyState()).isEqualTo(ApplyState.ACCEPTED);
 		}
@@ -158,25 +150,20 @@ class ApplyLeaderServiceTest {
 
 		@Test
 		@DisplayName("예외를 던지지 않고 정상적으로 Apply 상태를 DENIED 로 변경한다.")
-		void deny_Apply_Without_Exception() throws NoSuchFieldException, IllegalAccessException {
+		void deny_Apply_Without_Exception() {
 			//given
-			User user = createUser();
+			User user = createUser(TEST_USER_ID);
 			Matching matching = Matching.builder().build();
-			SimplePost simplePost = createSimplePost(user, FullPost.builder().content("test").build(), matching);
+			SimplePost simplePost = createSimplePost(user, FullPost.builder().content("test").build(), matching,
+				TEST_SIMPLE_POST_ID);
 			Apply apply = Apply.builder().applyUser(user).applySimplePost(simplePost).build();
 			given(simplePostService.findById(TEST_SIMPLE_POST_ID)).willReturn(simplePost);
-			given(applyService.getApply(TEST_APPLY_ID)).willReturn(apply);
+			given(applyService.findById(TEST_APPLY_ID)).willReturn(apply);
 			//when
-			applyLeaderService.denyApply(user, TEST_APPLY_ID, TEST_SIMPLE_POST_ID);
+			applyLeaderService.denyApply(TEST_USER_ID, TEST_APPLY_ID, TEST_SIMPLE_POST_ID);
 			//then
 			assertThat(apply.getApplyState()).isEqualTo(ApplyState.DENIED);
 		}
-
-	}
-
-	@Nested
-	@DisplayName("getAllApplyList 메서드에서")
-	class GetAllApplyListMethod {
 
 	}
 
@@ -189,38 +176,42 @@ class ApplyLeaderServiceTest {
 		class throwInvalidExceptionWithAcceptApplyMethodAndDenyApplyMethod {
 			@Test
 			@DisplayName("접근 유저와 SimplePost 리더가 달라 예외를 던진다.")
-			void accessUserIdNotEqualSimplePostUserId() throws NoSuchFieldException, IllegalAccessException {
+			void accessUserIdNotEqualSimplePostUserId() {
 				//given
-				User user = createUser();
-				User userEX = createUserEX();
+				User user = createUser(TEST_USER_ID);
+				User userEX = createUser(TEST_USER_ID_EX);
 				Matching matching = Matching.builder().build();
-				SimplePost simplePost = createSimplePost(userEX, FullPost.builder().content("test").build(), matching);
+				SimplePost simplePost = createSimplePost(userEX, FullPost.builder().content("test").build(), matching,
+					TEST_SIMPLE_POST_ID);
 				given(simplePostService.findById(TEST_SIMPLE_POST_ID)).willReturn(simplePost);
 				//when
 				//then
-				assertThatThrownBy(() -> applyLeaderService.acceptApply(user, TEST_APPLY_ID, TEST_SIMPLE_POST_ID))
+				assertThatThrownBy(
+					() -> applyLeaderService.acceptApply(TEST_USER_ID, TEST_APPLY_ID, TEST_SIMPLE_POST_ID))
 					.isInstanceOf(InvalidAccessException.class);
-				assertThatThrownBy(() -> applyLeaderService.denyApply(user, TEST_APPLY_ID, TEST_SIMPLE_POST_ID))
+				assertThatThrownBy(() -> applyLeaderService.denyApply(TEST_USER_ID, TEST_APPLY_ID, TEST_SIMPLE_POST_ID))
 					.isInstanceOf(InvalidAccessException.class);
 			}
 
 			@Test
 			@DisplayName("apply의 simplePostId와 요청 simplePostId가 달라 예외를 던진다.")
-			void accessSimplePostIdNotEqualApplySimplePostId() throws NoSuchFieldException, IllegalAccessException {
+			void accessSimplePostIdNotEqualApplySimplePostId() {
 				//given
-				User user = createUser();
+				User user = createUser(TEST_USER_ID);
 				Matching matching = Matching.builder().build();
-				SimplePost simplePost = createSimplePost(user, FullPost.builder().content("test").build(), matching);
-				SimplePost simplePostEX = createSimplePostEX(user, FullPost.builder().content("test").build(),
-					matching);
+				SimplePost simplePost = createSimplePost(user, FullPost.builder().content("test").build(), matching,
+					TEST_SIMPLE_POST_ID);
+				SimplePost simplePostEX = createSimplePost(user, FullPost.builder().content("test").build(),
+					matching, TEST_SIMPLE_POST_ID_EX);
 				Apply applyEX = Apply.builder().applyUser(user).applySimplePost(simplePostEX).build();
 				given(simplePostService.findById(TEST_SIMPLE_POST_ID)).willReturn(simplePost);
-				given(applyService.getApply(TEST_APPLY_ID)).willReturn(applyEX);
+				given(applyService.findById(TEST_APPLY_ID)).willReturn(applyEX);
 				//when
 				//then
-				assertThatThrownBy(() -> applyLeaderService.acceptApply(user, TEST_APPLY_ID, TEST_SIMPLE_POST_ID))
+				assertThatThrownBy(
+					() -> applyLeaderService.acceptApply(TEST_USER_ID, TEST_APPLY_ID, TEST_SIMPLE_POST_ID))
 					.isInstanceOf(InvalidAccessException.class);
-				assertThatThrownBy(() -> applyLeaderService.denyApply(user, TEST_APPLY_ID, TEST_SIMPLE_POST_ID))
+				assertThatThrownBy(() -> applyLeaderService.denyApply(TEST_USER_ID, TEST_APPLY_ID, TEST_SIMPLE_POST_ID))
 					.isInstanceOf(InvalidAccessException.class);
 			}
 		}

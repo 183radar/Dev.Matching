@@ -35,7 +35,7 @@ public class AuthUserArgumentResolver implements HandlerMethodArgumentResolver {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		String username = (String)authentication.getPrincipal();
 		log.info("access Username:{}", username);
-		Long userId = userService.getUserEntityByUsername(username).getId();
+		Long userId = userService.findByUsername(username).getId();
 
 		JwtTokenInfo tokenInfo = JwtTokenInfo.builder()
 			.userId(userId)

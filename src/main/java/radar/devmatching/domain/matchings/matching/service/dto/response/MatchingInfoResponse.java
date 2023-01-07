@@ -1,16 +1,14 @@
 package radar.devmatching.domain.matchings.matching.service.dto.response;
 
 import java.util.List;
-import java.util.Objects;
 
 import lombok.Builder;
 import radar.devmatching.domain.matchings.matching.entity.Matching;
 import radar.devmatching.domain.matchings.matchinguser.entity.MatchingUser;
 import radar.devmatching.domain.matchings.matchinguser.entity.MatchingUserRole;
 import radar.devmatching.domain.post.simple.entity.PostState;
-import radar.devmatching.domain.user.entity.User;
 
-public class MatchingResponse {
+public class MatchingInfoResponse {
 
 	private final String matchingTitle;
 	private final MatchingUserRole matchingUserRole;
@@ -20,7 +18,8 @@ public class MatchingResponse {
 	private final List<MatchingUser> matchingUserList;
 
 	@Builder
-	public MatchingResponse(String matchingTitle, MatchingUserRole matchingUserRole, int userCount, PostState postState,
+	public MatchingInfoResponse(String matchingTitle, MatchingUserRole matchingUserRole, int userCount,
+		PostState postState,
 		String matchingInfo, List<MatchingUser> matchingUserList) {
 		this.matchingTitle = matchingTitle;
 		this.matchingUserRole = matchingUserRole;
@@ -31,17 +30,12 @@ public class MatchingResponse {
 	}
 
 	// TODO : 리팩터링
-	public static MatchingResponse of(Matching matching, User user) {
+	public static MatchingInfoResponse of(MatchingUser matchingUser) {
+		Matching matching = matchingUser.getMatching();
 
-		MatchingUserRole matchingUserRole = matching.getMatchingUsers().stream()
-			.filter(matchingUser -> Objects.equals(user.getId(), matchingUser.getUser().getId()))
-			.map(matchingUser -> matchingUser.getMatchingUserRole())
-			.findFirst()
-			.get();
-
-		return MatchingResponse.builder()
+		return MatchingInfoResponse.builder()
 			.matchingTitle(matching.getMatchingTitle())
-			.matchingUserRole(matchingUserRole)
+			.matchingUserRole(matchingUser.getMatchingUserRole())
 			.userCount(matching.getMatchingUsers().size())
 			.postState(matching.getSimplePost().getPostState())
 			.matchingInfo(matching.getMatchingInfo())

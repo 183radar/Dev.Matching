@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import radar.devmatching.common.exception.EntityNotFoundException;
 import radar.devmatching.common.exception.error.ErrorMessage;
 import radar.devmatching.domain.matchings.matching.entity.Matching;
 import radar.devmatching.domain.matchings.matchinguser.entity.MatchingUser;
@@ -37,6 +38,7 @@ public class MatchingUserServiceImpl implements MatchingUserService {
 		return matchingUser;
 	}
 
+	@Override
 	public List<MatchingUserResponse> getMatchingUserList(Long userId) {
 		return matchingUserRepository.findMatchingUserList(userId).stream()
 			.map(MatchingUserResponse::of)
@@ -47,6 +49,11 @@ public class MatchingUserServiceImpl implements MatchingUserService {
 	@Transactional
 	public void deleteMatchingUser(Long matchingId, Long userId) {
 		matchingUserRepository.deleteByMatchingIdAndUserId(matchingId, userId);
+	}
+
+	public MatchingUser findByMatchingIdAndUserId(Long matchingId, Long userId) {
+		return matchingUserRepository.findByMatchingIdAndUserId(matchingId, userId)
+			.orElseThrow(() -> new EntityNotFoundException(ErrorMessage.MATCHING_USER_NOT_FOUND));
 	}
 
 }

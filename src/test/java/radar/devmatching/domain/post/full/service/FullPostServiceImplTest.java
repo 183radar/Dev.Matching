@@ -116,7 +116,7 @@ class FullPostServiceImplTest {
 				.build();
 			int applyCount = 2;
 			List<MainCommentResponse> mainCommentResponses = List.of(MainCommentResponse.of(mainComment));
-			given(userService.getUserEntity(anyLong())).willReturn(loginUser);
+			given(userService.findById(anyLong())).willReturn(loginUser);
 			given(simplePostService.findPostById(anyLong())).willReturn(simplePost);
 			given(applyService.getAcceptedApplyCount(anyLong())).willReturn(applyCount);
 			given(commentService.getAllComments(anyLong())).willReturn(mainCommentResponses);

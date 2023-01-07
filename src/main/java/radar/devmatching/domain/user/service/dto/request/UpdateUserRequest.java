@@ -11,14 +11,11 @@ public class UpdateUserRequest {
 	private final String githubUrl;
 	private final String introduce;
 
-	private final boolean nickNameCheck;
-
 	@Builder
 	public UpdateUserRequest(String schoolName, String githubUrl, String introduce) {
 		this.schoolName = schoolName;
 		this.githubUrl = githubUrl;
 		this.introduce = introduce;
-		this.nickNameCheck = false;
 	}
 
 	public String getSchoolName() {

@@ -9,12 +9,17 @@ public enum ErrorMessage {
 	//User
 	DUPLICATE_USERNAME("duplicate username", HttpStatus.CONFLICT),
 	DUPLICATE_NICKNAME("duplicate nickName", HttpStatus.CONFLICT),
+	NOT_EXIST_DUPLICATE_PERMISSION("not exist duplicate permission", HttpStatus.BAD_REQUEST),
 	USER_NOT_FOUND("not exist user", HttpStatus.BAD_REQUEST),
 	EMPTY_USERNAME("empty username", HttpStatus.BAD_REQUEST),
 	EMPTY_NICKNAME("empty nickName", HttpStatus.BAD_REQUEST),
 
+	//Matching
+	MATCHING_NOT_FOUND("not exist matching", HttpStatus.NOT_FOUND),
+
 	//MatchingUser
 	ALREADY_JOIN("already join user", HttpStatus.BAD_REQUEST),
+	MATCHING_USER_NOT_FOUND("not exist matchingUser", HttpStatus.NOT_FOUND),
 
 	//Apply
 	APPLY_NOT_FOUND("not exist apply", HttpStatus.NOT_FOUND),

@@ -6,5 +6,5 @@ import radar.devmatching.domain.user.service.dto.response.SignOutResponse;
 public interface AuthService {
 	SignInResponse signIn(String username, String password);
 
-	SignOutResponse singOut();
+	SignOutResponse signOut();
 }

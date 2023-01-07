@@ -94,4 +94,25 @@ class ApplyRepositoryTest {
 		assertThat(findApply).usingRecursiveComparison().isEqualTo(apply);
 	}
 
+	@Test
+	@DisplayName("findApplidsByUserId는 userId에 해당하는 Apply리스트를 반환한다.")
+	void findAppliesByUserId() {
+		//given
+		User user = createUser();
+		userRepository.save(user);
+		Matching matching = Matching.builder().build();
+		SimplePost simplePost = createSimplePost(user, FullPost.builder().content("test").build(), matching);
+		simplePostRepository.save(simplePost);
+		Apply apply = Apply.builder()
+			.applyUser(user)
+			.applySimplePost(simplePost)
+			.build();
+		applyRepository.save(apply);
+		//when
+		List<Apply> list = applyRepository.findAppliesByUserId(user.getId());
+		//then
+		assertThat(list.size()).isEqualTo(1);
+		assertThat(list.get(0)).usingRecursiveComparison().isEqualTo(apply);
+	}
+
 }

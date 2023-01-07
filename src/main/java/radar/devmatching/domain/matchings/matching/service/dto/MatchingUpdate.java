@@ -1,6 +1,7 @@
 package radar.devmatching.domain.matchings.matching.service.dto;
 
 import lombok.Builder;
+import radar.devmatching.common.util.ExcludeJacocoGenerated;
 import radar.devmatching.domain.matchings.matching.entity.Matching;
 
 public class MatchingUpdate {
@@ -29,6 +30,7 @@ public class MatchingUpdate {
 	}
 
 	@Override
+	@ExcludeJacocoGenerated
 	public String toString() {
 		return "MatchingUpdate{" +
 			"matchingId=" + matchingId +

@@ -29,7 +29,7 @@ public abstract class ControllerTestSetUp {
 	protected MockMvc mockMvc;
 
 	@MockBean
-	UserService userService;
+	protected UserService userService;
 
 	protected static User createUser(long userId) {
 		User user = User.builder()
@@ -62,7 +62,7 @@ public abstract class ControllerTestSetUp {
 	void setUp(WebApplicationContext context) {
 		User customUser = User.builder().build();
 		ReflectionTestUtils.setField(customUser, "id", 1L);
-		BDDMockito.given(userService.getUserEntityByUsername(eq("CustomUserName")))
+		BDDMockito.given(userService.findByUsername(eq("CustomUserName")))
 			.willReturn(customUser);
 
 		this.mockMvc = MockMvcBuilders.webAppContextSetup(context)

@@ -14,9 +14,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import radar.devmatching.common.security.JwtCookieProvider;
-import radar.devmatching.common.security.jwt.JwtToken;
+import radar.devmatching.common.security.jwt.JwtTokenCookieInfo;
+import radar.devmatching.common.security.jwt.JwtTokenInfo;
 import radar.devmatching.common.security.resolver.AuthUser;
-import radar.devmatching.domain.user.entity.User;
 import radar.devmatching.domain.user.service.AuthService;
 import radar.devmatching.domain.user.service.dto.request.SignInRequest;
 import radar.devmatching.domain.user.service.dto.response.SignInResponse;
@@ -39,7 +39,6 @@ public class AuthController {
 		return "user/signIn";
 	}
 
-	// TODO : SecurityContextHolder 에 Authentication 저장하기 추가.
 	@PostMapping("/signIn")
 	public String signIn(@Valid @ModelAttribute SignInRequest signInRequest,
 		BindingResult bindingResult) {
@@ -48,8 +47,8 @@ public class AuthController {
 		}
 		SignInResponse signInResponse = authService.signIn(signInRequest.getUsername(), signInRequest.getPassword());
 
-		JwtToken accessToken = signInResponse.getAccessToken();
-		JwtToken refreshToken = signInResponse.getRefreshToken();
+		JwtTokenCookieInfo accessToken = signInResponse.getAccessToken();
+		JwtTokenCookieInfo refreshToken = signInResponse.getRefreshToken();
 
 		ResponseCookie accessTokenCookie = JwtCookieProvider.createCookie(accessToken.getHeader(),
 			accessToken.getToken(),
@@ -64,9 +63,9 @@ public class AuthController {
 	}
 
 	@GetMapping("/signOut")
-	public String signOut(@AuthUser User user) {
-		SignOutResponse signOutResponse = authService.singOut();
-		log.info("access User={}", user);
+	public String signOut(@AuthUser JwtTokenInfo tokenInfo) {
+		SignOutResponse signOutResponse = authService.signOut();
+		log.info("access User={}", tokenInfo);
 		log.info("logout process execute");
 		JwtCookieProvider.deleteCookieFromRequest(signOutResponse.getAccessTokenHeader(),
 			signOutResponse.getRefreshTokenHeader());

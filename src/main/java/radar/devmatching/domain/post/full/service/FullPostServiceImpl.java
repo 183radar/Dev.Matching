@@ -43,7 +43,7 @@ public class FullPostServiceImpl implements FullPostService {
 	@Override
 	@Transactional
 	public PresentPostResponse getPostWithComment(long simplePostId, long loginUserId) {
-		User user = userService.getUserEntity(loginUserId);
+		User user = userService.findById(loginUserId);
 		SimplePost findPost = simplePostService.findPostById(simplePostId);
 
 		// 나중에 새로고침 누르면 clickCount는 안 올라가도록 설정해도 좋을듯?
