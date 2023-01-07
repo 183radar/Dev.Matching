@@ -1,14 +1,16 @@
 package radar.devmatching.domain.matchings.matching.service;
 
+import radar.devmatching.domain.matchings.matching.entity.Matching;
+import radar.devmatching.domain.matchings.matching.service.dto.MatchingInfo;
 import radar.devmatching.domain.matchings.matching.service.dto.MatchingUpdate;
-import radar.devmatching.domain.matchings.matching.service.dto.response.MatchingResponse;
-import radar.devmatching.domain.user.entity.User;
 
 public interface MatchingService {
 
-	MatchingResponse getMatchingInfo(Long matchingId, User user);
+	MatchingInfo getMatchingInfo(Long matchingId, Long userId);
 
 	MatchingUpdate getMatchingUpdateData(Long matchingId);
 
 	void updateMatching(Long matchingId, MatchingUpdate matchingUpdate);
+
+	Matching findById(Long matchingId);
 }
