@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import radar.devmatching.domain.post.simple.entity.PostCategory;
 import radar.devmatching.domain.post.simple.entity.PostState;
@@ -17,7 +18,7 @@ public interface SimplePostRepository extends JpaRepository<SimplePost, Long>, S
 	List<SimplePost> findMyPostsByLeaderIdOrderByCreateDateDesc(Long userId);
 
 	@Query("select a.applySimplePost from Apply a where a.applyUser.id = :userId order by a.applySimplePost.createDate desc ")
-	List<SimplePost> findApplicationPosts(Long userId);
+	List<SimplePost> findApplicationPosts(@Param("userId") Long userId);
 
 	@EntityGraph(attributePaths = {"fullPost"})
 	Optional<SimplePost> findPostById(Long simplePostId);
