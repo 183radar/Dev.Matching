@@ -14,7 +14,7 @@ import radar.devmatching.domain.user.entity.User;
 public class CreateUserRequest {
 
 	@NotBlank
-	@Length(min = 10, max = 30)
+	@Length(min = 2, max = 30)
 	String username;
 
 	@NotBlank
