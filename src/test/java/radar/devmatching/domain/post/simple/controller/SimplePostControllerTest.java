@@ -44,8 +44,7 @@ class SimplePostControllerTest extends ControllerTestSetUp {
 		result.andExpect(status().isOk())
 			.andExpect(handler().handlerType(SimplePostController.class))
 			.andExpect(handler().methodName("getCreatePost"))
-			.andExpect(model().attributeExists("createPostRequest"))
-			.andDo(print());
+			.andExpect(model().attributeExists("createPostRequest"));
 	}
 
 	@Nested
@@ -111,8 +110,7 @@ class SimplePostControllerTest extends ControllerTestSetUp {
 					.andExpect(handler().handlerType(SimplePostController.class))
 					.andExpect(handler().methodName("createPost"))
 					.andExpect(model().attributeErrorCount("createPostRequest", 5))
-					.andExpect(view().name("post/createPost"))
-					.andDo(print());
+					.andExpect(view().name("post/createPost"));
 			}
 
 			@Test

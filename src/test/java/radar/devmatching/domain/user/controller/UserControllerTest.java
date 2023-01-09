@@ -289,7 +289,7 @@ public class UserControllerTest extends ControllerTestSetUp {
 		void signUpRequest() throws Exception {
 			//given
 			CreateUserRequest createUserRequest = getCreateUserRequest();
-			given(userService.createUser(createUserRequest)).willReturn(UserResponse.of(createUser(USER_ID)));
+			given(userService.createUser(eq(createUserRequest))).willReturn(UserResponse.of(createUser(USER_ID)));
 
 			MockHttpSession session = new MockHttpSession();
 			session.setAttribute(CREATE_USER_REQUEST_DTO, createUserRequest);

@@ -10,7 +10,7 @@
                 게시글 수정
             </div>
             <div class="card-body" th:object="${updatePostDto}">
-                <form method="post" th:action="'/api/posts/'+*{simplePostId}+'/edit'">
+                <form method="post" th:action="'/api/posts/'+${#request.getAttribute('simplePostId')}+'/edit'">
                     <div class="form-floating">
                         <input class="form-control" placeholder="제목" th:errorclass="is-invalid" th:field="*{title}"
                                type="text"/>
