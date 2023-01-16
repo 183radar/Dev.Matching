@@ -10,7 +10,9 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
+import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
+import radar.devmatching.common.security.JwtProperties;
 import radar.devmatching.common.security.jwt.JwtTokenInfo;
 import radar.devmatching.domain.user.service.UserService;
 
@@ -33,9 +35,9 @@ public class AuthUserArgumentResolver implements HandlerMethodArgumentResolver {
 		NativeWebRequest webRequest, WebDataBinderFactory binderFactory) {
 
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		String username = (String)authentication.getPrincipal();
-		log.info("access Username:{}", username);
-		Long userId = userService.findByUsername(username).getId();
+		Claims claims = (Claims)authentication.getPrincipal();
+		Long userId = Long.parseLong((String)claims.get(JwtProperties.USER_ID));
+		String username = (String)claims.get(JwtProperties.USERNAME);
 
 		JwtTokenInfo tokenInfo = JwtTokenInfo.builder()
 			.userId(userId)
