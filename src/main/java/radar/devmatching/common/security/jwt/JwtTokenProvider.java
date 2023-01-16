@@ -4,13 +4,14 @@ import java.security.Key;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -33,33 +34,40 @@ import radar.devmatching.domain.user.entity.UserRole;
 @Component
 public class JwtTokenProvider {
 
+	private final String CLAIM_USER_ID = JwtProperties.USER_ID;
+	private final String CLAIM_USERNAME = JwtProperties.USERNAME;
+	private final String CLAIM_USER_ROLE = JwtProperties.ROLE;
+
 	private final long ACCESS_TOKEN_EXPIRE_TIME;
 	private final long REFRESH_TOKEN_EXPIRE_TIME;
 
 	private final Key key;
 
-	private final UserDetailsService userDetailsService;
-
 	public JwtTokenProvider(@Value("${jwt.access-token-expire-time}") long accessTime,
 		@Value("${jwt.refresh-token-expire-time}") long refreshTime,
-		@Value("${jwt.secret}") String secretKey,
-		UserDetailsService userDetailsService) {
+		@Value("${jwt.secret}") String secretKey) {
 		this.ACCESS_TOKEN_EXPIRE_TIME = accessTime;
 		this.REFRESH_TOKEN_EXPIRE_TIME = refreshTime;
 		byte[] keyBytes = Decoders.BASE64.decode(secretKey);
 		this.key = Keys.hmacShaKeyFor(keyBytes);
-		this.userDetailsService = userDetailsService;
 	}
 
-	protected String createToken(String username, UserRole userRole, long tokenValid) {
-		Claims claims = Jwts.claims().setSubject(username);
+	protected String createToken(Long userId, String username, UserRole userRole, long tokenValid) {
 
-		claims.put(JwtProperties.ROLE, userRole);
+		Map<String, Object> header = new HashMap<>();
+		header.put("typ", "JWT");
+
+		Claims claims = Jwts.claims();
+
+		claims.put(CLAIM_USER_ID, userId.toString());
+		claims.put(CLAIM_USERNAME, username);
+		claims.put(CLAIM_USER_ROLE, userRole);
 
 		Date date = new Date();
 
 		// TODO : accessToken, refreshToken 발행시간 차이 개선하기.
 		return Jwts.builder()
+			.setHeader(header)
 			.setClaims(claims) // 토큰 발행 유저 정보
 			.setIssuedAt(date) // 토큰 발행 시간
 			.setExpiration(new Date(date.getTime() + tokenValid)) // 토큰 만료 시간
@@ -67,19 +75,20 @@ public class JwtTokenProvider {
 			.compact();// 알고리즘과 키 설정
 	}
 
-	public String createAccessToken(String username, UserRole userRole) {
-		return createToken(username, userRole, ACCESS_TOKEN_EXPIRE_TIME);
+	public String createAccessToken(Long userId, String username, UserRole userRole) {
+		return createToken(userId, username, userRole, ACCESS_TOKEN_EXPIRE_TIME);
 	}
 
-	public String createRefreshToken(String username, UserRole userRole) {
-		return createToken(username, userRole, REFRESH_TOKEN_EXPIRE_TIME);
+	public String createRefreshToken(Long userId, String username, UserRole userRole) {
+		return createToken(userId, username, userRole, REFRESH_TOKEN_EXPIRE_TIME);
 	}
 
 	public String createNewAccessTokenFromRefreshToken(String refreshToken) {
 		Claims claims = parseClaims(refreshToken);
-		String username = claims.getSubject();
-		UserRole role = UserRole.valueOf((String)claims.get(JwtProperties.ROLE));
-		return createAccessToken(username, role);
+		Long userId = (Long)claims.get(CLAIM_USER_ID);
+		String username = (String)claims.get(CLAIM_USERNAME);
+		UserRole role = UserRole.valueOf((String)claims.get(CLAIM_USER_ROLE));
+		return createAccessToken(userId, username, role);
 	}
 
 	/**
@@ -92,21 +101,21 @@ public class JwtTokenProvider {
 
 	public Authentication getAuthentication(String accessToken) {
 		Claims claims = parseClaims(accessToken);
-		log.info("user role={}", claims.get(JwtProperties.ROLE).toString());
-		if (claims.get(JwtProperties.ROLE) == null || !StringUtils.hasText(claims.get(JwtProperties.ROLE).toString())) {
+		log.info("user role={}", claims.get(CLAIM_USER_ROLE).toString());
+		if (claims.get(CLAIM_USER_ROLE) == null || !StringUtils.hasText(claims.get(CLAIM_USER_ROLE).toString())) {
 			throw new BusinessException(ErrorMessage.AUTHORITY_NOT_FOUND); //유저권한없음
 		}
 
-		log.info("access claims : username={}, authority={}", claims.getSubject(), claims.get(JwtProperties.ROLE));
+		log.info("access claims : username={}, authority={}", claims.getSubject(), claims.get(CLAIM_USER_ROLE));
 
 		Collection<? extends GrantedAuthority> authorities =
-			Arrays.stream(claims.get(JwtProperties.ROLE).toString().split(","))
+			Arrays.stream(claims.get(CLAIM_USER_ROLE).toString().split(","))
 				.map(SimpleGrantedAuthority::new)
 				.collect(Collectors.toList());
 
 		// TODO : principal 을 생성할지 고민
 
-		return new JwtAuthenticationToken(claims.getSubject(), "", authorities);
+		return new JwtAuthenticationToken(claims, "", authorities);
 	}
 
 	public void validAccessToken(String token) {

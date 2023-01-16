@@ -1,7 +1,5 @@
 package radar.devmatching.common.security.jwt;
 
-import static org.springframework.http.HttpHeaders.*;
-
 import java.io.IOException;
 import java.util.Objects;
 
@@ -35,7 +33,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
 		FilterChain filterChain) throws ServletException, IOException {
 		try {
-			authentication(request, response);
+			authentication();
 			filterChain.doFilter(request, response);
 		} catch (TokenException e) {
 			SecurityContextHolder.clearContext();
@@ -43,13 +41,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		}
 	}
 
-	private void authentication(HttpServletRequest request, HttpServletResponse response) {
+	private void authentication() {
 		String accessToken = null;
 		try {
 			// accessToken 유효성 검사
-			accessToken = accessAuthentication(request);
+			accessToken = accessAuthentication();
 		} catch (ExpiredAccessTokenException e) {
-			accessToken = refreshAuthentication(request, response);
+			accessToken = refreshAuthentication();
 		}
 
 		if (Objects.nonNull(accessToken)) {
@@ -58,7 +56,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		}
 	}
 
-	private String accessAuthentication(HttpServletRequest request) {
+	private String accessAuthentication() {
 		String accessToken = JwtCookieProvider.getCookieFromRequest(JwtProperties.ACCESS_TOKEN_HEADER);
 		log.info("access Token = {}", accessToken);
 		if (Objects.isNull(accessToken)) {
@@ -73,7 +71,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	 * accessToken, refreshToken 재생성 or signOut 요청후 토큰 만료후 재로그인 하기.
 	 * TODO : 코드 중복 부분 리펙터링하기
 	 */
-	private String refreshAuthentication(HttpServletRequest request, HttpServletResponse response) {
+	private String refreshAuthentication() {
 
 		String accessToken = null;
 		String refreshToken = JwtCookieProvider.getCookieFromRequest(JwtProperties.REFRESH_TOKEN_HEADER);
@@ -90,7 +88,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			JwtCookieProvider.createCookie(JwtProperties.ACCESS_TOKEN_HEADER, accessToken,
 				jwtTokenProvider.getExpireTime());
 
-		response.addHeader(SET_COOKIE, accessTokenCookie.toString());
+		JwtCookieProvider.setCookie(accessTokenCookie);
 
 		return accessToken;
 	}

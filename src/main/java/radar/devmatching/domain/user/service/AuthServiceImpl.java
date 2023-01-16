@@ -41,8 +41,8 @@ public class AuthServiceImpl implements AuthService {
 			throw new UsernamePasswordNotMatchException(ErrorMessage.AUTHENTICATION_FAIL);
 		}
 		log.info("findUser role = {}", findUser.getUserRole());
-		String accessToken = jwtTokenProvider.createAccessToken(username, findUser.getUserRole());
-		String refreshToken = jwtTokenProvider.createRefreshToken(username, findUser.getUserRole());
+		String accessToken = jwtTokenProvider.createAccessToken(findUser.getId(), username, findUser.getUserRole());
+		String refreshToken = jwtTokenProvider.createRefreshToken(findUser.getId(), username, findUser.getUserRole());
 
 		return SignInResponse.builder()
 			.accessToken(JwtTokenCookieInfo.builder()
