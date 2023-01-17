@@ -1,18 +1,20 @@
 package radar.devmatching.util;
 
-import static org.mockito.ArgumentMatchers.*;
-
 import org.junit.jupiter.api.BeforeEach;
-import org.mockito.BDDMockito;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.impl.DefaultClaims;
+import radar.devmatching.common.security.JwtProperties;
+import radar.devmatching.common.security.jwt.JwtAuthenticationToken;
 import radar.devmatching.domain.matchings.matching.entity.Matching;
 import radar.devmatching.domain.post.full.entity.FullPost;
 import radar.devmatching.domain.post.simple.entity.PostCategory;
@@ -60,10 +62,11 @@ public abstract class ControllerTestSetUp {
 
 	@BeforeEach
 	void setUp(WebApplicationContext context) {
-		User customUser = User.builder().build();
-		ReflectionTestUtils.setField(customUser, "id", 1L);
-		BDDMockito.given(userService.findByUsername(eq("CustomUserName")))
-			.willReturn(customUser);
+		Claims claims = new DefaultClaims();
+		claims.put(JwtProperties.USER_ID, "1");
+		claims.put(JwtProperties.USERNAME, "CustomUsername");
+		JwtAuthenticationToken authentication = new JwtAuthenticationToken(claims, "", null);
+		SecurityContextHolder.getContext().setAuthentication(authentication);
 
 		this.mockMvc = MockMvcBuilders.webAppContextSetup(context)
 			.apply(SecurityMockMvcConfigurers.springSecurity())

@@ -85,7 +85,8 @@ public class JwtTokenProvider {
 
 	public String createNewAccessTokenFromRefreshToken(String refreshToken) {
 		Claims claims = parseClaims(refreshToken);
-		Long userId = (Long)claims.get(CLAIM_USER_ID);
+
+		Long userId = Long.parseLong((String)claims.get(CLAIM_USER_ID));
 		String username = (String)claims.get(CLAIM_USERNAME);
 		UserRole role = UserRole.valueOf((String)claims.get(CLAIM_USER_ROLE));
 		return createAccessToken(userId, username, role);

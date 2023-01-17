@@ -1,6 +1,5 @@
 package radar.devmatching.common.security.resolver;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.MethodParameter;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -14,15 +13,10 @@ import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
 import radar.devmatching.common.security.JwtProperties;
 import radar.devmatching.common.security.jwt.JwtTokenInfo;
-import radar.devmatching.domain.user.service.UserService;
 
 @Slf4j
 @Component
 public class AuthUserArgumentResolver implements HandlerMethodArgumentResolver {
-
-	// TODO : AutoWired 수정
-	@Autowired
-	private UserService userService;
 
 	@Override
 	public boolean supportsParameter(MethodParameter parameter) {
