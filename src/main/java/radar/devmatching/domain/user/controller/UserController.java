@@ -133,7 +133,7 @@ public class UserController {
 	@GetMapping("/delete")
 	public String deleteUser(@AuthUser JwtTokenInfo jwtTokenInfo) {
 		userService.deleteUser(jwtTokenInfo.getUserId());
-		return "redirect:/api/users/signIn";
+		return "redirect:/api/users/signOut";
 	}
 
 	// TODO : 비밀번호 변경, 닉네임 변경 페이지 만들기. 비밀번호 찾기,
