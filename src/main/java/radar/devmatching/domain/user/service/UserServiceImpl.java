@@ -91,16 +91,17 @@ public class UserServiceImpl implements UserService {
 	 */
 	@Override
 	public void checkDuplicateUsername(CreateUserRequest request) {
+		request.usernameDuplicateCheckClear();
 
 		String username = request.getUsername();
 		if (!StringUtils.hasText(username)) {
 			throw new EmptySpaceException(ErrorMessage.EMPTY_USERNAME);
 		}
 
-		request.usernameDuplicateCheckClear();
 		userRepository.findByUsername(username).ifPresent(user -> {
 			throw new DuplicateException(ErrorMessage.DUPLICATE_USERNAME);
 		});
+
 		request.usernameNonDuplicate();
 		log.info("checkDuplicateUsername request info={}", request);
 	}
@@ -108,12 +109,13 @@ public class UserServiceImpl implements UserService {
 	// TODO : nickName 길이 제한 추가하기
 	@Override
 	public void checkDuplicateNickName(CreateUserRequest request) {
+		request.nickNameDuplicateCheckClear();
+
 		String nickName = request.getNickName();
 		if (!StringUtils.hasText(nickName)) {
 			throw new EmptySpaceException(ErrorMessage.EMPTY_NICKNAME);
 		}
 
-		request.nickNameDuplicateCheckClear();
 		userRepository.findByNickName(nickName).ifPresent(user -> {
 			throw new DuplicateException(ErrorMessage.DUPLICATE_NICKNAME);
 		});
