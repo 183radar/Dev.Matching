@@ -2,9 +2,12 @@ package radar.devmatching.common.security.jwt;
 
 import java.io.IOException;
 
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 import lombok.extern.slf4j.Slf4j;
 import radar.devmatching.common.security.JwtCookieProvider;
@@ -16,15 +19,20 @@ import radar.devmatching.common.security.jwt.exception.TokenException;
  * 토큰 인증과정에서 오류가 발생했을 때 처리하지 않은 예외 : TokenException, ExpiredRefreshTokenException, JwtTokenNotFoundException
  */
 @Slf4j
-@Component
-public class JwtAuthenticationEntryPoint {
+public class JwtAuthenticationEntryPoint extends OncePerRequestFilter {
 
-	public void commence(HttpServletResponse response, TokenException tokenException) throws IOException {
-		log.warn("exception info={}", tokenException.getErrorMessage(), tokenException);
+	@Override
+	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
+		FilterChain filterChain) throws ServletException, IOException {
+		try {
+			filterChain.doFilter(request, response);
+		} catch (TokenException e) {
+			log.warn("exception info={}", e.getErrorMessage(), e);
+			JwtCookieProvider.deleteCookieFromRequest(JwtProperties.ACCESS_TOKEN_HEADER,
+				JwtProperties.REFRESH_TOKEN_HEADER);
 
-		JwtCookieProvider.deleteCookieFromRequest(JwtProperties.ACCESS_TOKEN_HEADER,
-			JwtProperties.REFRESH_TOKEN_HEADER);
-
-		response.sendRedirect("/api/users/signIn");
+			response.sendRedirect("/api/users/signIn");
+		}
 	}
+
 }

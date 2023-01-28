@@ -9,5 +9,4 @@ public class JwtProperties {
 	public static final String USERNAME = "username";
 	public static final String ROLE = "AuthenticationRole";
 
-	private static final String BEARER_TYPE = "Bearer";
 }

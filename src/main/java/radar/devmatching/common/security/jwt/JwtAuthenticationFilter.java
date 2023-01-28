@@ -20,25 +20,18 @@ import radar.devmatching.common.security.JwtCookieProvider;
 import radar.devmatching.common.security.JwtProperties;
 import radar.devmatching.common.security.jwt.exception.ExpiredAccessTokenException;
 import radar.devmatching.common.security.jwt.exception.JwtTokenNotFoundException;
-import radar.devmatching.common.security.jwt.exception.TokenException;
 
 @Slf4j
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 	private final JwtTokenProvider jwtTokenProvider;
-	private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
 		FilterChain filterChain) throws ServletException, IOException {
-		try {
-			authentication();
-			filterChain.doFilter(request, response);
-		} catch (TokenException e) {
-			SecurityContextHolder.clearContext();
-			jwtAuthenticationEntryPoint.commence(response, e);
-		}
+		authentication();
+		filterChain.doFilter(request, response);
 	}
 
 	private void authentication() {

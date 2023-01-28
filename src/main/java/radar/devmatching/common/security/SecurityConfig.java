@@ -18,7 +18,6 @@ import radar.devmatching.common.security.jwt.JwtTokenProvider;
 public class SecurityConfig {
 
 	private final JwtTokenProvider jwtTokenProvider;
-	private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
 	@Bean
 	public WebSecurityCustomizer webSecurityCustomizer() {
@@ -50,8 +49,9 @@ public class SecurityConfig {
 				request -> request.anyRequest().authenticated()
 			)
 
-			.addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider, jwtAuthenticationEntryPoint),
-				UsernamePasswordAuthenticationFilter.class);
+			.addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider),
+				UsernamePasswordAuthenticationFilter.class)
+			.addFilterBefore(new JwtAuthenticationEntryPoint(), JwtAuthenticationFilter.class);
 
 		return http.build();
 	}
