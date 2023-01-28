@@ -32,7 +32,7 @@ import radar.devmatching.domain.user.service.dto.response.UserResponse;
 @SessionAttributes("createUserRequest")
 public class UserController {
 
-	private static final String CREAT_USER_REQUEST = "createUserRequest";
+	private static final String CREATE_USER_REQUEST = "createUserRequest";
 	private static final String USER_INFO = "userInfo";
 	private static final String SIMPLE_USER_INFO = "simpleUserInfo";
 
@@ -40,21 +40,20 @@ public class UserController {
 
 	@GetMapping(value = "/signUp")
 	public String signUp(Model model) {
-		model.addAttribute(CREAT_USER_REQUEST, CreateUserRequest.of());
+		model.addAttribute(CREATE_USER_REQUEST, CreateUserRequest.of());
 		return "redirect:/api/users/signUp/page";
 	}
 
 	@GetMapping(value = "/signUp/page")
-	public String signUpPage(@ModelAttribute(CREAT_USER_REQUEST) CreateUserRequest request, Model model) {
-		model.addAttribute(CREAT_USER_REQUEST, request);
+	public String signUpPage(@ModelAttribute(CREATE_USER_REQUEST) CreateUserRequest request, Model model) {
+		// model.addAttribute(CREATE_USER_REQUEST, request);
 		return "user/signUp";
 	}
 
 	@PostMapping(value = "/signUp/page")
-	public String signUpRequest(@Valid @ModelAttribute(CREAT_USER_REQUEST) CreateUserRequest request,
-		BindingResult bindingResult, Model model, SessionStatus sessionStatus) {
+	public String signUpRequest(@Valid @ModelAttribute(CREATE_USER_REQUEST) CreateUserRequest request,
+		BindingResult bindingResult, SessionStatus sessionStatus) {
 		if (bindingResult.hasErrors()) {
-			model.addAttribute(CREAT_USER_REQUEST, request);
 			return "user/signUp";
 		}
 		userService.createUser(request);
@@ -70,11 +69,10 @@ public class UserController {
 	 * TODO : 메시지 통일하기
 	 */
 	@PostMapping("/duplicate/username")
-	public String checkDuplicateUsername(@ModelAttribute(CREAT_USER_REQUEST) CreateUserRequest request, Model model,
+	public String checkDuplicateUsername(@ModelAttribute(CREATE_USER_REQUEST) CreateUserRequest request,
 		RedirectAttributes redirectAttributes) {
 		userService.checkDuplicateUsername(request);
 		redirectAttributes.addFlashAttribute("msg", request.getUsername() + ": 사용가능한 아이디 입니다.");
-		model.addAttribute(CREAT_USER_REQUEST, request);
 		return "redirect:/api/users/signUp/page";
 	}
 
@@ -85,11 +83,10 @@ public class UserController {
 	 * TODO : 메시지 통일하기
 	 */
 	@PostMapping("/duplicate/nickName")
-	public String checkDuplicateNickName(@ModelAttribute(CREAT_USER_REQUEST) CreateUserRequest request, Model model,
+	public String checkDuplicateNickName(@ModelAttribute(CREATE_USER_REQUEST) CreateUserRequest request,
 		RedirectAttributes redirectAttributes) {
 		userService.checkDuplicateNickName(request);
 		redirectAttributes.addFlashAttribute("msg", request.getNickName() + ": 사용가능한 이름 입니다.");
-		model.addAttribute(CREAT_USER_REQUEST, request);
 		return "redirect:/api/users/signUp/page";
 	}
 
