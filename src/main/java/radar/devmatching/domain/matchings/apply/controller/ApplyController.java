@@ -34,7 +34,7 @@ public class ApplyController {
 	public String getApplyListInUser(@AuthUser JwtTokenInfo tokenInfo, Model model) {
 		List<ApplyResponse> applyList = applyService.getAllApplyList(tokenInfo.getUserId());
 		model.addAttribute("applyList", applyList);
-		return "/matching/apply/applyList";
+		return "matching/apply/applyList";
 	}
 
 }

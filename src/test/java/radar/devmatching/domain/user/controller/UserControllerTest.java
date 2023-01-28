@@ -45,7 +45,7 @@ public class UserControllerTest extends ControllerTestSetUp {
 			.username("username")
 			.password("password")
 			.nickName("nickName")
-			.schoolName("test")
+			.schoolName("schoolName")
 			.build();
 
 		request.usernameNonDuplicate();
@@ -97,10 +97,17 @@ public class UserControllerTest extends ControllerTestSetUp {
 		//given
 		CreateUserRequest createUserRequest = getCreateUserRequest();
 
+		MultiValueMap<String, String> param = new LinkedMultiValueMap<>();
+		param.add("username", "username1");
+		param.add("password", "test1");
+		param.add("nickName", "test");
+		param.add("schoolName", "test");
+
 		MockHttpSession session = new MockHttpSession();
 		session.setAttribute(CREATE_USER_REQUEST_DTO, createUserRequest);
 		MockHttpServletRequestBuilder request = post(BASIC_URL + "/duplicate/username")
 			.session(session)
+			.params(param)
 			.with(SecurityMockMvcRequestPostProcessors.csrf());
 		//when
 		ResultActions result = mockMvc.perform(request);
@@ -179,7 +186,7 @@ public class UserControllerTest extends ControllerTestSetUp {
 		result.andExpect(status().isFound())
 			.andExpect(handler().handlerType(UserController.class))
 			.andExpect(handler().methodName("deleteUser"))
-			.andExpect(redirectedUrl(BASIC_URL + "/signIn"))
+			.andExpect(redirectedUrl(BASIC_URL + "/signOut"))
 			.andDo(print());
 
 		verify(userService, times(1)).deleteUser(any());
