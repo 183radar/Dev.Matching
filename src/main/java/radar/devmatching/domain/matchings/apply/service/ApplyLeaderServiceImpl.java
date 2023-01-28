@@ -54,8 +54,9 @@ public class ApplyLeaderServiceImpl implements ApplyLeaderService {
 
 		if (Objects.equals(apply.getApplyState(), ApplyState.ACCEPTED)) {
 			Long matchingId = apply.getApplySimplePost().getMatching().getId();
+			Long applyUserId = apply.getApplyUser().getId();
 
-			matchingUserService.deleteMatchingUser(matchingId, userId);
+			matchingUserService.deleteMatchingUser(matchingId, applyUserId);
 		}
 
 		apply.denyApply();
