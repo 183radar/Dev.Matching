@@ -16,6 +16,8 @@ spring:
   jpa:
     hibernate:
       ddl-auto: create
+  #      naming:
+  #        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
   security:
     oauth2:
       resourceserver:
@@ -27,3 +29,6 @@ jwt:
   secret:
   access-token-expire-time:
   refresh-token-expire-time:
+
+server:
+  port: 443
